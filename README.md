@@ -22,7 +22,7 @@ Please make sure to update tests as appropriate.
 ## To do
 ```markdown
 -refactorization
--getting name from puuid
+-getting name from puuid more efficiently
 -not getting rank from latest match
 -code more readable
 -getting agents from valorant endpoint
