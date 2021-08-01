@@ -23,6 +23,7 @@ Alternatively if you have python 2 installed run `python3 main.py`
 
 ## Usage
  • When in a VALORANT game, run the .exe.
+ • Colour of the Agent + Name reflects the team colour.
 
 
 ## Contributing
