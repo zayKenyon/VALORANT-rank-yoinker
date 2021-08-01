@@ -46,3 +46,5 @@ Please make sure to update tests as appropriate.
 -add config file with region and color options
 
 -add leaderboard position
+
+-dont wait time but fetch until rate limit and then wait
