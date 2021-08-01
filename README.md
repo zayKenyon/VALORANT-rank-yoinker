@@ -51,3 +51,5 @@ Please make sure to update tests as appropriate.
 -add leaderboard position
 
 -dont wait time but fetch until rate limit and then wait
+
+-get region from logs
