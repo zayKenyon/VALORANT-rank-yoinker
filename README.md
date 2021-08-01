@@ -42,3 +42,5 @@ Please make sure to update tests as appropriate.
 ~~-getting agents from valorant endpoint~~
 
 -getting version from log file
+
+-add config file with region and color options
