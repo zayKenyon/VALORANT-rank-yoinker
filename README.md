@@ -31,11 +31,9 @@ Please make sure to update tests as appropriate.
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## TODO
-```
 -refactorization
 -getting multiple names from puuid
-</del>-not getting rank from latest match</del>
+~~-not getting rank from latest match~~
 ~~-code more readable~~
 ~~-getting agents from valorant endpoint~~
 -getting version from log file
-```
