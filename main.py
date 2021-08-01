@@ -234,6 +234,5 @@ for player in Players:
                     0
                     ]])
     time.sleep(0.5)
-    print("test")
 print(table)
 input("Press enter to exit...")
