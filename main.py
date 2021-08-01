@@ -33,7 +33,6 @@ NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 end_tag = "\033[0m"
 
-
 number_to_ranks = {
     0: LIGHT_GRAY + "Unrated" + end_tag,
     1: LIGHT_GRAY + "Unrated" + end_tag,
@@ -62,15 +61,26 @@ number_to_ranks = {
     24: BOLD + "Radiant" + end_tag
 }
 
-
-
 headers = {}
+
+def get_region():
+    path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
+    with open(path, "r", encoding="utf8") as file:
+        while True:
+            line = file.readline()
+            if '.a.pvp.net/account-xp/v1/' in line:
+                return line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
+
+region = get_region()
+glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
+pd_url = f"https://pd.{region}.a.pvp.net"
 
 def get_current_version():
     data = requests.get('https://valorant-api.com/v1/version')
     data = data.json()['data']
     version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
     return version
+
 
 def fetch(url_type, endpoint, method):
     global response
@@ -85,12 +95,13 @@ def fetch(url_type, endpoint, method):
             local_headers = {}
             local_headers['Authorization'] = 'Basic ' + base64.b64encode(
                 ('riot:' + lockfile['password']).encode()).decode()
-            response = requests.request(method, f"https://127.0.0.1:{lockfile['port']}{endpoint}", headers=local_headers,
-                                    verify=False)
+            response = requests.request(method, f"https://127.0.0.1:{lockfile['port']}{endpoint}",
+                                        headers=local_headers,
+                                        verify=False)
             return response.json()
         elif url_type == "custom":
             response = requests.request(method, f"{endpoint}", headers=get_headers(),
-                                    verify=False)
+                                        verify=False)
             return response.json()
     except json.decoder.JSONDecodeError:
         print(response)
@@ -108,8 +119,6 @@ def get_lockfile():
 
 
 lockfile = get_lockfile()
-
-
 
 
 def get_headers():
@@ -143,8 +152,6 @@ def get_puuid():
     return puuid
 
 
-
-
 def get_coregame_match_id():
     global response
     try:
@@ -161,13 +168,13 @@ def get_coregame_stats():
     return response
 
 
-
 def getRank(puuid, seasonID):
     response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
     try:
         rankTIER = response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
         if int(rankTIER) not in (0, 1, 2, 3):
-            rank = [rankTIER, response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]]
+            rank = [rankTIER,
+                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]]
         else:
             rank = [0, 0]
     except TypeError:
@@ -177,40 +184,30 @@ def getRank(puuid, seasonID):
     return rank
 
 
-
 def get_name_from_puuid(puuid):
     response = requests.put(pd_url + f"/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
     return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
-def get_latest_season_id(content=fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")):
+
+def get_content():
+    content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v2/content", "get")
+    return content
+
+
+def get_latest_season_id(content=get_content()):
     for season in content["Seasons"]:
         if season["IsActive"] == True:
             return season["ID"]
 
-def get_content():
-    content = fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")
-    return content
 
-def get_all_agents(content=fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")):
+def get_all_agents(content=get_content()):
     agent_dict = {}
     for agent in content["Characters"]:
         if "NPE" not in agent["AssetName"]:
             agent_dict.update({agent['ID'].lower(): agent['Name']})
     return agent_dict
 
-def get_region():
-    path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
-    with open(path, "r", encoding="utf8") as file:
-        while True:
-            line = file.readline()
-            if '.a.pvp.net/account-xp/v1/' in line:
-                return line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
 
-
-
-region = get_region()
-glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
-pd_url = f"https://pd.{region}.a.pvp.net"
 
 content = get_content()
 agent_dict = get_all_agents(content)
@@ -228,11 +225,11 @@ for player in Players:
     else:
         color = ''
     table.add_rows([[color + agent_dict[player["CharacterID"].lower()] + end_tag,
-                    color + get_name_from_puuid(player["Subject"]) + end_tag,
-                    number_to_ranks[rank[0]],
-                    rank[1],
-                    0
-                    ]])
+                     color + get_name_from_puuid(player["Subject"]) + end_tag,
+                     number_to_ranks[rank[0]],
+                     rank[1],
+                     0
+                     ]])
     time.sleep(0.5)
 print(table)
 input("Press enter to exit...")
