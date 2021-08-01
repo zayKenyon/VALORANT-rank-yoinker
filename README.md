@@ -1,21 +1,24 @@
 # VALORANT live match rank grabber
 
-VALORANT live match rank grabber lets you retrieve the ranks of everyone in the lobby, regardless of gamemode.
+VALORANT live match rank grabber lets you retrieve the ranks and basic informations of everyone in the lobby, regardless of gamemode.
+
+
+![image](https://user-images.githubusercontent.com/74879467/127770329-9f14086d-cbf9-458f-b656-21b50409882b.png)
 
 ## Installation
  • Download the latest release, and run it.
 
-### **If you would like to compile the code yourself:**
+### **If you would like to run the code yourself:**
 
-Copy `main.py` and `requirements.txt` to your downloads folder 
+Install Python
 
-Install Python 3.9 from the microsoft store
-
-Open cmd.exe run `cd downloads` 
+Open cmd.exe run `cd path/to/your/folder` 
 
 In cmd.exe run `pip install -r requirements.txt`
 
 Afterwards, run `python main.py`
+
+Alternatively if you have python 2 installed run `python3 main.py`
 
 
 ## Usage
@@ -35,11 +38,18 @@ Please make sure to update tests as appropriate.
 
 -getting name from puuid more efficiently 
 
--not getting rank from latest match
+~~-not getting rank from latest match~~
 
--code more readable
+~~-code more readable~~
 
--getting agents from valorant endpoint
+~~-getting agents from valorant endpoint~~
 
 -getting version from log file
 
+-add config file with region and color options
+
+-add leaderboard position
+
+-dont wait time but fetch until rate limit and then wait
+
+~~-get region from logs~~
