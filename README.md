@@ -5,17 +5,17 @@ VALORANT live match rank grabber lets you retrieve the ranks of everyone in the 
 ## Installation
  • Download the latest release, and run it.
 
-### **If you would like to compile the code yourself:**
+### **If you would like to run the code yourself:**
 
-Copy `main.py` and `requirements.txt` to your downloads folder 
+Install Python
 
-Install Python 3.9 from the microsoft store
-
-Open cmd.exe run `cd downloads` 
+Open cmd.exe run `cd path/to/your/folder` 
 
 In cmd.exe run `pip install -r requirements.txt`
 
 Afterwards, run `python main.py`
+
+Alternatively if you have python 2 installed run `python3 main.py`
 
 
 ## Usage
