@@ -34,8 +34,8 @@ Please make sure to update tests as appropriate.
 ```
 -refactorization
 -getting multiple names from puuid
-``-not getting rank from latest match``
-``-code more readable``
-``-getting agents from valorant endpoint``
+~~-not getting rank from latest match~~
+~~-code more readable~~
+~~-getting agents from valorant endpoint~~
 -getting version from log file
 ```
