@@ -1,10 +1,22 @@
 import requests
 import urllib3
+import psutil
 import os
 import base64
 import json
 import time
+from InquirerPy import prompt
+from InquirerPy.separator import Separator
 from prettytable import PrettyTable
+
+"""
+parent_pid = os.getppid()
+print(psutil.Process(parent_pid).name())
+
+cmd = True
+if cmd = True:
+"""
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -61,16 +73,35 @@ number_to_ranks = {
     23: LIGHT_RED + "Immortal 3" + end_tag,
     24: BOLD + "Radiant" + end_tag
 }
+questions = [
+    {
+        "type": "list",
+        "message": "Select an action (UP + DOWN + ENTER):",
+        "choices": ["Start", {"name": "Exit", "value": None}],
+        "default": None,
+    },
+    {
+        "type": "list",
+        "message": "Select a region:",
+        "choices": [
+            {"name": "EU", "value": "eu"},
+            {"name": "NA", "value": "na"},
+            Separator(),
+            {"name": "KO", "value": "ko"},
+            {"name": "AP", "value": "ap"}
+        ],
+        "multiselect": False,
+        "transformer": lambda result: result[0] + result[1]
+    },
+]
+result = prompt(questions=questions)
+region = result[1]
 
 
-
+glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
+pd_url = f"https://pd.{region}.a.pvp.net"
 headers = {}
 
-def get_current_version():
-    data = requests.get('https://valorant-api.com/v1/version')
-    data = data.json()['data']
-    version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
-    return version
 
 def fetch(url_type, endpoint, method):
     global response
@@ -110,6 +141,11 @@ def get_lockfile():
 lockfile = get_lockfile()
 
 
+def get_current_version():
+    data = requests.get('https://valorant-api.com/v1/version')
+    data = data.json()['data']
+    version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
+    return version
 
 
 def get_headers():
@@ -143,6 +179,16 @@ def get_puuid():
     return puuid
 
 
+def get_all_agents(reverse=False):
+    agent_dict = {}
+    response = requests.get("https://valorant-api.com/v1/agents")
+    if reverse is False:
+        for agent in response.json()['data']:
+            agent_dict.update({agent['displayName']: agent['uuid']})
+    else:
+        for agent in response.json()['data']:
+            agent_dict.update({agent['uuid']: agent['displayName']})
+    return agent_dict
 
 
 def get_coregame_match_id():
@@ -161,78 +207,62 @@ def get_coregame_stats():
     return response
 
 
-
-def getRank(puuid, seasonID):
-    response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+def get_players_in_lobby_puuid():
+    players = []
+    coregame_stats = get_coregame_stats()
+    i = 0
     try:
-        rankTIER = response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
-        if int(rankTIER) not in (0, 1, 2, 3):
-            rank = [rankTIER, response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]]
-        else:
-            rank = [0, 0]
-    except TypeError:
-        rank = [0, 0]
+        for player in coregame_stats["Players"]:
+            players.append([])
+            players[i].append(player["Subject"])
+            players[i].append(player["CharacterID"])
+            players[i].append(player["PlayerIdentity"]["Incognito"])
+            players[i].append(player["TeamID"])
+            i += 1
     except KeyError:
-        rank = [0, 0]
-    return rank
+        return players
+    return players
 
+
+def get_rank_from_puuid(puuid, all=False):
+    response = fetch("pd", f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=20&queue=competitive",
+                     "get")
+    try:
+        if all is False:
+            if not response["Matches"]:
+                return [1, 0]
+            else:
+                return [response["Matches"][0]["TierAfterUpdate"], response["Matches"][0]["RankedRatingAfterUpdate"]]
+        elif all is True:
+            return response
+    except TypeError:
+        return 1
+    except KeyError:
+        return 1
+    except IndexError:
+        return 1
 
 
 def get_name_from_puuid(puuid):
     response = requests.put(pd_url + f"/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
     return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
-def get_latest_season_id(content=fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")):
-    for season in content["Seasons"]:
-        if season["IsActive"] == True:
-            return season["ID"]
 
-def get_content():
-    content = fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")
-    return content
-
-def get_all_agents(content=fetch("custom", "https://shared.na.a.pvp.net/content-service/v2/content", "get")):
-    agent_dict = {}
-    for agent in content["Characters"]:
-        if "NPE" not in agent["AssetName"]:
-            agent_dict.update({agent['ID'].lower(): agent['Name']})
-    return agent_dict
-
-def get_region():
-    path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
-    with open(path, "r", encoding="utf8") as file:
-        while True:
-            line = file.readline()
-            if '.a.pvp.net/account-xp/v1/' in line:
-                return line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
-
-
-
-region = get_region()
-glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
-pd_url = f"https://pd.{region}.a.pvp.net"
-
-content = get_content()
-agent_dict = get_all_agents(content)
-seasonID = get_latest_season_id(content)
-
-Players = get_coregame_stats()["Players"]
-table = PrettyTable()
-table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position"]
-for player in Players:
-    rank = getRank(player["Subject"], seasonID)
-    if player['TeamID'] == 'Red':
+tabledoutput = PrettyTable()
+tabledoutput.field_names = ["Agent", "Name", "Rank", "RR"]
+agent_dict = get_all_agents(reverse=True)
+for player in get_players_in_lobby_puuid():
+    rank_puuid = get_rank_from_puuid(player[0])
+    if player[3].lower() == 'red':
         color = LIGHT_RED
-    elif player['TeamID'] == 'Blue':
-        color = LIGHT_BLUE
     else:
-        color = ''
-    table.add_rows([[color + agent_dict[player["CharacterID"].lower()] + end_tag,
-                    color + get_name_from_puuid(player["Subject"]) + end_tag,
-                    number_to_ranks[rank[0]],
-                    rank[1],
-                    0
-                    ]])
+        color = LIGHT_BLUE
+    tabledoutput.add_rows([[color + agent_dict[player[1].lower()] + end_tag, color + get_name_from_puuid(player[0]) +
+                            end_tag,
+                          number_to_ranks[rank_puuid[0]],
+                            (str(rank_puuid[1]))
+                            ]])
     time.sleep(0.5)
-print(table)
-input("Press enter to exit...")
+
+print(tabledoutput)
+time.sleep(300)

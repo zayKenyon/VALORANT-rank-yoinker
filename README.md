@@ -36,7 +36,7 @@ Please make sure to update tests as appropriate.
 ## TODO
 -refactorization
 
--getting multiple names from puuid
+-getting name from puuid more efficiently 
 
 ~~-not getting rank from latest match~~
 
