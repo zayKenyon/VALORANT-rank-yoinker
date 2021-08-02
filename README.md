@@ -23,6 +23,7 @@ Alternatively if you have python 2 installed run `python3 main.py`
 
 ## Usage
  • When in a VALORANT game, run the .exe.
+ 
  • Colour of the Agent + Name reflects the team colour.
 
 
@@ -33,24 +34,3 @@ Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
-
-## TODO
--refactorization
-
--getting name from puuid more efficiently 
-
-~~-not getting rank from latest match~~
-
-~~-code more readable~~
-
-~~-getting agents from valorant endpoint~~
-
--getting version from log file
-
--add config file with region and color options
-
-~~-add leaderboard position~~
-
--dont wait time but fetch until rate limit and then wait
-
-~~-get region from logs~~
