@@ -63,6 +63,7 @@ number_to_ranks = {
 
 headers = {}
 
+
 def get_region():
     path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
     with open(path, "r", encoding="utf8") as file:
@@ -71,9 +72,11 @@ def get_region():
             if '.a.pvp.net/account-xp/v1/' in line:
                 return line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
 
+
 region = get_region()
 glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
 pd_url = f"https://pd.{region}.a.pvp.net"
+
 
 def get_current_version():
     data = requests.get('https://valorant-api.com/v1/version')
@@ -201,7 +204,7 @@ def get_content():
 
 def get_latest_season_id(content=get_content()):
     for season in content["Seasons"]:
-        if season["IsActive"] == True:
+        if season["IsActive"]:
             return season["ID"]
 
 
@@ -211,7 +214,6 @@ def get_all_agents(content=get_content()):
         if "NPE" not in agent["AssetName"]:
             agent_dict.update({agent['ID'].lower(): agent['Name']})
     return agent_dict
-
 
 
 content = get_content()
