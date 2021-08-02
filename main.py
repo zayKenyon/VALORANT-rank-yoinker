@@ -174,13 +174,18 @@ def getRank(puuid, seasonID):
         rankTIER = response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
         if int(rankTIER) not in (0, 1, 2, 3):
             rank = [rankTIER,
-                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]]
+                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                    0]
+        elif int(rankTIER) >= 21:
+            rank = [rankTIER,
+                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
         else:
-            rank = [0, 0]
+            rank = [0, 0, 0]
     except TypeError:
-        rank = [0, 0]
+        rank = [0, 0, 0]
     except KeyError:
-        rank = [0, 0]
+        rank = [0, 0, 0]
     return rank
 
 
@@ -228,7 +233,7 @@ for player in Players:
                      color + get_name_from_puuid(player["Subject"]) + end_tag,
                      number_to_ranks[rank[0]],
                      rank[1],
-                     0
+                     rank[2]
                      ]])
     time.sleep(0.5)
 print(table)
