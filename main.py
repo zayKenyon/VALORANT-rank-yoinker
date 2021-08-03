@@ -123,16 +123,18 @@ def get_lockfile():
 
 lockfile = get_lockfile()
 
-
+puuid = ''
 def get_headers():
     global headers
     if headers == {}:
+        global puuid
         local_headers = {}
         local_headers['Authorization'] = 'Basic ' + base64.b64encode(
             ('riot:' + lockfile['password']).encode()).decode()
         response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
                                 verify=False)
         entitlements = response.json()
+        puuid = entitlements['subject']
         headers = {
             'Authorization': f"Bearer {entitlements['accessToken']}",
             'X-Riot-Entitlements-JWT': entitlements['token'],
@@ -145,13 +147,13 @@ def get_headers():
 
 
 def get_puuid():
-    local_headers = {}
-    local_headers['Authorization'] = 'Basic ' + base64.b64encode(
-        ('riot:' + lockfile['password']).encode()).decode()
-    response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
-                            verify=False)
-    entitlements = response.json()
-    puuid = entitlements['subject']
+    # local_headers = {}
+    # local_headers['Authorization'] = 'Basic ' + base64.b64encode(
+    #     ('riot:' + lockfile['password']).encode()).decode()
+    # response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
+    #                         verify=False)
+    # entitlements = response.json()
+    # puuid = entitlements['subject']
     return puuid
 
 
@@ -164,11 +166,32 @@ def get_coregame_match_id():
     except KeyError:
         print(f"No match id found. {response}")
         return 0
+    except TypeError:
+        print(f"No match id found. {response}")
+        return 0
+
+def get_pregame_match_id():
+    try:
+        response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{get_puuid()}", method="get")
+        match_id = response['MatchID']
+        return match_id
+    except KeyError:
+        print(f"No match id found. {response}")
+        return 0
+    except TypeError:
+        print(f"No match id found. {response}")
+        return 0
 
 
 def get_coregame_stats():
     response = fetch("glz", f"/core-game/v1/matches/{get_coregame_match_id()}", "get")
     return response
+
+
+def get_pregame_stats():
+    response = fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
+    return response
+
 
 
 def getRank(puuid, seasonID):
@@ -216,27 +239,72 @@ def get_all_agents(content=get_content()):
     return agent_dict
 
 
+def presence(puuid):
+    presences = fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
+    for presence in presences['presences']:
+        if presence['puuid'] == puuid:
+            return json.loads(base64.b64decode(presence['private']))
+
+
+
+
 content = get_content()
 agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
 
-Players = get_coregame_stats()["Players"]
+
 table = PrettyTable()
-table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position"]
-for player in Players:
-    rank = getRank(player["Subject"], seasonID)
-    if player['TeamID'] == 'Red':
-        color = LIGHT_RED
-    elif player['TeamID'] == 'Blue':
-        color = LIGHT_BLUE
-    else:
-        color = ''
-    table.add_rows([[color + agent_dict[player["CharacterID"].lower()] + end_tag,
-                     color + get_name_from_puuid(player["Subject"]) + end_tag,
-                     number_to_ranks[rank[0]],
-                     rank[1],
-                     rank[2]
-                     ]])
-    time.sleep(0.5)
+#current in-game status
+game_state = presence(get_puuid())["sessionLoopState"]
+game_state_dict = {
+    "INGAME": LIGHT_RED + "In-Game" + end_tag,
+    "PREGAME": LIGHT_GREEN + "Agent Select" + end_tag,
+    "MENUS": BOLD + YELLOW + "In-Menus" + end_tag
+}
+table.title = f"Valorant status: {game_state_dict[game_state]}"
+table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
+if game_state == "INGAME":
+    Players = get_coregame_stats()["Players"]
+    for player in Players:
+        rank = getRank(player["Subject"], seasonID)
+        if player['TeamID'] == 'Red':
+            color = LIGHT_RED
+        elif player['TeamID'] == 'Blue':
+            color = LIGHT_BLUE
+        else:
+            color = ''
+        table.add_rows([[BOLD + agent_dict.get(player["CharacterID"].lower()) + end_tag,
+                         color + get_name_from_puuid(player["Subject"]) + end_tag,
+                         number_to_ranks[rank[0]],
+                         rank[1],
+                         rank[2],
+                         player["PlayerIdentity"].get("AccountLevel")
+                         ]])
+        time.sleep(0.5)
+elif game_state == "PREGAME":
+    pregame_stats = get_pregame_stats()
+    Players = pregame_stats["AllyTeam"]["Players"]
+    for player in Players:
+        rank = getRank(player["Subject"], seasonID)
+        if pregame_stats["AllyTeam"]['TeamID'] == 'Red':
+            color = LIGHT_RED
+        elif pregame_stats["AllyTeam"]['TeamID'] == 'Blue':
+            color = LIGHT_BLUE
+        else:
+            color = ''
+        if player["CharacterSelectionState"] == "locked":
+            agent_color = BOLD
+        else:
+            agent_color = LIGHT_GRAY
+        table.add_rows([[agent_color + str(agent_dict.get(player["CharacterID"].lower())) + end_tag,
+                         color + get_name_from_puuid(player["Subject"]) + end_tag,
+                         number_to_ranks[rank[0]],
+                         rank[1],
+                         rank[2],
+                         player["PlayerIdentity"].get("AccountLevel")
+                         ]])
+        time.sleep(0.5)
+
+
 print(table)
 input("Press enter to exit...")
