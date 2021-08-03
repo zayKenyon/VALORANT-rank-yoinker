@@ -322,9 +322,9 @@ if game_state == "INGAME":
 elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
-    player_level = player["PlayerIdentity"].get("AccountLevel")
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
+        player_level = player["PlayerIdentity"].get("AccountLevel")
         if pregame_stats["AllyTeam"]['TeamID'] == 'Red':
             color = LIGHT_RED
         elif pregame_stats["AllyTeam"]['TeamID'] == 'Blue':
