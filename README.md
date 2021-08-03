@@ -32,11 +32,11 @@ Alternatively if you have python 2 installed run `python3 main.py`
 
 
 ## Usage
- • When in a VALORANT game, run the .exe.
+ • When in a VALORANT is running start the program otherwise you will get an error.
  
- • Colour of the Agent + Name reflects the team colour.
+ • Colour of the Name reflects the team colour.
 
-
+ • When you are using cmd (or terminal that doesn't support ANSI escape colors) change config.json or run the code if config.json doesn't exist.
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
