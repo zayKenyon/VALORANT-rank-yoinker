@@ -45,5 +45,5 @@ Please make sure to update tests as appropriate.
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
 
-##DISCLAIMER
+## DISCLAIMER
 NO-ONE INVOLVED WITH THIS PROJECT IS ASSOCIATED WITH RIOT, THIS PROJECT IS NOT ENDORSED BY RIOT
