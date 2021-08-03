@@ -1,4 +1,6 @@
-If you find any issue create new issue in Issues tab or join the discord server that is still in work: ![Discord](https://img.shields.io/discord/872101595037446144?color=%236a7ec5&label=discord&logo=discord&style=plastic)
+If you find any issue create new issue in Issues tab or join the discord server that is still in work:
+
+[![Discord](https://img.shields.io/discord/872101595037446144?color=%236a7ec5&label=discord&logo=discord&style=plastic)](https://discord.gg/HeTKed64Ka) 
 # VALORANT live match rank grabber
 
 VALORANT live match rank grabber lets you retrieve the ranks and basic informations of everyone in the lobby, regardless of gamemode.
