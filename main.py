@@ -94,7 +94,7 @@ pd_url = f"https://pd.{region}.a.pvp.net"
 
 def get_current_version():
     # version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
-    #release-03.02-shipping-9-587972
+    # release-03.02-shipping-9-587972
     path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
     with open(path, "r", encoding="utf8") as file:
         while True:
@@ -105,7 +105,6 @@ def get_current_version():
                 version.insert(2, "shipping")
                 return "-".join(version)
                 # return version
-
 
 
 def fetch(url_type, endpoint, method):
@@ -289,23 +288,41 @@ if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
+        player_level = player["PlayerIdentity"].get("AccountLevel")
         if player['TeamID'] == 'Red':
             color = LIGHT_RED
         elif player['TeamID'] == 'Blue':
             color = LIGHT_BLUE
         else:
             color = ''
+
+        if player_level >= 400:
+            PLcolor = CYAN  # PL = Player Level
+            pass
+        elif player_level >= 300:
+            PLcolor = YELLOW
+            pass
+        elif player_level >= 200:
+            PLcolor = BLUE
+            pass
+        elif player_level >= 100:
+            PLcolor = BROWN
+            pass
+        elif player_level < 100:
+            PLcolor = LIGHT_GRAY
+
         table.add_rows([[BOLD + agent_dict.get(player["CharacterID"].lower()) + end_tag,
                          color + get_name_from_puuid(player["Subject"]) + end_tag,
                          number_to_ranks[rank[0]],
                          rank[1],
                          rank[2],
-                         player["PlayerIdentity"].get("AccountLevel")
+                         PLcolor + str(player["PlayerIdentity"].get("AccountLevel")) + end_tag
                          ]])
         time.sleep(0.5)
 elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
+    player_level = player["PlayerIdentity"].get("AccountLevel")
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         if pregame_stats["AllyTeam"]['TeamID'] == 'Red':
@@ -314,6 +331,22 @@ elif game_state == "PREGAME":
             color = LIGHT_BLUE
         else:
             color = ''
+
+        if player_level >= 400:
+            PLcolor = CYAN  # PL = Player Level
+            pass
+        elif player_level >= 300:
+            PLcolor = YELLOW
+            pass
+        elif player_level >= 200:
+            PLcolor = BLUE
+            pass
+        elif player_level >= 100:
+            PLcolor = BROWN
+            pass
+        elif player_level < 100:
+            PLcolor = LIGHT_GRAY
+
         if player["CharacterSelectionState"] == "locked":
             agent_color = BOLD
         else:
