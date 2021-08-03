@@ -93,10 +93,19 @@ pd_url = f"https://pd.{region}.a.pvp.net"
 
 
 def get_current_version():
-    data = requests.get('https://valorant-api.com/v1/version')
-    data = data.json()['data']
-    version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
-    return version
+    # version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
+    #release-03.02-shipping-9-587972
+    path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
+    with open(path, "r", encoding="utf8") as file:
+        while True:
+            line = file.readline()
+            if 'CI server version:' in line:
+                version_without_shipping = line.split('CI server version: ')[1].strip()
+                version = version_without_shipping.split("-")
+                version.insert(2, "shipping")
+                return "-".join(version)
+                # return version
+
 
 
 def fetch(url_type, endpoint, method):
