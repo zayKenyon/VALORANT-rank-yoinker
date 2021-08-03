@@ -8,30 +8,44 @@ from prettytable import PrettyTable
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-BLACK = "\033[0;30m"
-RED = "\033[0;31m"
-GREEN = "\033[0;32m"
-BROWN = "\033[0;33m"
-BLUE = "\033[0;34m"
-PURPLE = "\033[0;35m"
-CYAN = "\033[0;36m"
-LIGHT_GRAY = "\033[0;37m"
-DARK_GRAY = "\033[1;30m"
-LIGHT_RED = "\033[1;31m"
-LIGHT_GREEN = "\033[1;32m"
-YELLOW = "\033[1;33m"
-LIGHT_BLUE = "\033[1;34m"
-LIGHT_PURPLE = "\033[1;35m"
-LIGHT_CYAN = "\033[1;36m"
-LIGHT_WHITE = "\033[1;37m"
-BOLD = "\033[1m"
-FAINT = "\033[2m"
-ITALIC = "\033[3m"
-UNDERLINE = "\033[4m"
-BLINK = "\033[5m"
-NEGATIVE = "\033[7m"
-CROSSED = "\033[9m"
-end_tag = "\033[0m"
+try:
+    with open("config.json", "r") as file:
+        config = json.load(file)
+        enableColors = config.get("enableColors")
+except FileNotFoundError:
+    with open("config.json", "w+") as file:
+        enableColors = bool(input("Disable colors? (1 for yes, 0 for no): "))
+        json.dump({"enableColors": enableColors}, file)
+
+if enableColors:
+    BLACK = "\033[0;30m"
+    RED = "\033[0;31m"
+    GREEN = "\033[0;32m"
+    BROWN = "\033[0;33m"
+    BLUE = "\033[0;34m"
+    PURPLE = "\033[0;35m"
+    CYAN = "\033[0;36m"
+    LIGHT_GRAY = "\033[0;37m"
+    DARK_GRAY = "\033[1;30m"
+    LIGHT_RED = "\033[1;31m"
+    LIGHT_GREEN = "\033[1;32m"
+    YELLOW = "\033[1;33m"
+    LIGHT_BLUE = "\033[1;34m"
+    LIGHT_PURPLE = "\033[1;35m"
+    LIGHT_CYAN = "\033[1;36m"
+    LIGHT_WHITE = "\033[1;37m"
+    BOLD = "\033[1m"
+    FAINT = "\033[2m"
+    ITALIC = "\033[3m"
+    UNDERLINE = "\033[4m"
+    BLINK = "\033[5m"
+    NEGATIVE = "\033[7m"
+    CROSSED = "\033[9m"
+    end_tag = "\033[0m"
+else:
+    BLACK = RED = GREEN = BROWN = BLUE = PURPLE = CYAN = LIGHT_GRAY = DARK_GRAY = LIGHT_RED = LIGHT_GREEN = YELLOW = ''
+    LIGHT_BLUE = LIGHT_PURPLE = LIGHT_CYAN = LIGHT_WHITE = BOLD = FAINT = ITALIC = UNDERLINE = ''
+    BLINK = NEGATIVE = CROSSED = end_tag = ''
 
 number_to_ranks = {
     0: LIGHT_GRAY + "Unrated" + end_tag,
@@ -124,6 +138,8 @@ def get_lockfile():
 lockfile = get_lockfile()
 
 puuid = ''
+
+
 def get_headers():
     global headers
     if headers == {}:
@@ -170,6 +186,7 @@ def get_coregame_match_id():
         print(f"No match id found. {response}")
         return 0
 
+
 def get_pregame_match_id():
     try:
         response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{get_puuid()}", method="get")
@@ -191,7 +208,6 @@ def get_coregame_stats():
 def get_pregame_stats():
     response = fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
     return response
-
 
 
 def getRank(puuid, seasonID):
@@ -246,15 +262,12 @@ def presence(puuid):
             return json.loads(base64.b64decode(presence['private']))
 
 
-
-
 content = get_content()
 agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
 
-
 table = PrettyTable()
-#current in-game status
+# current in-game status
 game_state = presence(get_puuid())["sessionLoopState"]
 game_state_dict = {
     "INGAME": LIGHT_RED + "In-Game" + end_tag,
@@ -304,7 +317,6 @@ elif game_state == "PREGAME":
                          player["PlayerIdentity"].get("AccountLevel")
                          ]])
         time.sleep(0.5)
-
 
 print(table)
 input("Press enter to exit...")
