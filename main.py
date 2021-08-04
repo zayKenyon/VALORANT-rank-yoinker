@@ -84,12 +84,20 @@ def get_region():
         while True:
             line = file.readline()
             if '.a.pvp.net/account-xp/v1/' in line:
-                return line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
+                pd_url = line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
+            elif 'https://glz' in line:
+                glz_url = []
+                glz_url.append(line.split('https://glz-')[1].split(".")[0])
+                glz_url.append(line.split('https://glz-')[1].split(".")[1])
+            if "pd_url" in locals() and "glz_url" in locals():
+                return[pd_url, glz_url]
 
 
 region = get_region()
-glz_url = f"https://glz-{region}-1.{region}.a.pvp.net"
-pd_url = f"https://pd.{region}.a.pvp.net"
+pd_url = f"https://pd.{region[0]}.a.pvp.net"
+glz_url = f"https://glz-{region[1][0]}-1.{region[1][1]}.a.pvp.net"
+region = region[0]
+
 
 
 def get_current_version():
@@ -268,7 +276,6 @@ def presence(puuid):
     for presence in presences['presences']:
         if presence['puuid'] == puuid:
             return json.loads(base64.b64decode(presence['private']))
-
 
 content = get_content()
 agent_dict = get_all_agents(content)
