@@ -95,7 +95,7 @@ def get_region():
 
 region = get_region()
 pd_url = f"https://pd.{region[0]}.a.pvp.net"
-glz_url = f"https://glz-{region[1][0]}-1.{region[1][1]}.a.pvp.net"
+glz_url = f"https://glz-{region[1][0]}.{region[1][1]}.a.pvp.net"
 region = region[0]
 
 
@@ -179,13 +179,6 @@ def get_headers():
 
 
 def get_puuid():
-    # local_headers = {}
-    # local_headers['Authorization'] = 'Basic ' + base64.b64encode(
-    #     ('riot:' + lockfile['password']).encode()).decode()
-    # response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
-    #                         verify=False)
-    # entitlements = response.json()
-    # puuid = entitlements['subject']
     return puuid
 
 
@@ -251,6 +244,14 @@ def get_name_from_puuid(puuid):
     response = requests.put(pd_url + f"/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
     return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
+def get_multiple_names_from_puuid(puuids):
+    response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids,
+                            verify=False)
+    name_dict = {}
+    for player in response.json():
+        name_dict.update({player["Subject"]: player["GameName"] + "#" + player["TagLine"]})
+    return name_dict
+
 
 def get_content():
     content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v2/content", "get")
@@ -279,6 +280,7 @@ def presence(puuid):
 
 
 def level_to_color(level):
+    PLcolor = ''
     if level >= 400:
         PLcolor = CYAN  # PL = Player Level
         pass
@@ -294,6 +296,21 @@ def level_to_color(level):
     elif level < 100:
         PLcolor = LIGHT_GRAY
     return PLcolor
+
+def get_names_from_puuids(players):
+    players_puuid = []
+    for player in players:
+        players_puuid.append(player["Subject"])
+    return get_multiple_names_from_puuid(players_puuid)
+
+def get_color_from_team(team):
+    if team == 'Red':
+        color = LIGHT_RED
+    elif team == 'Blue':
+        color = LIGHT_BLUE
+    else:
+        color = ''
+    return color
 
 content = get_content()
 agent_dict = get_all_agents(content)
@@ -311,20 +328,16 @@ table.title = f"Valorant status: {game_state_dict[game_state]}"
 table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
 if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
+    names = get_names_from_puuids(Players)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         player_level = player["PlayerIdentity"].get("AccountLevel")
-        if player['TeamID'] == 'Red':
-            color = LIGHT_RED
-        elif player['TeamID'] == 'Blue':
-            color = LIGHT_BLUE
-        else:
-            color = ''
+        color = get_color_from_team(player['TeamID'])
 
         PLcolor = level_to_color(player_level)
 
         table.add_rows([[BOLD + agent_dict.get(player["CharacterID"].lower()) + end_tag,
-                         color + get_name_from_puuid(player["Subject"]) + end_tag,
+                         color + names[player["Subject"]] + end_tag,
                          number_to_ranks[rank[0]],
                          rank[1],
                          rank[2],
@@ -334,15 +347,11 @@ if game_state == "INGAME":
 elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
+    names = get_names_from_puuids(Players)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         player_level = player["PlayerIdentity"].get("AccountLevel")
-        if pregame_stats["AllyTeam"]['TeamID'] == 'Red':
-            color = LIGHT_RED
-        elif pregame_stats["AllyTeam"]['TeamID'] == 'Blue':
-            color = LIGHT_BLUE
-        else:
-            color = ''
+        color = get_color_from_team(pregame_stats["AllyTeam"]['TeamID'])
 
         PLcolor = level_to_color(player_level)
 
@@ -351,11 +360,11 @@ elif game_state == "PREGAME":
         else:
             agent_color = LIGHT_GRAY
         table.add_rows([[agent_color + str(agent_dict.get(player["CharacterID"].lower())) + end_tag,
-                         color + get_name_from_puuid(player["Subject"]) + end_tag,
+                         color + names[player["Subject"]] + end_tag,
                          number_to_ranks[rank[0]],
                          rank[1],
                          rank[2],
-                         PLcolor + player_level + end_tag
+                         PLcolor + str(player_level) + end_tag
                          ]])
         time.sleep(0.5)
 
