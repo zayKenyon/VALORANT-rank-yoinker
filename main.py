@@ -5,7 +5,7 @@ import base64
 import json
 import time
 from prettytable import PrettyTable
-
+import sys
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 try:
@@ -123,7 +123,7 @@ def fetch(url_type, endpoint, method):
             return response.json()
         elif url_type == "pd":
             response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
-            return response.json()
+            return response
         elif url_type == "local":
             local_headers = {}
             local_headers['Authorization'] = 'Basic ' + base64.b64encode(
@@ -222,14 +222,15 @@ def get_pregame_stats():
 def getRank(puuid, seasonID):
     response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
     try:
-        rankTIER = response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
+        r = response.json()
+        rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
         if int(rankTIER) >= 21:
             rank = [rankTIER,
-                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
+                    r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                    r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
         elif int(rankTIER) not in (0, 1, 2, 3):
             rank = [rankTIER,
-                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                    r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                     0]
         else:
             rank = [0, 0, 0]
@@ -237,7 +238,7 @@ def getRank(puuid, seasonID):
         rank = [0, 0, 0]
     except KeyError:
         rank = [0, 0, 0]
-    return rank
+    return [rank, response.ok]
 
 
 def get_name_from_puuid(puuid):
@@ -328,8 +329,11 @@ table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position", "Lev
 if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
     names = get_names_from_puuids(Players)
+    i = 0
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
+        rankStatus = rank[1]
+        rank = rank[0]
         player_level = player["PlayerIdentity"].get("AccountLevel")
         color = get_color_from_team(player['TeamID'])
 
@@ -342,13 +346,17 @@ if game_state == "INGAME":
                          rank[2],
                          PLcolor + str(player_level) + end_tag
                          ]])
-        time.sleep(0.5)
+        if not rankStatus:
+            print("You got rate limited 😞 waiting 3 seconds!")
+            time.sleep(3)
 elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
     names = get_names_from_puuids(Players)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
+        rankStatus = rank[1]
+        rank = rank[0]
         player_level = player["PlayerIdentity"].get("AccountLevel")
         color = get_color_from_team(pregame_stats["AllyTeam"]['TeamID'])
 
@@ -365,7 +373,8 @@ elif game_state == "PREGAME":
                          rank[2],
                          PLcolor + str(player_level) + end_tag
                          ]])
-        time.sleep(0.5)
-
+        if not rankStatus:
+            print("You got rate limited 😞 waiting 3 seconds!")
+            time.sleep(3)
 print(table)
 input("Press enter to exit...")
