@@ -223,14 +223,14 @@ def getRank(puuid, seasonID):
     response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
     try:
         rankTIER = response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
-        if int(rankTIER) not in (0, 1, 2, 3):
-            rank = [rankTIER,
-                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                    0]
-        elif int(rankTIER) >= 21:
+        if int(rankTIER) >= 21:
             rank = [rankTIER,
                     response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                     response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
+        elif int(rankTIER) not in (0, 1, 2, 3):
+            rank = [rankTIER,
+                    response["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                    0]
         else:
             rank = [0, 0, 0]
     except TypeError:
@@ -315,7 +315,6 @@ def get_color_from_team(team):
 content = get_content()
 agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
-
 table = PrettyTable()
 # current in-game status
 game_state = presence(get_puuid())["sessionLoopState"]
