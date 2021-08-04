@@ -329,7 +329,8 @@ table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position", "Lev
 if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
     names = get_names_from_puuids(Players)
-    i = 0
+    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+    Players.sort(key=lambda Players: bool(Players["TeamID"]), reverse=True)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
@@ -353,6 +354,7 @@ elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
     names = get_names_from_puuids(Players)
+    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
