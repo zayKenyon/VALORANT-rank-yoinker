@@ -5,7 +5,7 @@ import base64
 import json
 import time
 from prettytable import PrettyTable
-import sys
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 try:
