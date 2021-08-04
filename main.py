@@ -95,7 +95,7 @@ def get_region():
 
 region = get_region()
 pd_url = f"https://pd.{region[0]}.a.pvp.net"
-glz_url = f"https://glz-{region[1][0]}-1.{region[1][1]}.a.pvp.net"
+glz_url = f"https://glz-{region[1][0]}.{region[1][1]}.a.pvp.net"
 region = region[0]
 
 
