@@ -277,6 +277,24 @@ def presence(puuid):
         if presence['puuid'] == puuid:
             return json.loads(base64.b64decode(presence['private']))
 
+
+def level_to_color(level):
+    if level >= 400:
+        PLcolor = CYAN  # PL = Player Level
+        pass
+    elif level >= 300:
+        PLcolor = YELLOW
+        pass
+    elif level >= 200:
+        PLcolor = BLUE
+        pass
+    elif level >= 100:
+        PLcolor = BROWN
+        pass
+    elif level < 100:
+        PLcolor = LIGHT_GRAY
+    return PLcolor
+
 content = get_content()
 agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
@@ -303,27 +321,14 @@ if game_state == "INGAME":
         else:
             color = ''
 
-        if player_level >= 400:
-            PLcolor = CYAN  # PL = Player Level
-            pass
-        elif player_level >= 300:
-            PLcolor = YELLOW
-            pass
-        elif player_level >= 200:
-            PLcolor = BLUE
-            pass
-        elif player_level >= 100:
-            PLcolor = BROWN
-            pass
-        elif player_level < 100:
-            PLcolor = LIGHT_GRAY
+        PLcolor = level_to_color(player_level)
 
         table.add_rows([[BOLD + agent_dict.get(player["CharacterID"].lower()) + end_tag,
                          color + get_name_from_puuid(player["Subject"]) + end_tag,
                          number_to_ranks[rank[0]],
                          rank[1],
                          rank[2],
-                         PLcolor + str(player["PlayerIdentity"].get("AccountLevel")) + end_tag
+                         PLcolor + str(player_level) + end_tag
                          ]])
         time.sleep(0.5)
 elif game_state == "PREGAME":
@@ -339,20 +344,7 @@ elif game_state == "PREGAME":
         else:
             color = ''
 
-        if player_level >= 400:
-            PLcolor = CYAN  # PL = Player Level
-            pass
-        elif player_level >= 300:
-            PLcolor = YELLOW
-            pass
-        elif player_level >= 200:
-            PLcolor = BLUE
-            pass
-        elif player_level >= 100:
-            PLcolor = BROWN
-            pass
-        elif player_level < 100:
-            PLcolor = LIGHT_GRAY
+        PLcolor = level_to_color(player_level)
 
         if player["CharacterSelectionState"] == "locked":
             agent_color = BOLD
@@ -363,7 +355,7 @@ elif game_state == "PREGAME":
                          number_to_ranks[rank[0]],
                          rank[1],
                          rank[2],
-                         player["PlayerIdentity"].get("AccountLevel")
+                         PLcolor + player_level + end_tag
                          ]])
         time.sleep(0.5)
 
