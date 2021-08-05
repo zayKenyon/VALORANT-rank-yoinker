@@ -14,8 +14,13 @@ try:
         enableColors = config.get("enableColors")
 except FileNotFoundError:
     with open("config.json", "w+") as file:
-        enableColors = bool(input("Disable colors? (1 for yes, 0 for no): "))
+        enableColors = bool(input("Enable colors? (1 for yes, 0 for no): "))
         json.dump({"enableColors": enableColors}, file)
+except json.decoder.JSONDecodeError:
+    with open("config.json", "w") as file:
+        enableColors = bool(input("Enable colors? (1 for yes, 0 for no): "))
+        json.dump({"enableColors": enableColors}, file)
+
 
 if enableColors:
     BLACK = "\033[0;30m"
@@ -318,7 +323,10 @@ agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
 table = PrettyTable()
 # current in-game status
-game_state = presence(get_puuid())["sessionLoopState"]
+try:
+    game_state = presence(get_puuid())["sessionLoopState"]
+except TypeError:
+    raise Exception("Game has not started yet!")
 game_state_dict = {
     "INGAME": LIGHT_RED + "In-Game" + end_tag,
     "PREGAME": LIGHT_GREEN + "Agent Select" + end_tag,
