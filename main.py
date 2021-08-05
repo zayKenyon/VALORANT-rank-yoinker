@@ -338,7 +338,7 @@ if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
     names = get_names_from_puuids(Players)
     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
-    Players.sort(key=lambda Players: bool(Players["TeamID"]), reverse=True)
+    Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
     for player in Players:
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
