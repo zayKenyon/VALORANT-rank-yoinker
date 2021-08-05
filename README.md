@@ -9,9 +9,7 @@ VALORANT live match rank grabber lets you retrieve the ranks and basic informati
 
 
 
-![image](https://user-images.githubusercontent.com/74879467/128015037-1d88412e-58c3-46ba-a23f-6b42836abcf0.png)
-
-![image](https://user-images.githubusercontent.com/74879467/128015134-777f380f-b5e1-446b-b113-52b5f0c816e4.png)
+![image](https://user-images.githubusercontent.com/74879467/128422692-90de1b01-ebf8-47ce-8a07-0af599d2966b.png)
 
 
 
