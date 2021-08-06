@@ -52,6 +52,16 @@ else:
     LIGHT_BLUE = LIGHT_PURPLE = LIGHT_CYAN = LIGHT_WHITE = BOLD = FAINT = ITALIC = UNDERLINE = ''
     BLINK = NEGATIVE = CROSSED = end_tag = ''
 
+
+partyIconList = [LIGHT_CYAN + "🔵" + end_tag,
+                 LIGHT_RED + "🔵" + end_tag,
+                 LIGHT_GREEN + "🔵" + end_tag,
+                 LIGHT_PURPLE + "🔵" + end_tag,
+                 LIGHT_WHITE + "🔵" + end_tag,
+                 "🔵",
+                 LIGHT_BLUE + "🔵" + end_tag,
+                 YELLOW + "🔵" + end_tag]
+
 number_to_ranks = {
     0: LIGHT_GRAY + "Unrated" + end_tag,
     1: LIGHT_GRAY + "Unrated" + end_tag,
@@ -280,10 +290,29 @@ def get_all_agents(content=get_content()):
 
 def presence(puuid):
     presences = fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
-    for presence in presences['presences']:
-        if presence['puuid'] == puuid:
-            return json.loads(base64.b64decode(presence['private']))
+    return presences['presences']
 
+
+def get_game_state(presences=presence(get_puuid())):
+    for presence in presences:
+        if presence['puuid'] == puuid:
+            return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
+
+def decode_presence(private):
+    return json.loads(base64.b64decode(private))
+
+def get_party_json(GamePlayersPuuid, presences):
+    party_json = {}
+    for presence in presences:
+        if presence["puuid"] in GamePlayersPuuid:
+            decodedPresence = decode_presence(presence["private"])
+            if decodedPresence["partySize"] > 1:
+                try:
+                    party_json[decodedPresence["partyId"]].append(presence["puuid"])
+                except KeyError:
+                    party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
+
+    return party_json
 
 def level_to_color(level):
     PLcolor = ''
@@ -318,13 +347,22 @@ def get_color_from_team(team):
         color = ''
     return color
 
+def get_PlayersPuuid(Players):
+    res = []
+    for player in Players:
+        res.append(player["Subject"])
+    return res
+
+
+
 content = get_content()
 agent_dict = get_all_agents(content)
 seasonID = get_latest_season_id(content)
 table = PrettyTable()
 # current in-game status
 try:
-    game_state = presence(get_puuid())["sessionLoopState"]
+    presence = presence(get_puuid())
+    game_state = get_game_state(presence)
 except TypeError:
     raise Exception("Game has not started yet!")
 game_state_dict = {
@@ -336,10 +374,24 @@ table.title = f"Valorant status: {game_state_dict[game_state]}"
 table.field_names = ["Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
 if game_state == "INGAME":
     Players = get_coregame_stats()["Players"]
+    partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
     names = get_names_from_puuids(Players)
     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
+    partyCount = 0
+    partyIcons = {}
     for player in Players:
+        party_icon = ''
+
+        #set party premade icon
+        for party in partyOBJ:
+            if player["Subject"] in partyOBJ[party]:
+                if party not in partyIcons:
+                    partyIcons.update({party: partyIconList[partyCount]})
+                    party_icon = partyIconList[partyCount] + ' '
+                else:
+                    party_icon = partyIcons[party] + ' '
+                partyCount += 1
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
         rank = rank[0]
@@ -348,7 +400,7 @@ if game_state == "INGAME":
 
         PLcolor = level_to_color(player_level)
 
-        table.add_rows([[BOLD + agent_dict.get(player["CharacterID"].lower()) + end_tag,
+        table.add_rows([[BOLD + party_icon + agent_dict.get(player["CharacterID"].lower()) + end_tag,
                          color + names[player["Subject"]] + end_tag,
                          number_to_ranks[rank[0]],
                          rank[1],
@@ -361,9 +413,22 @@ if game_state == "INGAME":
 elif game_state == "PREGAME":
     pregame_stats = get_pregame_stats()
     Players = pregame_stats["AllyTeam"]["Players"]
+    partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
     names = get_names_from_puuids(Players)
     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+    partyIcons = {}
     for player in Players:
+        party_icon = ''
+
+        # set party premade icon
+        for party in partyOBJ:
+            if player["Subject"] in partyOBJ[party]:
+                if party not in partyIcons:
+                    partyIcons.update({party: partyIconList[partyCount]})
+                    party_icon = partyIconList[partyCount] + ' '
+                else:
+                    party_icon = partyIcons[party] + ' '
+                partyCount += 1
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
         rank = rank[0]
