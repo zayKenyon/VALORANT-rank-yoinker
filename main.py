@@ -53,15 +53,17 @@ else:
     BLINK = NEGATIVE = CROSSED = end_tag = ''
 
 symbol = "■"
-
-partyIconList = [LIGHT_CYAN + symbol + end_tag,
-                 LIGHT_RED + symbol + end_tag,
-                 LIGHT_GREEN + symbol + end_tag,
-                 LIGHT_PURPLE + symbol + end_tag,
-                 LIGHT_WHITE + symbol + end_tag,
-                 symbol,
-                 LIGHT_BLUE + symbol + end_tag,
-                 YELLOW + symbol + end_tag]
+if enableColors:
+    partyIconList = [LIGHT_CYAN + symbol + end_tag,
+                     LIGHT_RED + symbol + end_tag,
+                     LIGHT_GREEN + symbol + end_tag,
+                     LIGHT_PURPLE + symbol + end_tag,
+                     LIGHT_WHITE + symbol + end_tag,
+                     symbol,
+                     LIGHT_BLUE + symbol + end_tag,
+                     YELLOW + symbol + end_tag]
+else:
+    partyIconList = [1, 2, 3, 4, 5, 6, 7, 8]
 
 number_to_ranks = {
     0: LIGHT_GRAY + "Unrated" + end_tag,
