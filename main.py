@@ -34,7 +34,6 @@ except json.decoder.JSONDecodeError:
     with open("config.json", "w") as file:
         configDialog(file)
 
-
 if enableColors:
     BLACK = "\033[0;30m"
     RED = "\033[0;31m"
@@ -117,18 +116,15 @@ def get_region():
             if '.a.pvp.net/account-xp/v1/' in line:
                 pd_url = line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
             elif 'https://glz' in line:
-                glz_url = []
-                glz_url.append(line.split('https://glz-')[1].split(".")[0])
-                glz_url.append(line.split('https://glz-')[1].split(".")[1])
+                glz_url = [(line.split('https://glz-')[1].split(".")[0]), (line.split('https://glz-')[1].split(".")[1])]
             if "pd_url" in locals() and "glz_url" in locals():
-                return[pd_url, glz_url]
+                return [pd_url, glz_url]
 
 
 region = get_region()
 pd_url = f"https://pd.{region[0]}.a.pvp.net"
 glz_url = f"https://glz-{region[1][0]}.{region[1][1]}.a.pvp.net"
 region = region[0]
-
 
 
 def get_current_version():
@@ -276,6 +272,7 @@ def get_name_from_puuid(puuid):
     response = requests.put(pd_url + f"/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
     return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
+
 def get_multiple_names_from_puuid(puuids):
     response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids,
                             verify=False)
@@ -314,8 +311,10 @@ def get_game_state(presences=presence(get_puuid())):
         if presence['puuid'] == puuid:
             return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
 
+
 def decode_presence(private):
     return json.loads(base64.b64decode(private))
+
 
 def get_party_json(GamePlayersPuuid, presences):
     party_json = {}
@@ -329,6 +328,7 @@ def get_party_json(GamePlayersPuuid, presences):
                     party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
 
     return party_json
+
 
 def level_to_color(level):
     PLcolor = ''
@@ -348,11 +348,13 @@ def level_to_color(level):
         PLcolor = LIGHT_GRAY
     return PLcolor
 
+
 def get_names_from_puuids(players):
     players_puuid = []
     for player in players:
         players_puuid.append(player["Subject"])
     return get_multiple_names_from_puuid(players_puuid)
+
 
 def get_color_from_team(team):
     if team == 'Red':
@@ -363,6 +365,7 @@ def get_color_from_team(team):
         color = ''
     return color
 
+
 def get_PlayersPuuid(Players):
     res = []
     for player in Players:
@@ -372,7 +375,6 @@ def get_PlayersPuuid(Players):
 def addRowTable(table, args: []):
     # for arg in args:
     table.add_rows([args])
-
 
 content = get_content()
 agent_dict = get_all_agents(content)
@@ -400,7 +402,7 @@ if game_state == "INGAME":
     for player in Players:
         party_icon = ''
 
-        #set party premade icon
+        # set party premade icon
         for party in partyOBJ:
             if player["Subject"] in partyOBJ[party]:
                 if party not in partyIcons:
