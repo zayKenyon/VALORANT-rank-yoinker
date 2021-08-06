@@ -4,7 +4,7 @@ If you find any issue create new issue in Issues tab or join the discord server:
 ![GitHub last commit](https://img.shields.io/github/last-commit/isaacKenyon/valorant-live-match-rank-grabber?logo=github&style=plastic)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isaacKenyon/valorant-live-match-rank-grabber?color=bright%20green&logo=github&style=plastic)
 
-Massive shoutout to https://github.com/OwOHamper for making this entire thing possible, this project simply would not exist without him.
+Massive shoutout to [OwOHamper](https://github.com/OwOHamper) for making this entire thing possible, this project simply would not exist without him.
 # VALORANT live match rank grabber
 
 VALORANT live match rank grabber lets you retrieve the ranks and basic informations of everyone in the lobby, regardless of gamemode.
