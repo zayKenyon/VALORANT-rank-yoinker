@@ -13,11 +13,14 @@ VALORANT live match rank grabber lets you retrieve the ranks and basic informati
 
 ![image](https://user-images.githubusercontent.com/74879467/128511983-6b5e1dcd-3231-4b1e-99f5-3d01e7ccd643.png)
 
-## Tutorial
-https://www.youtube.com/watch?v=nts1OsuFSTw
 
 ## Installation
- • Download the latest release, and run it.
+**NOTE - THIS WILL NOT LET YOU HAVE COLOURS, FOLLOW THE TUTORIAL FOR COLOURS**
+
+• Download the latest release .exe, and run it. 
+
+## Tutorial
+https://www.youtube.com/watch?v=nts1OsuFSTw
 
 ### **If you would like to run the code yourself:**
 
