@@ -14,11 +14,11 @@ try:
         enableColors = config.get("enableColors")
 except FileNotFoundError:
     with open("config.json", "w+") as file:
-        enableColors = bool(input("Enable colors? (1 for yes, 0 for no): "))
+        enableColors = bool(int(input("Enable colors? (1 for yes, 0 for no): ")))
         json.dump({"enableColors": enableColors}, file)
 except json.decoder.JSONDecodeError:
     with open("config.json", "w") as file:
-        enableColors = bool(input("Enable colors? (1 for yes, 0 for no): "))
+        enableColors = bool(int(input("Enable colors? (1 for yes, 0 for no): ")))
         json.dump({"enableColors": enableColors}, file)
 
 
