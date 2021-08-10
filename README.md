@@ -36,7 +36,7 @@ Alternatively if you have python 2 installed run `python3 main.py`
 
 
 ## Usage
- • When in a VALORANT is running start the program otherwise you will get an error.
+ • When in a VALORANT game, start the program otherwise you will get an error.
  
  • Colour of the Name reflects the team colour.
 
