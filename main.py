@@ -10,16 +10,17 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def configDialog(fileToWrite):
     while True:
-        enableColors = input("Enable colors? (y/n): ")
+        enableColors = input("Are you using cmd or terminal that doesn't support colors and you would like to disable colors? (y/n): ")
         if enableColors == "y":
-            enableColors = True
-        elif enableColors == "n":
             enableColors = False
+        elif enableColors == "n":
+            enableColors = True
         else:
             print('Avaible options are: "y", "n"')
             continue
         jsonToWrite = {"enableColors": enableColors}
         json.dump(jsonToWrite, fileToWrite)
+        break
 
 
 
