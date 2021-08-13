@@ -3,6 +3,8 @@ If you find any issue create new issue in Issues tab or join the discord server:
 [![Discord](https://img.shields.io/discord/872101595037446144?color=%236a7ec5&label=discord&logo=discord&style=plastic)](https://discord.gg/HeTKed64Ka) 
 ![GitHub last commit](https://img.shields.io/github/last-commit/isaacKenyon/valorant-live-match-rank-grabber?logo=github&style=plastic)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isaacKenyon/valorant-live-match-rank-grabber?color=bright%20green&logo=github&style=plastic)
+![GitHub](https://img.shields.io/github/license/isaacKenyon/valorant-live-match-rank-grabber)
+![GitHub top language](https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber)
 
 Massive shoutout to [OwOHamper](https://github.com/OwOHamper) for making this entire thing possible, this project simply would not exist without him.
 # VALORANT live match rank grabber
