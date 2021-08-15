@@ -330,6 +330,25 @@ def get_party_json(GamePlayersPuuid, presences):
 
     return party_json
 
+def get_party_members(self_puuid, presences):
+    party_member = {}
+    res = []
+    for presence in presences:
+        if presence["puuid"] == self_puuid:
+            decodedPresence = decode_presence(presence["private"])
+            party_id = decodedPresence["partyId"]
+            party_member.update({"Subject": presence["puuid"]})
+            party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
+            res.append(party_member)
+    for presence in presences:
+        decodedPresence = decode_presence(presence["private"])
+        if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
+            party_member = {}
+            party_member.update({"Subject": presence["puuid"]})
+            party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
+            res.append(party_member)
+    return res
+
 
 def level_to_color(level):
     PLcolor = ''
@@ -516,7 +535,49 @@ elif game_state == "PREGAME":
         if not rankStatus:
             print("You got rate limited 😞 waiting 3 seconds!")
             time.sleep(3)
+if game_state == "MENUS":
+    Players = get_party_members(puuid, presence)
+    names = get_names_from_puuids(Players)
+    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+    for player in Players:
+        party_icon = symbol[0]
+        rank = getRank(player["Subject"], seasonID)
+        rankStatus = rank[1]
+        rank = rank[0]
+        player_level = player["PlayerIdentity"].get("AccountLevel")
+        PLcolor = level_to_color(player_level)
 
+        # AGENT
+        agent = ""
+
+        # NAME
+        name = names[player["Subject"]] + end_tag
+
+        #rank
+        rankName = number_to_ranks[rank[0]]
+
+        #rr
+        rr = rank[1]
+
+        #leaderboard
+        leaderboard = rank[2]
+
+
+        #level
+        level = PLcolor + str(player_level) + end_tag
+        addRowTable(table, [party_icon,
+                         agent,
+                         name,
+                         rankName,
+                         rr,
+                         leaderboard,
+                         level
+                        ])
+        # table.add_rows([])
+        if not rankStatus:
+            print("You got rate limited 😞 waiting 3 seconds!")
+            time.sleep(3)
+#
 table.title = f"Valorant status: {game_state_dict[game_state]}"
 table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
 print(table)
