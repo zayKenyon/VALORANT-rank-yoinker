@@ -20,7 +20,7 @@ def configDialog(fileToWrite):
             continue
         jsonToWrite = {"enableColors": enableColors}
         json.dump(jsonToWrite, fileToWrite)
-        break
+        return enableColors
 
 
 
@@ -30,10 +30,10 @@ try:
         enableColors = config.get("enableColors")
 except FileNotFoundError:
     with open("config.json", "w+") as file:
-        configDialog(file)
+        enableColors = configDialog(file)
 except json.decoder.JSONDecodeError:
     with open("config.json", "w") as file:
-        configDialog(file)
+        enableColors = configDialog(file)
 
 if enableColors:
     BLACK = "\033[0;30m"
@@ -540,7 +540,7 @@ if game_state == "MENUS":
     names = get_names_from_puuids(Players)
     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
     for player in Players:
-        party_icon = symbol[0]
+        party_icon = partyIconList[0]
         rank = getRank(player["Subject"], seasonID)
         rankStatus = rank[1]
         rank = rank[0]
