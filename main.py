@@ -71,10 +71,10 @@ if enableColors:
                      LIGHT_RED + symbol + end_tag,
                      LIGHT_GREEN + symbol + end_tag,
                      LIGHT_PURPLE + symbol + end_tag,
-                     LIGHT_WHITE + symbol + end_tag,
                      symbol,
                      LIGHT_BLUE + symbol + end_tag,
-                     YELLOW + symbol + end_tag]
+                     YELLOW + symbol + end_tag,
+                     8]
 else:
     partyIconList = [1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -314,8 +314,23 @@ def get_game_state(presences=presence()):
 
 
 def decode_presence(private):
-    return json.loads(base64.b64decode(private))
-
+    try:
+        if not "{" in str(private):
+            return json.loads(base64.b64decode(bytes(private, encoding="utf-8") + b'=='))
+        else:
+            return {
+                "isValid": False,
+                "partyId": "0",
+                "partySize": 0,
+                "partyVersion": 0,
+            }
+    except:
+        return {
+            "isValid": False,
+            "partyId": "0",
+            "partySize": 0,
+            "partyVersion": 0,
+        }
 
 def get_party_json(GamePlayersPuuid, presences):
     party_json = {}
