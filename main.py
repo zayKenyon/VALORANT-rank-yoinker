@@ -444,7 +444,7 @@ while True:
         game_state = get_game_state(presence)
     except TypeError:
         raise Exception("Game has not started yet!")
-    if game_state != lastGameState:
+    if cooldown == 0 or game_state != lastGameState:
         lastGameState = game_state
         game_state_dict = {
             "INGAME": LIGHT_RED + "In-Game" + end_tag,
@@ -635,4 +635,7 @@ while True:
         table.title = f"Valorant status: {game_state_dict[game_state]}"
         table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
         print(table)
-    time.sleep(cooldown)
+    if cooldown == 0:
+        input("Press enter to fetch again")
+    else:
+        time.sleep(cooldown)
