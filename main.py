@@ -337,11 +337,12 @@ def get_party_json(GamePlayersPuuid, presences):
     for presence in presences:
         if presence["puuid"] in GamePlayersPuuid:
             decodedPresence = decode_presence(presence["private"])
-            if decodedPresence["partySize"] > 1:
-                try:
-                    party_json[decodedPresence["partyId"]].append(presence["puuid"])
-                except KeyError:
-                    party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
+            if decodedPresence["isValid"]:
+                if decodedPresence["partySize"] > 1:
+                    try:
+                        party_json[decodedPresence["partyId"]].append(presence["puuid"])
+                    except KeyError:
+                        party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
 
     return party_json
 
@@ -351,17 +352,19 @@ def get_party_members(self_puuid, presences):
     for presence in presences:
         if presence["puuid"] == self_puuid:
             decodedPresence = decode_presence(presence["private"])
-            party_id = decodedPresence["partyId"]
-            party_member.update({"Subject": presence["puuid"]})
-            party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
-            res.append(party_member)
+            if decodedPresence["isValid"]:
+                party_id = decodedPresence["partyId"]
+                party_member.update({"Subject": presence["puuid"]})
+                party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
+                res.append(party_member)
     for presence in presences:
         decodedPresence = decode_presence(presence["private"])
-        if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
-            party_member = {}
-            party_member.update({"Subject": presence["puuid"]})
-            party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
-            res.append(party_member)
+        if decodedPresence["isValid"]:
+            if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
+                party_member = {}
+                party_member.update({"Subject": presence["puuid"]})
+                party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
+                res.append(party_member)
     return res
 
 
