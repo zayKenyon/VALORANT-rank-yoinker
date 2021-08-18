@@ -302,12 +302,12 @@ def get_all_agents(content=get_content()):
     return agent_dict
 
 
-def presence():
+def get_presence():
     presences = fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
     return presences['presences']
 
 
-def get_game_state(presences=presence()):
+def get_game_state(presences=get_presence()):
     for presence in presences:
         if presence['puuid'] == puuid:
             return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
@@ -396,189 +396,195 @@ def addRowTable(table, args: []):
     # for arg in args:
     table.add_rows([args])
 
-content = get_content()
-agent_dict = get_all_agents(content)
-seasonID = get_latest_season_id(content)
-table = PrettyTable()
-# current in-game status
-try:
-    presence = presence()
-    game_state = get_game_state(presence)
-except TypeError:
-    raise Exception("Game has not started yet!")
-game_state_dict = {
-    "INGAME": LIGHT_RED + "In-Game" + end_tag,
-    "PREGAME": LIGHT_GREEN + "Agent Select" + end_tag,
-    "MENUS": BOLD + YELLOW + "In-Menus" + end_tag
-}
-if game_state == "INGAME":
-    Players = get_coregame_stats()["Players"]
-    partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-    names = get_names_from_puuids(Players)
-    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
-    Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
-    partyCount = 0
-    partyIcons = {}
-    for player in Players:
-        party_icon = ''
+def refresh_table():
+    print("\033c", end="")
+    content = get_content()
+    agent_dict = get_all_agents(content)
+    seasonID = get_latest_season_id(content)
+    table = PrettyTable()
+    # current in-game status
+    try:
+        presence = get_presence()
+        game_state = get_game_state(presence)
+    except TypeError:
+        raise Exception("Game has not started yet!")
+    game_state_dict = {
+        "INGAME": LIGHT_RED + "In-Game" + end_tag,
+        "PREGAME": LIGHT_GREEN + "Agent Select" + end_tag,
+        "MENUS": BOLD + YELLOW + "In-Menus" + end_tag
+    }
+    if game_state == "INGAME":
+        Players = get_coregame_stats()["Players"]
+        partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
+        names = get_names_from_puuids(Players)
+        Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+        Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
+        partyCount = 0
+        partyIcons = {}
+        for player in Players:
+            party_icon = ''
 
-        # set party premade icon
-        for party in partyOBJ:
-            if player["Subject"] in partyOBJ[party]:
-                if party not in partyIcons:
-                    partyIcons.update({party: partyIconList[partyCount]})
-                    # PARTY_ICON
-                    party_icon = partyIconList[partyCount]
-                else:
-                    # PARTY_ICON
-                    party_icon = partyIcons[party]
-                partyCount += 1
-        rank = getRank(player["Subject"], seasonID)
-        rankStatus = rank[1]
-        rank = rank[0]
-        player_level = player["PlayerIdentity"].get("AccountLevel")
-        color = get_color_from_team(player['TeamID'])
-        PLcolor = level_to_color(player_level)
+            # set party premade icon
+            for party in partyOBJ:
+                if player["Subject"] in partyOBJ[party]:
+                    if party not in partyIcons:
+                        partyIcons.update({party: partyIconList[partyCount]})
+                        # PARTY_ICON
+                        party_icon = partyIconList[partyCount]
+                    else:
+                        # PARTY_ICON
+                        party_icon = partyIcons[party]
+                    partyCount += 1
+            rank = getRank(player["Subject"], seasonID)
+            rankStatus = rank[1]
+            rank = rank[0]
+            player_level = player["PlayerIdentity"].get("AccountLevel")
+            color = get_color_from_team(player['TeamID'])
+            PLcolor = level_to_color(player_level)
 
-        # AGENT
-        agent = BOLD + str(agent_dict.get(player["CharacterID"].lower())) + end_tag
+            # AGENT
+            agent = BOLD + str(agent_dict.get(player["CharacterID"].lower())) + end_tag
 
-        # NAME
-        name = color + names[player["Subject"]] + end_tag
+            # NAME
+            name = color + names[player["Subject"]] + end_tag
 
-        #rank
-        rankName = number_to_ranks[rank[0]]
+            #rank
+            rankName = number_to_ranks[rank[0]]
 
-        #rr
-        rr = rank[1]
+            #rr
+            rr = rank[1]
 
-        #leaderboard
-        leaderboard = rank[2]
-
-
-        #level
-        level = PLcolor + str(player_level) + end_tag
-        addRowTable(table, [party_icon,
-                         agent,
-                         name,
-                         rankName,
-                         rr,
-                         leaderboard,
-                         level
-                        ])
-        # table.add_rows([])
-        if not rankStatus:
-            print("You got rate limited 😞 waiting 3 seconds!")
-            time.sleep(3)
-elif game_state == "PREGAME":
-    pregame_stats = get_pregame_stats()
-    Players = pregame_stats["AllyTeam"]["Players"]
-    partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-    names = get_names_from_puuids(Players)
-    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
-    partyCount = 0
-    partyIcons = {}
-    for player in Players:
-        party_icon = ''
-
-        # set party premade icon
-        for party in partyOBJ:
-            if player["Subject"] in partyOBJ[party]:
-                if party not in partyIcons:
-                    partyIcons.update({party: partyIconList[partyCount]})
-                    # PARTY_ICON
-                    party_icon = partyIconList[partyCount]
-                else:
-                    # PARTY_ICON
-                    party_icon = partyIcons[party]
-                partyCount += 1
-        rank = getRank(player["Subject"], seasonID)
-        rankStatus = rank[1]
-        rank = rank[0]
-        player_level = player["PlayerIdentity"].get("AccountLevel")
-        color = get_color_from_team(pregame_stats["AllyTeam"]['TeamID'])
-
-        PLcolor = level_to_color(player_level)
-
-        if player["CharacterSelectionState"] == "locked":
-            agent_color = BOLD
-        else:
-            agent_color = LIGHT_GRAY
-
-        # AGENT
-        agent = agent_color + str(agent_dict.get(player["CharacterID"].lower())) + end_tag
-
-        # NAME
-        name = color + names[player["Subject"]] + end_tag
-
-        # rank
-        rankName = number_to_ranks[rank[0]]
-
-        # rr
-        rr = rank[1]
-
-        # leaderboard
-        leaderboard = rank[2]
-
-        # level
-        level = PLcolor + str(player_level) + end_tag
+            #leaderboard
+            leaderboard = rank[2]
 
 
-        addRowTable(table, [party_icon,
-                         agent,
-                         name,
-                         rankName,
-                         rr,
-                         leaderboard,
-                         level
-                        ])
-        if not rankStatus:
-            print("You got rate limited 😞 waiting 3 seconds!")
-            time.sleep(3)
-if game_state == "MENUS":
-    Players = get_party_members(puuid, presence)
-    names = get_names_from_puuids(Players)
-    Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
-    for player in Players:
-        party_icon = partyIconList[0]
-        rank = getRank(player["Subject"], seasonID)
-        rankStatus = rank[1]
-        rank = rank[0]
-        player_level = player["PlayerIdentity"].get("AccountLevel")
-        PLcolor = level_to_color(player_level)
+            #level
+            level = PLcolor + str(player_level) + end_tag
+            addRowTable(table, [party_icon,
+                            agent,
+                            name,
+                            rankName,
+                            rr,
+                            leaderboard,
+                            level
+                            ])
+            # table.add_rows([])
+            if not rankStatus:
+                print("You got rate limited 😞 waiting 3 seconds!")
+                time.sleep(3)
+    elif game_state == "PREGAME":
+        pregame_stats = get_pregame_stats()
+        Players = pregame_stats["AllyTeam"]["Players"]
+        partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
+        names = get_names_from_puuids(Players)
+        Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+        partyCount = 0
+        partyIcons = {}
+        for player in Players:
+            party_icon = ''
 
-        # AGENT
-        agent = ""
+            # set party premade icon
+            for party in partyOBJ:
+                if player["Subject"] in partyOBJ[party]:
+                    if party not in partyIcons:
+                        partyIcons.update({party: partyIconList[partyCount]})
+                        # PARTY_ICON
+                        party_icon = partyIconList[partyCount]
+                    else:
+                        # PARTY_ICON
+                        party_icon = partyIcons[party]
+                    partyCount += 1
+            rank = getRank(player["Subject"], seasonID)
+            rankStatus = rank[1]
+            rank = rank[0]
+            player_level = player["PlayerIdentity"].get("AccountLevel")
+            color = get_color_from_team(pregame_stats["AllyTeam"]['TeamID'])
 
-        # NAME
-        name = names[player["Subject"]] + end_tag
+            PLcolor = level_to_color(player_level)
 
-        #rank
-        rankName = number_to_ranks[rank[0]]
+            if player["CharacterSelectionState"] == "locked":
+                agent_color = BOLD
+            else:
+                agent_color = LIGHT_GRAY
 
-        #rr
-        rr = rank[1]
+            # AGENT
+            agent = agent_color + str(agent_dict.get(player["CharacterID"].lower())) + end_tag
 
-        #leaderboard
-        leaderboard = rank[2]
+            # NAME
+            name = color + names[player["Subject"]] + end_tag
+
+            # rank
+            rankName = number_to_ranks[rank[0]]
+
+            # rr
+            rr = rank[1]
+
+            # leaderboard
+            leaderboard = rank[2]
+
+            # level
+            level = PLcolor + str(player_level) + end_tag
 
 
-        #level
-        level = PLcolor + str(player_level) + end_tag
-        addRowTable(table, [party_icon,
-                         agent,
-                         name,
-                         rankName,
-                         rr,
-                         leaderboard,
-                         level
-                        ])
-        # table.add_rows([])
-        if not rankStatus:
-            print("You got rate limited 😞 waiting 3 seconds!")
-            time.sleep(3)
-#
-table.title = f"Valorant status: {game_state_dict[game_state]}"
-table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
-print(table)
-input("Press enter to exit...")
+            addRowTable(table, [party_icon,
+                            agent,
+                            name,
+                            rankName,
+                            rr,
+                            leaderboard,
+                            level
+                            ])
+            if not rankStatus:
+                print("You got rate limited 😞 waiting 3 seconds!")
+                time.sleep(3)
+    if game_state == "MENUS":
+        Players = get_party_members(puuid, presence)
+        names = get_names_from_puuids(Players)
+        Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+        for player in Players:
+            party_icon = partyIconList[0]
+            rank = getRank(player["Subject"], seasonID)
+            rankStatus = rank[1]
+            rank = rank[0]
+            player_level = player["PlayerIdentity"].get("AccountLevel")
+            PLcolor = level_to_color(player_level)
+
+            # AGENT
+            agent = ""
+
+            # NAME
+            name = names[player["Subject"]] + end_tag
+
+            #rank
+            rankName = number_to_ranks[rank[0]]
+
+            #rr
+            rr = rank[1]
+
+            #leaderboard
+            leaderboard = rank[2]
+
+
+            #level
+            level = PLcolor + str(player_level) + end_tag
+            addRowTable(table, [party_icon,
+                            agent,
+                            name,
+                            rankName,
+                            rr,
+                            leaderboard,
+                            level
+                            ])
+            # table.add_rows([])
+            if not rankStatus:
+                print("You got rate limited 😞 waiting 3 seconds!")
+                time.sleep(3)
+    #
+    table.title = f"Valorant status: {game_state_dict[game_state]}"
+    table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
+    print(table)
+
+
+while True:
+    refresh_table()
+    input("Press Enter to refresh...")
