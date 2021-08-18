@@ -302,12 +302,12 @@ def get_all_agents(content=get_content()):
     return agent_dict
 
 
-def presence():
+def get_presence():
     presences = fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
     return presences['presences']
 
 
-def get_game_state(presences=presence()):
+def get_game_state(presences=get_presence()):
     for presence in presences:
         if presence['puuid'] == puuid:
             return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
@@ -417,7 +417,7 @@ seasonID = get_latest_season_id(content)
 table = PrettyTable()
 # current in-game status
 try:
-    presence = presence()
+    presence = get_presence()
     game_state = get_game_state(presence)
 except TypeError:
     raise Exception("Game has not started yet!")
