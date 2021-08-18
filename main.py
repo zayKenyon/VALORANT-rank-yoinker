@@ -492,26 +492,25 @@ while True:
                     # NAME
                     name = color + names[player["Subject"]] + end_tag
 
-                    #rank
+                    # RANK
                     rankName = number_to_ranks[rank[0]]
 
-                    #rr
+                    # RANK RATING
                     rr = rank[1]
 
-                    #leaderboard
+                    # LEADERBOARD
                     leaderboard = rank[2]
 
-
-                    #level
+                    # LEVEL
                     level = PLcolor + str(player_level) + end_tag
                     addRowTable(table, [party_icon,
-                                     agent,
-                                     name,
-                                     rankName,
-                                     rr,
-                                     leaderboard,
-                                     level
-                                    ])
+                                        agent,
+                                        name,
+                                        rankName,
+                                        rr,
+                                        leaderboard,
+                                        level
+                                        ])
                     # table.add_rows([])
                     bar()
         elif game_state == "PREGAME":
@@ -561,27 +560,27 @@ while True:
                     # NAME
                     name = color + names[player["Subject"]] + end_tag
 
-                    # rank
+                    # RANK
                     rankName = number_to_ranks[rank[0]]
 
-                    # rr
+                    # RANK RATING
                     rr = rank[1]
 
-                    # leaderboard
+                    # LEADERBOARD
                     leaderboard = rank[2]
 
-                    # level
+                    # LEVEL
                     level = PLcolor + str(player_level) + end_tag
 
 
                     addRowTable(table, [party_icon,
-                                     agent,
-                                     name,
-                                     rankName,
-                                     rr,
-                                     leaderboard,
-                                     level
-                                    ])
+                                        agent,
+                                        name,
+                                        rankName,
+                                        rr,
+                                        leaderboard,
+                                        level
+                                        ])
                     if not rankStatus:
                         print("You have been rate limited, 😞 waiting 3 seconds!")
                         time.sleep(3)
@@ -609,26 +608,26 @@ while True:
                     # NAME
                     name = names[player["Subject"]] + end_tag
 
-                    #rank
+                    # RANK
                     rankName = number_to_ranks[rank[0]]
 
-                    #rr
+                    # RANK RATING
                     rr = rank[1]
 
-                    #leaderboard
+                    # LEADERBOARD
                     leaderboard = rank[2]
 
 
-                    #level
+                    # LEVEL
                     level = PLcolor + str(player_level) + end_tag
                     addRowTable(table, [party_icon,
-                                     agent,
-                                     name,
-                                     rankName,
-                                     rr,
-                                     leaderboard,
-                                     level
-                                    ])
+                                        agent,
+                                        name,
+                                        rankName,
+                                        rr,
+                                        leaderboard,
+                                        level
+                                        ])
                     # table.add_rows([])
                     bar()
         #
