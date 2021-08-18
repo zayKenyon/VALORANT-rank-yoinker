@@ -43,6 +43,8 @@ Alternatively if you have python 2 installed run `python3 main.py`
  • Colour of the Name reflects the team colour.
 
  • When you are using cmd (or terminal that doesn't support ANSI escape colors) change config.json or run the code if config.json doesn't exist.
+ 
+ • If you want to use terminal that does support colors you can install [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)
 
 
 ## Contributing
