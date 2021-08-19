@@ -11,7 +11,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def configDialog(fileToWrite):
     while True:
-        enableColors = input("Enable colors (Have to use windows terminal.) or disable colors (regular cmd)? (y/n): ")
+        enableColors = input("Would you like to have colours? (Must use Windows Terminal - check README!) (y/n): ")
         if enableColors == "y":
             enableColors = True
         elif enableColors == "n":
@@ -22,7 +22,7 @@ def configDialog(fileToWrite):
         while True:
             try:
                 cooldown = int(input(
-                    "Enter cooldown between game state refresh. (0 to disable automatically refreshing status): "))
+                    "How often should the leaderboard scan for new match? (seconds) (0 to disable automatic refreshing: "))
             except ValueError:
                 print('You need to enter an integer without decimal dot')
                 continue
