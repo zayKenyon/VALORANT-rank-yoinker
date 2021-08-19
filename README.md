@@ -23,10 +23,10 @@
          <img alt="Last Commit" src="https://img.shields.io/github/last-commit/isaacKenyon/valorant-rank-yoinker?logo=github&style=for-the-badge">
      </a>
      <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/LICENSE">
-        <img alt="License" src="https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge"
+        <img alt="License" src="https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge">
      </a>
      <a href="https://www.python.org/">
-         <img alt="Language" src="https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber?style=for-the-badge"
+         <img alt="Language" src="https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber?style=for-the-badge">
      </a>
         
      
