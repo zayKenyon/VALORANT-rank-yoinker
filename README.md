@@ -26,7 +26,7 @@
         <img alt="License" src="https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge">
      </a>
      <a href="https://www.python.org/">
-         <img alt="Language" src="https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber?style=for-the-badge">
+         <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/isaacKenyon/Valorant-rank-yoinker?logo=python&logoColor=yellow&style=for-the-badge">
      </a>
         
      
