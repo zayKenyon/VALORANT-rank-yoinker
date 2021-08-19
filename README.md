@@ -102,9 +102,8 @@ Follow these simple steps in-order to use the program :)
    ```
 
 ### Installation
-**NOTE - THIS WILL NOT LET YOU HAVE COLOURS, FOLLOW THE TUTORIAL FOR COLOURS**
 
-• Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), and run it. 
+Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), and run it. 
 
 
  
@@ -113,8 +112,7 @@ Follow these simple steps in-order to use the program :)
 
 You must be in a match in-order for this program to work.
  
-If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases):
-1. Run the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases)
+If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), all you have to do is run it.
  
 If you are compiling the code yourself:
 1. Open the terminal ([Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)) for colour!
