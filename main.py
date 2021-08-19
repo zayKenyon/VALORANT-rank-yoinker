@@ -9,6 +9,7 @@ from alive_progress import alive_bar
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
 def configDialog(fileToWrite):
     while True:
         enableColors = input("Would you like to have colours? (Must use Windows Terminal - check README!) (y/n): ")
@@ -20,16 +21,17 @@ def configDialog(fileToWrite):
             print('Avaible options are: "y", "n"')
             continue
         while True:
-            try:
-                cooldown = int(input(
-                    "How often should the leaderboard scan for new match? (seconds) (0 to disable automatic refreshing: "))
-            except ValueError:
-                print('You need to enter an integer without decimal dot')
+            cooldown = input(
+                "How often should the leaderboard scan for new a match? (seconds) (0 to disable automatic "
+                "refreshing: ")
+            if cooldown.isdigit():
+                pass
+            else:
+                print('You need to enter a whole number.')
                 continue
             jsonToWrite = {"enableColors": enableColors, "cooldown": cooldown}
             json.dump(jsonToWrite, fileToWrite)
             return {"enableColors": enableColors, "cooldown": cooldown}
-
 
 
 try:
@@ -47,7 +49,6 @@ except json.decoder.JSONDecodeError:
         config = configDialog(file)
         enableColors = config["enableColors"]
         cooldown = config["cooldown"]
-
 
 
 if enableColors:
@@ -350,6 +351,7 @@ def decode_presence(private):
             "partyVersion": 0,
         }
 
+
 def get_party_json(GamePlayersPuuid, presences):
     party_json = {}
     for presence in presences:
@@ -363,6 +365,7 @@ def get_party_json(GamePlayersPuuid, presences):
                         party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
 
     return party_json
+
 
 def get_party_members(self_puuid, presences):
     party_member = {}
@@ -428,9 +431,11 @@ def get_PlayersPuuid(Players):
         res.append(player["Subject"])
     return res
 
+
 def addRowTable(table, args: []):
     # for arg in args:
     table.add_rows([args])
+
 
 content = get_content()
 agent_dict = get_all_agents(content)
@@ -572,7 +577,6 @@ while True:
                     # LEVEL
                     level = PLcolor + str(player_level) + end_tag
 
-
                     addRowTable(table, [party_icon,
                                         agent,
                                         name,
@@ -617,7 +621,6 @@ while True:
                     # LEADERBOARD
                     leaderboard = rank[2]
 
-
                     # LEVEL
                     level = PLcolor + str(player_level) + end_tag
                     addRowTable(table, [party_icon,
@@ -630,11 +633,10 @@ while True:
                                         ])
                     # table.add_rows([])
                     bar()
-        #
         table.title = f"Valorant status: {game_state_dict[game_state]}"
         table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
         print(table)
-    if cooldown == 0:
+    if int(cooldown) == 0:
         input("Press enter to fetch again")
     else:
-        time.sleep(cooldown)
+        time.sleep(int(cooldown))
