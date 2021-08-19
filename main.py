@@ -22,12 +22,9 @@ def configDialog(fileToWrite):
             continue
         while True:
             cooldown = input(
-                "How often should the leaderboard scan for new a match? (seconds) (0 to disable automatic "
-                "refreshing: ")
-            if cooldown.isdigit():
-                pass
-            else:
-                print('You need to enter a whole number.')
+                "How often should the program scan for new a game state? (seconds) (0 to disable automatic refreshing: ")
+            if not cooldown.isdigit():
+                print('You need to enter a number.')
                 continue
             jsonToWrite = {"enableColors": enableColors, "cooldown": cooldown}
             json.dump(jsonToWrite, fileToWrite)
@@ -449,7 +446,7 @@ while True:
         game_state = get_game_state(presence)
     except TypeError:
         raise Exception("Game has not started yet!")
-    if cooldown == 0 or game_state != lastGameState:
+    if int(cooldown) == 0 or game_state != lastGameState:
         lastGameState = game_state
         game_state_dict = {
             "INGAME": LIGHT_RED + "In-Game" + end_tag,
@@ -637,6 +634,6 @@ while True:
         table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
         print(table)
     if int(cooldown) == 0:
-        input("Press enter to fetch again")
+        input("Press enter to fetch again...")
     else:
         time.sleep(int(cooldown))
