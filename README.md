@@ -114,7 +114,7 @@ You must be in a match in-order for this program to work.
  
 If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), all you have to do is run it.
  
-If you are compiling the code yourself:
+If you are running the code directly:
 1. Open the terminal ([Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)) for colour!
 2. Execute `cd path/to/your/folder` 
 3. Execute `pip install -r requirements.txt`
@@ -122,7 +122,7 @@ If you are compiling the code yourself:
 
  Alternatively if you have python 2 installed run `python3 main.py`
 
-If you are compiling the code yourself and do not want to install [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701), you must reply with 'n' to the prompt when initially running the code or disable colours in the config
+If you are running the code directly and do not want to install [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701), you must reply with 'n' to the prompt when initially running the code or disable colours in the config
 
 ### Tutorial
 https://www.youtube.com/watch?v=nts1OsuFSTw
@@ -151,7 +151,7 @@ This project uses the MIT License. More details can be found [here.](https://git
 ## Contact 
 Join the community discord:         
 <a href="https://discord.gg/HeTKed64Ka">
-         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=236a7ec5&logo=discord&style=for-the-badge">
+         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
 </a>
  
  
