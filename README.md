@@ -17,7 +17,7 @@
 <!-- PROJECT BADGES -->    
 <p align="center">
      <a href="https://discord.gg/HeTKed64Ka">
-         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=236a7ec5&logo=discord&style=for-the-badge">
+         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
      </a>                                                                                                                             
      <a href="https://github.com/isaacKenyon/VALORANT-rank-yoinker/commits/main">
          <img alt="Last Commit" src="https://img.shields.io/github/last-commit/isaacKenyon/valorant-rank-yoinker?logo=github&style=for-the-badge">
