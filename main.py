@@ -166,16 +166,14 @@ def fetch(url_type, endpoint, method):
             response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
             return response
         elif url_type == "local":
-            local_headers = {}
-            local_headers['Authorization'] = 'Basic ' + base64.b64encode(
-                ('riot:' + lockfile['password']).encode()).decode()
+            local_headers = {'Authorization': 'Basic ' + base64.b64encode(
+                ('riot:' + lockfile['password']).encode()).decode()}
             response = requests.request(method, f"https://127.0.0.1:{lockfile['port']}{endpoint}",
                                         headers=local_headers,
                                         verify=False)
             return response.json()
         elif url_type == "custom":
-            response = requests.request(method, f"{endpoint}", headers=get_headers(),
-                                        verify=False)
+            response = requests.request(method, f"{endpoint}", headers=get_headers(), verify=False)
             return response.json()
     except json.decoder.JSONDecodeError:
         print(response)
@@ -219,14 +217,10 @@ def get_headers():
     return headers
 
 
-def get_puuid():
-    return puuid
-
-
 def get_coregame_match_id():
     global response
     try:
-        response = fetch(url_type="glz", endpoint=f"/core-game/v1/players/{get_puuid()}", method="get")
+        response = fetch(url_type="glz", endpoint=f"/core-game/v1/players/{puuid}", method="get")
         match_id = response['MatchID']
         return match_id
     except KeyError:
@@ -239,7 +233,7 @@ def get_coregame_match_id():
 
 def get_pregame_match_id():
     try:
-        response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{get_puuid()}", method="get")
+        response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{puuid}", method="get")
         match_id = response['MatchID']
         return match_id
     except KeyError:
@@ -291,11 +285,9 @@ def get_name_from_puuid(puuid):
 
 
 def get_multiple_names_from_puuid(puuids):
-    response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids,
-                            verify=False)
-    name_dict = {}
-    for player in response.json():
-        name_dict.update({player["Subject"]: player["GameName"] + "#" + player["TagLine"]})
+    response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids, verify=False)
+    name_dict = {player["Subject"]: f"{player['GameName']}#{player['TagLine']}"
+    for player in response.json()}
     return name_dict
 
 
@@ -333,20 +325,14 @@ def decode_presence(private):
     try:
         if not "{" in str(private):
             return json.loads(base64.b64decode(bytes(private, encoding="utf-8") + b'=='))
-        else:
-            return {
-                "isValid": False,
-                "partyId": "0",
-                "partySize": 0,
-                "partyVersion": 0,
-            }
     except:
-        return {
-            "isValid": False,
-            "partyId": "0",
-            "partySize": 0,
-            "partyVersion": 0,
-        }
+        pass
+    return {
+        "isValid": False,
+        "partyId": "0",
+        "partySize": 0,
+        "partyVersion": 0,
+    }
 
 
 def get_party_json(GamePlayersPuuid, presences):
@@ -387,22 +373,16 @@ def get_party_members(self_puuid, presences):
 
 
 def level_to_color(level):
-    PLcolor = ''
     if level >= 400:
-        PLcolor = CYAN  # PL = Player Level
-        pass
+        return CYAN  # PL = Player Level
     elif level >= 300:
-        PLcolor = YELLOW
-        pass
+        return YELLOW
     elif level >= 200:
-        PLcolor = BLUE
-        pass
+        return BLUE
     elif level >= 100:
-        PLcolor = BROWN
-        pass
+        return BROWN
     elif level < 100:
-        PLcolor = LIGHT_GRAY
-    return PLcolor
+        return LIGHT_GRAY
 
 
 def get_names_from_puuids(players):
@@ -423,10 +403,7 @@ def get_color_from_team(team):
 
 
 def get_PlayersPuuid(Players):
-    res = []
-    for player in Players:
-        res.append(player["Subject"])
-    return res
+    return [player["Subject"] for player in Players]
 
 
 def addRowTable(table, args: []):
