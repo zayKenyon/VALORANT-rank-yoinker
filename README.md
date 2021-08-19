@@ -67,7 +67,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![Screenshot](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/assets/Showcase%20Image%201.png)
+![Screenshot](assets/Example.png)
 
 A simple Python app which retrieves the rank and basic information of everyone in the lobby, regardless of gamemode.
 
@@ -79,7 +79,7 @@ A simple Python app which retrieves the rank and basic information of everyone i
  Displays for each player:
 |Their Premade|Current Rank|Rank Rating|Leaderboard Position|Account Level|
 |:---:|:---:|:---:|:---:|:---:|
-|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/assets/Rank%20Rating.png)|![Leaderboard](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/assets/Leaderboard%20Position.png)|![Level](assets/Level.png)|
+|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Leaderboard](assets/Leaderboard.png)|![Level](assets/Level.png)|
 
 ### Built With 
  * [Python](https://www.python.org/downloads/)
