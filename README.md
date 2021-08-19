@@ -11,17 +11,26 @@
   <p align="center">
     Retrieve the rank and basic information of everyone in the lobby, regardless of gamemode.
     <br />
- 
- 
- 
-<!-- BADGES -->
-[![Discord](https://img.shields.io/discord/872101595037446144?color=%236a7ec5&label=discord&logo=discord&style=plastic)](https://discord.gg/HeTKed64Ka) 
-![GitHub last commit](https://img.shields.io/github/last-commit/isaacKenyon/valorant-live-match-rank-grabber?logo=github&style=plastic)
-![GitHub](https://img.shields.io/github/license/isaacKenyon/valorant-live-match-rank-grabber)
-![GitHub top language](https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber)
 
-
- 
+    
+    
+<!-- PROJECT BADGES -->    
+<p align="center">
+     <a href="https://discord.gg/HeTKed64Ka">
+         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=236a7ec5&logo=discord&style=for-the-badge">
+     </a>                                                                                                                             
+     <a href="https://github.com/isaacKenyon/VALORANT-rank-yoinker/commits/main">
+         <img alt="Last Commit" src="https://img.shields.io/github/last-commit/isaacKenyon/valorant-rank-yoinker?logo=github&style=for-the-badge">
+     </a>
+     <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/LICENSE">
+        <img alt="License" src="https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge"
+     </a>
+     <a href="https://www.python.org/">
+         <img alt="Language" src="https://img.shields.io/github/languages/top/isaacKenyon/valorant-live-match-rank-grabber?style=for-the-badge"
+     </a>
+        
+     
+     
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
@@ -142,8 +151,10 @@ This project uses the MIT License. More details can be found [here.](https://git
  
 <!-- CONTACT -->
 ## Contact 
-[![Discord](https://img.shields.io/discord/872101595037446144?color=%236a7ec5&label=discord&logo=discord&style=plastic)](https://discord.gg/HeTKed64Ka) 
-
+Join the community discord:         
+<a href="https://discord.gg/HeTKed64Ka">
+         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=236a7ec5&logo=discord&style=for-the-badge">
+</a>
  
  
 <!-- ACKNOWLEDGEMENTS -->
@@ -156,3 +167,4 @@ This project uses the MIT License. More details can be found [here.](https://git
 <!-- DISCLAIMER -->
 ## Disclaimer
 THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+    
