@@ -1,8 +1,7 @@
 <!-- PROJECT LOGO -->
 <p align="center">
-(logo tbd)
 <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/">
-    <img src="Screenshots/logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/logo.png" alt="Logo" width="160" height="160">
   </a>
 </p>
 <h3 align="center">vRY</h3>
