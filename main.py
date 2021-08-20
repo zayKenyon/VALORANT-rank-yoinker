@@ -22,7 +22,8 @@ def configDialog(fileToWrite):
             continue
         while True:
             cooldown = input(
-                "How often should the program scan for new a game state? (seconds) (0 to disable automatic refreshing: ")
+                "How often should the program scan for new a game state (seconds)?  (0 to disable automatic "
+                "refreshing): ")
             if not cooldown.isdigit():
                 print('You need to enter a number.')
                 continue
@@ -199,9 +200,8 @@ def get_headers():
     global headers
     if headers == {}:
         global puuid
-        local_headers = {}
-        local_headers['Authorization'] = 'Basic ' + base64.b64encode(
-            ('riot:' + lockfile['password']).encode()).decode()
+        local_headers = {'Authorization': 'Basic ' + base64.b64encode(
+            ('riot:' + lockfile['password']).encode()).decode()}
         response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
                                 verify=False)
         entitlements = response.json()
@@ -303,10 +303,9 @@ def get_latest_season_id(content=get_content()):
 
 
 def get_all_agents(content=get_content()):
-    agent_dict = {}
     for agent in content["Characters"]:
         if "NPE" not in agent["AssetName"]:
-            agent_dict.update({agent['ID'].lower(): agent['Name']})
+            agent_dict = {agent['ID'].lower(): agent['Name']}
     return agent_dict
 
 
@@ -323,7 +322,7 @@ def get_game_state(presences=get_presence()):
 
 def decode_presence(private):
     try:
-        if not "{" in str(private):
+        if b"{" not in private:
             return json.loads(base64.b64decode(bytes(private, encoding="utf-8") + b'=='))
     except:
         pass
@@ -351,23 +350,18 @@ def get_party_json(GamePlayersPuuid, presences):
 
 
 def get_party_members(self_puuid, presences):
-    party_member = {}
     res = []
     for presence in presences:
         if presence["puuid"] == self_puuid:
             decodedPresence = decode_presence(presence["private"])
             if decodedPresence["isValid"]:
                 party_id = decodedPresence["partyId"]
-                party_member.update({"Subject": presence["puuid"]})
-                party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
+                party_member = {"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}}
                 res.append(party_member)
     for presence in presences:
         decodedPresence = decode_presence(presence["private"])
         if decodedPresence["isValid"]:
             if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
-                party_member = {}
-                party_member.update({"Subject": presence["puuid"]})
-                party_member.update({"PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}})
                 res.append(party_member)
     return res
 
@@ -482,6 +476,7 @@ while True:
 
                     # LEVEL
                     level = PLcolor + str(player_level) + end_tag
+
                     addRowTable(table, [party_icon,
                                         agent,
                                         name,
@@ -525,7 +520,6 @@ while True:
                     rank = rank[0]
                     player_level = player["PlayerIdentity"].get("AccountLevel")
                     color = get_color_from_team(pregame_stats["AllyTeam"]['TeamID'])
-
                     PLcolor = level_to_color(player_level)
 
                     if player["CharacterSelectionState"] == "locked":
@@ -597,6 +591,7 @@ while True:
 
                     # LEVEL
                     level = PLcolor + str(player_level) + end_tag
+
                     addRowTable(table, [party_icon,
                                         agent,
                                         name,
