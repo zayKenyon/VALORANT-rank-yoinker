@@ -287,7 +287,7 @@ def get_name_from_puuid(puuid):
 def get_multiple_names_from_puuid(puuids):
     response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids, verify=False)
     name_dict = {player["Subject"]: f"{player['GameName']}#{player['TagLine']}"
-    for player in response.json()}
+                 for player in response.json()}
     return name_dict
 
 
@@ -303,9 +303,10 @@ def get_latest_season_id(content=get_content()):
 
 
 def get_all_agents(content=get_content()):
+    agent_dict = {}
     for agent in content["Characters"]:
         if "NPE" not in agent["AssetName"]:
-            agent_dict = {agent['ID'].lower(): agent['Name']}
+            agent_dict.update({agent['ID'].lower(): agent['Name']})
     return agent_dict
 
 
@@ -356,13 +357,14 @@ def get_party_members(self_puuid, presences):
             decodedPresence = decode_presence(presence["private"])
             if decodedPresence["isValid"]:
                 party_id = decodedPresence["partyId"]
-                party_member = {"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel": decodedPresence["accountLevel"]}}
-                res.append(party_member)
+                res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
+                                                                             decodedPresence["accountLevel"]}})
     for presence in presences:
         decodedPresence = decode_presence(presence["private"])
         if decodedPresence["isValid"]:
             if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
-                res.append(party_member)
+                res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
+                                                                             decodedPresence["accountLevel"]}})
     return res
 
 
