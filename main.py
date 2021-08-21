@@ -344,7 +344,6 @@ def get_party_json(GamePlayersPuuid, presences):
     for presence in presences:
         if presence["puuid"] in GamePlayersPuuid:
             decodedPresence = decode_presence(presence["private"])
-            print(decodedPresence)
             if decodedPresence["isValid"]:
                 if decodedPresence["partySize"] > 1:
                     try:
@@ -566,7 +565,6 @@ while True:
                     bar()
         if game_state == "MENUS":
             Players = get_party_members(puuid, presence)
-            print(presence)
             with alive_bar(total=len(Players), title='Fetching Players', bar='blocks') as bar:
                 names = get_names_from_puuids(Players)
                 Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
