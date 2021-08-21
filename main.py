@@ -39,6 +39,10 @@ try:
         config = json.load(file)
         enableColors = config.get("enableColors")
         cooldown = config.get("cooldown")
+        if enableColors is None or cooldown is None:
+            config = configDialog(file)
+            enableColors = config["enableColors"]
+            cooldown = config["cooldown"]
 except FileNotFoundError:
     with open("config.json", "w+") as file:
         config = configDialog(file)
