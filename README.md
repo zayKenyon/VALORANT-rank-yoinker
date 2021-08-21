@@ -100,8 +100,11 @@ Follow these simple steps in-order to use the program :)
    py get-pip.py
    ```
 
+### Video tutorial
+https://youtu.be/TSLRd8Y9PiE
+    
 ### Installation
-
+    
 Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), and run it. 
 
 
@@ -123,8 +126,6 @@ If you are running the code directly:
 
 If you are running the code directly and do not want to install [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701), you must reply with 'n' to the prompt when initially running the code or disable colours in the config
 
-### Tutorial
-https://www.youtube.com/watch?v=nts1OsuFSTw
 
 
  
