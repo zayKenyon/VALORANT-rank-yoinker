@@ -51,7 +51,7 @@
     <li>
      <a href="#usage">Usage</a></li>
       <ul>
-       <li><a href="#tutorial">Video Tutorial</a></li>
+       <li><a href="#video tutorial">Video Tutorial</a></li>
       </ul>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
