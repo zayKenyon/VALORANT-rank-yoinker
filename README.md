@@ -100,7 +100,7 @@ Follow these simple steps in-order to use the program :)
    py get-pip.py
    ```
 
-### Video-Tutorial
+### Video Tutorial
 https://youtu.be/TSLRd8Y9PiE
     
 ### Installation
