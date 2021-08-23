@@ -51,7 +51,7 @@
     <li>
      <a href="#usage">Usage</a></li>
       <ul>
-       <li><a href="#tutorial">Tutorial</a></li>
+       <li><a href="#tutorial">Video Tutorial</a></li>
       </ul>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -100,7 +100,7 @@ Follow these simple steps in-order to use the program :)
    py get-pip.py
    ```
 
-### Video tutorial
+### Video Tutorial
 https://youtu.be/TSLRd8Y9PiE
     
 ### Installation
