@@ -71,9 +71,9 @@
 A simple Python app which retrieves the rank and basic information of everyone in the lobby, regardless of gamemode.
 
 ### Current Features
--Automatic Sorting Of Team
+* Automatic Sorting Of Team
  
--Automatic Sorting Of Account Level
+* Automatic Sorting Of Account Level
 
  Displays for each player:
 |Their Premade|Current Rank|Rank Rating|Leaderboard Position|Account Level|
