@@ -1,3 +1,5 @@
+from io import TextIOWrapper
+from json.decoder import JSONDecodeError
 import requests
 import urllib3
 import os
@@ -6,19 +8,19 @@ import json
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
-import json
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+def exit(status: int):  # so we don't need to import the entire sys module
+    raise SystemExit(status)
 
-def configDialog(fileToWrite):
+
+def configDialog(fileToWrite: TextIOWrapper):
     while True:
         enableColors = input("Would you like to have colours? (Must use Windows Terminal - check README!) (y/n): ")
-        if enableColors == "y":
-            enableColors = True
-        elif enableColors == "n":
-            enableColors = False
+        if enableColors in ("y", "n"):
+            enableColors = enableColors == "y"
         else:
             print('Avaible options are: "y", "n"')
             continue
@@ -29,30 +31,22 @@ def configDialog(fileToWrite):
             if not cooldown.isdigit():
                 print('You need to enter a number.')
                 continue
-            jsonToWrite = {"enableColors": enableColors, "cooldown": cooldown}
+            jsonToWrite = {"enableColors": enableColors, "cooldown": int(cooldown)}
             json.dump(jsonToWrite, fileToWrite)
-            return {"enableColors": enableColors, "cooldown": cooldown}
+            return jsonToWrite
 
 
 try:
     with open("config.json", "r") as file:
         config = json.load(file)
-        enableColors = config.get("enableColors")
-        cooldown = config.get("cooldown")
-        if enableColors is None or cooldown is None:
+        if None in (config.get("enableColors"), config.get("cooldown")):
             config = configDialog(file)
-            enableColors = config["enableColors"]
-            cooldown = config["cooldown"]
-except FileNotFoundError:
-    with open("config.json", "w+") as file:
-        config = configDialog(file)
-        enableColors = config["enableColors"]
-        cooldown = config["cooldown"]
-except json.decoder.JSONDecodeError:
+except (FileNotFoundError, JSONDecodeError):
     with open("config.json", "w") as file:
         config = configDialog(file)
-        enableColors = config["enableColors"]
-        cooldown = config["cooldown"]
+finally:
+    enableColors = config["enableColors"]
+    cooldown = config["cooldown"]
 
 
 if enableColors:
@@ -98,33 +92,33 @@ if enableColors:
 else:
     partyIconList = [1, 2, 3, 4, 5, 6, 7, 8]
 
-number_to_ranks = {
-    0: LIGHT_GRAY + "Unrated" + end_tag,
-    1: LIGHT_GRAY + "Unrated" + end_tag,
-    2: LIGHT_GRAY + "Unrated" + end_tag,
-    3: LIGHT_GRAY + "Iron 1" + end_tag,
-    4: LIGHT_GRAY + "Iron 2" + end_tag,
-    5: LIGHT_GRAY + "Iron 3" + end_tag,
-    6: BROWN + "Bronze 1" + end_tag,
-    7: BROWN + "Bronze 2" + end_tag,
-    8: BROWN + "Bronze 3" + end_tag,
-    9: LIGHT_WHITE + "Silver 1" + end_tag,
-    10: LIGHT_WHITE + "Silver 2" + end_tag,
-    11: LIGHT_WHITE + "Silver 3" + end_tag,
-    12: BOLD + YELLOW + "Gold 1" + end_tag,
-    13: BOLD + YELLOW + "Gold 2" + end_tag,
-    14: BOLD + YELLOW + "Gold 3" + end_tag,
-    15: LIGHT_CYAN + "Platinum 1" + end_tag,
-    16: LIGHT_CYAN + "Platinum 2" + end_tag,
-    17: LIGHT_CYAN + "Platinum 3" + end_tag,
-    18: LIGHT_PURPLE + "Diamond 1" + end_tag,
-    19: LIGHT_PURPLE + "Diamond 2" + end_tag,
-    20: LIGHT_PURPLE + "Diamond 3" + end_tag,
-    21: LIGHT_RED + "Immortal" + end_tag,
-    22: LIGHT_RED + "Immortal 2" + end_tag,
-    23: LIGHT_RED + "Immortal 3" + end_tag,
-    24: BOLD + "Radiant" + end_tag
-}
+number_to_ranks = [
+    LIGHT_GRAY + "Unrated" + end_tag,
+    LIGHT_GRAY + "Unrated" + end_tag,
+    LIGHT_GRAY + "Unrated" + end_tag,
+    LIGHT_GRAY + "Iron 1" + end_tag,
+    LIGHT_GRAY + "Iron 2" + end_tag,
+    LIGHT_GRAY + "Iron 3" + end_tag,
+    BROWN + "Bronze 1" + end_tag,
+    BROWN + "Bronze 2" + end_tag,
+    BROWN + "Bronze 3" + end_tag,
+    LIGHT_WHITE + "Silver 1" + end_tag,
+    LIGHT_WHITE + "Silver 2" + end_tag,
+    LIGHT_WHITE + "Silver 3" + end_tag,
+    BOLD + YELLOW + "Gold 1" + end_tag,
+    BOLD + YELLOW + "Gold 2" + end_tag,
+    BOLD + YELLOW + "Gold 3" + end_tag,
+    LIGHT_CYAN + "Platinum 1" + end_tag,
+    LIGHT_CYAN + "Platinum 2" + end_tag,
+    LIGHT_CYAN + "Platinum 3" + end_tag,
+    LIGHT_PURPLE + "Diamond 1" + end_tag,
+    LIGHT_PURPLE + "Diamond 2" + end_tag,
+    LIGHT_PURPLE + "Diamond 3" + end_tag,
+    LIGHT_RED + "Immortal" + end_tag,
+    LIGHT_RED + "Immortal 2" + end_tag,
+    LIGHT_RED + "Immortal 3" + end_tag,
+    BOLD + "Radiant" + end_tag
+]
 
 headers = {}
 
@@ -138,7 +132,7 @@ def get_region():
                 pd_url = line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
             elif 'https://glz' in line:
                 glz_url = [(line.split('https://glz-')[1].split(".")[0]), (line.split('https://glz-')[1].split(".")[1])]
-            if "pd_url" in locals() and "glz_url" in locals():
+            if "pd_url" in locals().keys() and "glz_url" in locals().keys():
                 return [pd_url, glz_url]
 
 
@@ -163,7 +157,7 @@ def get_current_version():
                 # return version
 
 
-def fetch(url_type, endpoint, method):
+def fetch(url_type: str, endpoint: str, method: str):
     global response
     try:
         if url_type == "glz":
@@ -193,8 +187,9 @@ def get_lockfile():
             data = lockfile.read().split(':')
             keys = ['name', 'PID', 'port', 'password', 'protocol']
             return dict(zip(keys, data))
-    except:
-        raise Exception("Lockfile not found, you're not in a game!")
+    except FileNotFoundError:
+        print("Lockfile not found, you're not in a game!")
+        exit(1)
 
 
 lockfile = get_lockfile()
@@ -229,23 +224,17 @@ def get_coregame_match_id():
         response = fetch(url_type="glz", endpoint=f"/core-game/v1/players/{puuid}", method="get")
         match_id = response['MatchID']
         return match_id
-    except KeyError:
-        print(f"No match id found. {response}")
-        return 0
-    except TypeError:
+    except (KeyError, TypeError):
         print(f"No match id found. {response}")
         return 0
 
 
 def get_pregame_match_id():
+    global response
     try:
         response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{puuid}", method="get")
-        match_id = response['MatchID']
-        return match_id
-    except KeyError:
-        print(f"No match id found. {response}")
-        return 0
-    except TypeError:
+        return response['MatchID']
+    except (KeyError, TypeError):
         print(f"No match id found. {response}")
         return 0
 
@@ -286,7 +275,7 @@ def getRank(puuid, seasonID):
 
 
 def get_name_from_puuid(puuid):
-    response = requests.put(pd_url + f"/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
+    response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
     return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
 
@@ -331,9 +320,9 @@ def decode_presence(private):
     try:
         if "{" not in str(private):
             dict = json.loads(base64.b64decode(bytes(private, encoding="utf-8") + b'=='))
-            if dict.get("isValid") != None:
+            if dict.get("isValid") is not None:
                 return dict
-    except:
+    except: # prolly JSONDecodeError? Not sure because of b64 so won't change it but please don't use bare excepts
         pass
     return {
         "isValid": False,
@@ -396,7 +385,7 @@ def get_names_from_puuids(players):
     return get_multiple_names_from_puuid(players_puuid)
 
 
-def get_color_from_team(team):
+def get_color_from_team(team: str):
     if team == 'Red':
         color = LIGHT_RED
     elif team == 'Blue':
@@ -410,7 +399,7 @@ def get_PlayersPuuid(Players):
     return [player["Subject"] for player in Players]
 
 
-def addRowTable(table, args: []):
+def addRowTable(table: PrettyTable, args: list):
     # for arg in args:
     table.add_rows([args])
 
@@ -427,7 +416,7 @@ while True:
         game_state = get_game_state(presence)
     except TypeError:
         raise Exception("Game has not started yet!")
-    if int(cooldown) == 0 or game_state != lastGameState:
+    if cooldown == 0 or game_state != lastGameState:
         lastGameState = game_state
         game_state_dict = {
             "INGAME": LIGHT_RED + "In-Game" + end_tag,
@@ -612,10 +601,12 @@ while True:
                                         ])
                     # table.add_rows([])
                     bar()
-        table.title = f"Valorant status: {game_state_dict[game_state]}"
+        if (title := game_state_dict.get(game_state)) is None:
+            exit(1)
+        table.title = f"Valorant status: {title}"
         table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Leaderboard Position", "Level"]
         print(table)
-    if int(cooldown) == 0:
+    if cooldown == 0:
         input("Press enter to fetch again...")
     else:
-        time.sleep(int(cooldown))
+        time.sleep(cooldown)
