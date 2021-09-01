@@ -34,6 +34,9 @@
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
+    <li> 
+        <a href="Terms-of-Use">Terms of Use</a>
+    </li>
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
@@ -61,8 +64,17 @@
   </ol>
 </details> 
  
+
+    
+<!-- NOTE -->
+ # Terms of Use
+ * Use this tool with good intent **ONLY**
+ * Do not 'doxx' or 'expose' people for their ranks
+ * Do not pretend to 'hack' people
+ * Do not pretend to have infected people's VALORANT accounts
  
- 
+    
+    
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
