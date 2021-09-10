@@ -14,7 +14,7 @@ body, html {
     box-shadow:inset 0 0 0 2000px rgba(0, 0, 0, 0.5);
 }
 img{
-    width: 25%;
+    width: 22%;
 }
 h3{
     color: white;
@@ -31,11 +31,11 @@ h3{
     padding: 1a;
     text-align: center;
     border-radius: 10px;
-    background: #353e4e;
+    background: #2b2f36;
 }
 
 h1{
-    color: #32e2b2;
+    color: #ff4655;
     font-family: Verdana, sans-serif;
 }
 p{
