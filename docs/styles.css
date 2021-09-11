@@ -6,7 +6,7 @@ html, body {
 }
 
 .bg {
-    background-image: url("images/Example.png");
+    background-image: url("../assets/Example.png");
     height: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -15,24 +15,19 @@ html, body {
 }
 img{
     width: 22%;
+    position: relative;
+    top: 10px;
 }
 
-h5{
-    color:#ece8e1;
-    font-family: Verdana, sans-serif;
-}
-h1{
-    color: #ff4655;
-    font-family: Verdana, sans-serif;
-}
 h3{
     color: white;
     font-family: Verdana, sans-serif;
-    opacity: 50%;
+    opacity: 80%;
 }
-p{
+h2{
     color: white;
-    font-family: Verdana, sans-serif;
+    font-size: 22px;
+    font-family: 'Inconsolata', monospace;
 }
 
 #box {
@@ -42,16 +37,15 @@ p{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 1a;
     text-align: center;
     border-radius: 10px;
     background: #2b2f36;
-  }
+}
 
 #box:hover {
     opacity: 1;
 }
-  
+
 .btn {
     /* Clean style */
     -moz-appearance: none;
