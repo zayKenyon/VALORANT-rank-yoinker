@@ -1,5 +1,5 @@
-body, html {
-    height: 100%;
+html, body {
+    margin: 0; height: 100%; overflow: hidden
 }
 :root {
     --background-color: black;
@@ -16,13 +16,27 @@ body, html {
 img{
     width: 22%;
 }
+
+h5{
+    color:#ece8e1;
+    font-family: Verdana, sans-serif;
+}
+h1{
+    color: #ff4655;
+    font-family: Verdana, sans-serif;
+}
 h3{
     color: white;
     font-family: Verdana, sans-serif;
     opacity: 50%;
 }
+p{
+    color: white;
+    font-family: Verdana, sans-serif;
+}
 
 #box {
+    opacity: 0.75;
     margin: 0;
     position: absolute;
     top: 50%;
@@ -32,17 +46,12 @@ h3{
     text-align: center;
     border-radius: 10px;
     background: #2b2f36;
-}
+  }
 
-h1{
-    color: #ff4655;
-    font-family: Verdana, sans-serif;
+#box:hover {
+    opacity: 1;
 }
-p{
-    color: white;
-    font-family: Verdana, sans-serif;
-}
-
+  
 .btn {
     /* Clean style */
     -moz-appearance: none;
