@@ -169,12 +169,16 @@ def fetch(url_type: str, endpoint: str, method: str):
     try:
         if url_type == "glz":
             response = requests.request(method, glz_url + endpoint, headers=get_headers(), verify=False)
-            if not response.ok: headers = {}
+            if not response.ok:
+                headers = {}
+                fetch(url_type, endpoint, method)
             log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
             return response.json()
         elif url_type == "pd":
             response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
-            if not response.ok: headers = {}
+            if not response.ok:
+                headers = {}
+                fetch(url_type, endpoint, method)
             log(
                 f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
             return response
@@ -303,12 +307,16 @@ def getRank(puuid, seasonID):
     except KeyError:
         rank = [0, 0, 0]
     max_rank = 0
-    for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
-        if r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"] is not None:
-            for winByTier in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"]:
-                if int(winByTier) > max_rank:
-                    max_rank = int(winByTier)
-    rank.append(max_rank)
+    seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
+    if seasons is not None:
+        for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
+            if r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"] is not None:
+                for winByTier in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"]:
+                    if int(winByTier) > max_rank:
+                        max_rank = int(winByTier)
+        rank.append(max_rank)
+    else:
+        rank.append(max_rank)
     return [rank, response.ok]
 
 
@@ -477,7 +485,6 @@ while True:
             "PREGAME": color('Agent Select', fore=(103, 237, 76)),
             "MENUS": color('In-Menus', fore=(238, 241, 54)),
         }
-        time.sleep(5)
         #color showcase
         # for game_state in game_state_dict:
         #     print(game_state_dict[game_state])
