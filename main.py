@@ -707,7 +707,7 @@ while True:
         if (title := game_state_dict.get(game_state)) is None:
             exit(1)
         table.title = f"Valorant status: {title}"
-        table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peek rank", "Leaderboard Position", "Level"]
+        table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak rank", "Leaderboard Position", "Level"]
         print(table)
     if cooldown == 0:
         input("Press enter to fetch again...")
