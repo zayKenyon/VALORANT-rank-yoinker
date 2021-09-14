@@ -477,6 +477,7 @@ while True:
             "PREGAME": color('Agent Select', fore=(103, 237, 76)),
             "MENUS": color('In-Menus', fore=(238, 241, 54)),
         }
+        time.sleep(5)
         #color showcase
         # for game_state in game_state_dict:
         #     print(game_state_dict[game_state])
