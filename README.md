@@ -37,27 +37,26 @@
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li> 
-        <a href="Terms-of-Use">Terms of Use</a>
-    </li>
+      <li>
+          <a href="Terms-of-Use">Terms of Use</a>
+      </li>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-      <li><a href="#current-features">Current Features</a></li>
-      </ul>
+         <ul>
+            <li>
+               <a href="#current-features">Current Features</a>
+            </li>
+        </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
+     <a href="#installation">Installation</a>
+        <ul>
+            <li>
+                <a href="#video-tutorial">Video Tutorial</a>
+            </li>
+        </ul>
     </li>
-    <li>
-     <a href="#usage">Usage</a></li>
-      <ul>
-       <li><a href="#video-tutorial">Video Tutorial</a></li>
-      </ul>
+    <li><a href="#usage">Usage</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -98,32 +97,18 @@ A simple Python app which retrieves the rank and basic information of everyone i
 
 
     
-<!-- GETTING STARTED -->
-## Getting Started
- 
-Follow these simple steps in-order to use the program :)
-### Prerequisites
-Pip should be installed with Python, it is very unlikely that it doesn't, but if it doesn't:
-
-  * Download the script from https://bootstrap.pypa.io/get-pip.py.
-
-  * Open a terminal/command prompt, cd to the folder containing the `get-pip.py` file and run:
-   ```sh
-    py get-pip.py
-   ```
+<!-- Installation -->
+## Installation
+    
+Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), and run it.  
 
 ### Video Tutorial
-https://youtu.be/TSLRd8Y9PiE
+https://www.youtube.com/watch?v=TSLRd8Y9PiE
     
-### Installation
-    
-Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), and run it. 
 
-
- 
 <!-- USAGE EXAMPLES -->
 ## Usage
-
+    
 VALORANT must be open for this to work.
 
 #### Recommended:   
