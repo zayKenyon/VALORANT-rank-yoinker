@@ -125,9 +125,11 @@ Download the [latest release](https://github.com/isaacKenyon/valorant-live-match
 ## Usage
 
 VALORANT must be open for this to work
- 
+
+#### Recommended:   
 If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), all you have to do is run it.
- 
+
+#### Not Recommended:    
 If you are running the code directly:
 1. Open the terminal
 2. Execute `cd path/to/the/folder` 
