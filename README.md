@@ -17,7 +17,10 @@
 <p align="center">
      <a href="https://discord.gg/HeTKed64Ka">
          <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
-     </a>                                                                                                                             
+     </a>
+     <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest">
+         <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/isaacKenyon/VALORANT-rank-yoinker/total?style=for-the-badge">
+    </a>
      <a href="https://github.com/isaacKenyon/VALORANT-rank-yoinker/commits/main">
          <img alt="Last Commit" src="https://img.shields.io/github/last-commit/isaacKenyon/valorant-rank-yoinker?logo=github&style=for-the-badge">
      </a>
@@ -41,7 +44,6 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
       <li><a href="#current-features">Current Features</a></li>
-      <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
     <li>
@@ -86,23 +88,21 @@ A simple Python app which retrieves the rank and basic information of everyone i
 * Automatic Sorting Of Team
  
 * Automatic Sorting Of Account Level
+    
+* Shows player's Peak Rank
 
  Displays for each player:
 |Their Premade|Current Rank|Rank Rating|Leaderboard Position|Account Level|
 |:---:|:---:|:---:|:---:|:---:|
 |![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Leaderboard](assets/Leaderboard.png)|![Level](assets/Level.png)|
 
-### Built With 
- * [Python](https://www.python.org/downloads/)
 
- 
- 
+    
 <!-- GETTING STARTED -->
 ## Getting Started
  
 Follow these simple steps in-order to use the program :)
 ### Prerequisites
-* [Windows Terminal (If you want colours)](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)
 * Pip should install with Python, but if not:
 
   Download the script from https://bootstrap.pypa.io/get-pip.py.
@@ -126,19 +126,16 @@ Download the [latest release](https://github.com/isaacKenyon/valorant-live-match
 
 You must be in a match in-order for this program to work.
  
-If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases), all you have to do is run it.
- 
-If you are running the code directly:
-1. Open the terminal ([Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)) for colour!
-2. Execute `cd path/to/your/folder` 
+### Recommended:
+If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), all you have to do is run it.
+
+### If Compiling:
+1. Open the terminal
+2. Execute `cd path/to/the/folder` 
 3. Execute `pip install -r requirements.txt`
 4. Execute `python main.py`
 
- Alternatively if you have python 2 installed run `python3 main.py`
-
-If you are running the code directly and do not want to install [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701), you must reply with 'n' to the prompt when initially running the code or disable colours in the config
-
-
+Alternatively if you have python 2 installed run `python3 main.py`
 
  
 <!-- CONTRIBUTING -->
@@ -146,16 +143,14 @@ If you are running the code directly and do not want to install [Windows Termina
 Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Commit Your Changes
+3. Open a Pull Request
 
 
  
 <!-- LICENSE -->
 ## License
-This project uses the MIT License. More details can be found [here.](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/LICENSE)
+This project uses the [MIT License.](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/LICENSE)
 
  
  
