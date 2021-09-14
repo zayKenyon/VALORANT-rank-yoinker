@@ -103,13 +103,13 @@ A simple Python app which retrieves the rank and basic information of everyone i
  
 Follow these simple steps in-order to use the program :)
 ### Prerequisites
-* Pip should install with Python, but if not:
+Pip should be installed with Python, it is very unlikely that it doesn't, but if it doesn't:
 
-  Download the script from https://bootstrap.pypa.io/get-pip.py.
+  * Download the script from https://bootstrap.pypa.io/get-pip.py.
 
-  Open a terminal/command prompt, cd to the folder containing the `get-pip.py` file and run:
-  ```sh
-   py get-pip.py
+  * Open a terminal/command prompt, cd to the folder containing the `get-pip.py` file and run:
+   ```sh
+    py get-pip.py
    ```
 
 ### Video Tutorial
@@ -124,7 +124,7 @@ Download the [latest release](https://github.com/isaacKenyon/valorant-live-match
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-VALORANT must be open for this to work
+VALORANT must be open for this to work.
 
 #### Recommended:   
 If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), all you have to do is run it.
