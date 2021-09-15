@@ -81,8 +81,6 @@
 
 ![Screenshot](assets/Example.png)
 
-A simple Python app which retrieves the rank and basic information of everyone in the lobby, regardless of gamemode.
-
 ### Current Features
 * Automatic Sorting Of Team
  
