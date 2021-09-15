@@ -114,12 +114,13 @@ If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-
 
 #### Not Recommended:    
 If you are running the code directly:
-1. Open the terminal
-2. Execute `cd path/to/the/folder` 
-3. Execute `pip install -r requirements.txt`
-4. Execute `python main.py`
+1. Install [Python](https://www.python.org/downloads)
+2. Download the source code and navigate to its folder
+3. In the path, write `cmd` 
+4. Execute `pip install -r requirements.txt`
+5. Execute `main.py`
 
- Alternatively if you have python 2 installed run `python3 main.py`
+Alternatively if you have python 2 installed run `python3 main.py`
 
 
  
