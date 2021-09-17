@@ -510,6 +510,7 @@ try:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
                     names = get_names_from_puuids(Players)
+                    log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
@@ -580,6 +581,7 @@ try:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
                     names = get_names_from_puuids(Players)
+                    log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
                     partyIcons = {}
@@ -660,6 +662,7 @@ try:
                 Players = get_party_members(puuid, presence)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     names = get_names_from_puuids(Players)
+                    log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     for player in Players:
                         party_icon = partyIconList[0]
