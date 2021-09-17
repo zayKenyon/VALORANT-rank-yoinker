@@ -37,27 +37,26 @@
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li> 
-        <a href="Terms-of-Use">Terms of Use</a>
-    </li>
+      <li>
+          <a href="Terms-of-Use">Terms of Use</a>
+      </li>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-      <li><a href="#current-features">Current Features</a></li>
-      </ul>
+         <ul>
+            <li>
+               <a href="#current-features">Current Features</a>
+            </li>
+        </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
+     <a href="#installation">Installation</a>
+        <ul>
+            <li>
+                <a href="#video-tutorial">Video Tutorial</a>
+            </li>
+        </ul>
     </li>
-    <li>
-     <a href="#usage">Usage</a></li>
-      <ul>
-       <li><a href="#video-tutorial">Video Tutorial</a></li>
-      </ul>
+    <li><a href="#usage">Usage</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -82,8 +81,6 @@
 
 ![Screenshot](assets/Example.png)
 
-A simple Python app which retrieves the rank and basic information of everyone in the lobby, regardless of gamemode.
-
 ### Current Features
 * Automatic Sorting Of Team
  
@@ -92,49 +89,38 @@ A simple Python app which retrieves the rank and basic information of everyone i
 * Displays Each Players' Peak Rank
 
  Displays for each player:
-|Their Premade|Current Rank|Rank Rating|Leaderboard Position|Account Level|
+|Their Premade|Current Rank|Rank Rating|Peak Rank|Account Level|
 |:---:|:---:|:---:|:---:|:---:|
-|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Leaderboard](assets/Leaderboard.png)|![Level](assets/Level.png)|
+|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
 
 
     
-<!-- GETTING STARTED -->
-## Getting Started
- 
-Follow these simple steps in-order to use the program :)
-### Prerequisites
-* Pip should install with Python, but if not:
-
-  Download the script from https://bootstrap.pypa.io/get-pip.py.
-
-  Open a terminal/command prompt, cd to the folder containing the `get-pip.py` file and run:
-  ```sh
-   py get-pip.py
-   ```
+<!-- Installation -->
+## Installation
+    
+Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), and run it.  
 
 ### Video Tutorial
-https://youtu.be/TSLRd8Y9PiE
+https://www.youtube.com/watch?v=TSLRd8Y9PiE
     
-### Installation
-    
-Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), and run it. 
 
-
- 
 <!-- USAGE EXAMPLES -->
 ## Usage
+    
+VALORANT must be open for this to work.
 
-VALORANT must be open for this to work
- 
+#### Recommended:   
 If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), all you have to do is run it.
- 
-If you are running the code directly:
-1. Open the terminal
-2. Execute `cd path/to/the/folder` 
-3. Execute `pip install -r requirements.txt`
-4. Execute `python main.py`
 
- Alternatively if you have python 2 installed run `python3 main.py`
+#### Not Recommended:    
+If you are running the code directly:
+1. Install [Python](https://www.python.org/downloads)
+2. Download the source code and navigate to its folder
+3. In the path, write `cmd` 
+4. Execute `pip install -r requirements.txt`
+5. Execute `main.py`
+
+Alternatively if you have python 2 installed run `python3 main.py`
 
 
  

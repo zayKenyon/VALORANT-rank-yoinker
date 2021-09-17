@@ -31,6 +31,7 @@ h2{
 }
 
 #box {
+    pointer-events: auto;
     opacity: 0.75;
     margin: 0;
     position: absolute;

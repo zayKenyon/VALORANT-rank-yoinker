@@ -1,16 +1,16 @@
 import traceback
-from io import TextIOWrapper
-from json.decoder import JSONDecodeError
 import requests
 import urllib3
 import os
 import base64
 import json
 import time
-from prettytable import PrettyTable
-from alive_progress import alive_bar
 import glob
 from colr import color
+from prettytable import PrettyTable
+from alive_progress import alive_bar
+from io import TextIOWrapper
+from json.decoder import JSONDecodeError
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 os.system('cls')
@@ -21,8 +21,11 @@ def exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code {status}")
     raise SystemExit(status)
 
+
 try:
     logFileOpened = False
+
+
     def log(stringToLog: str):
         global logFileOpened
         # creating logs folder
@@ -37,11 +40,13 @@ try:
             filenames.append(0)
         if logFileOpened:
             with open(f"logs/log-{max(filenames)}.txt", "a") as logFile:
-                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}] {stringToLog.encode('ascii', 'replace').decode()}\n")
+                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}]"
+                              f" {stringToLog.encode('ascii', 'replace').decode()}\n")
         else:
             with open(f"logs/log-{max(filenames) + 1}.txt", "w") as logFile:
                 logFileOpened = True
-                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}] {stringToLog.encode('ascii', 'replace').decode()}\n")
+                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}]"
+                              f" {stringToLog.encode('ascii', 'replace').decode()}\n")
 
 
     def configDialog(fileToWrite: TextIOWrapper):
@@ -56,14 +61,14 @@ try:
             #     print('Avaible options are: "y", "n"')
             #     continue
             # while True:
-                # log("cooldown prompt displayed")
-                # cooldown = input(
-                #     "How often should the program scan for new a game state (seconds)?  (0 to disable automatic "
-                #     "refreshing): ")
-                # if not cooldown.isdigit():
-                #     log(f"invalid cooldown option: '{cooldown}'")
-                #     print('You need to enter a number.')
-                #     continue
+            # log("cooldown prompt displayed")
+            # cooldown = input(
+            #     "How often should the program scan for new a game state (seconds)?  (0 to disable automatic "
+            #     "refreshing): ")
+            # if not cooldown.isdigit():
+            #     log(f"invalid cooldown option: '{cooldown}'")
+            #     print('You need to enter a number.')
+            #     continue
             jsonToWrite = {"cooldown": 1}
             json.dump(jsonToWrite, fileToWrite)
             return jsonToWrite
@@ -83,7 +88,6 @@ try:
     finally:
         cooldown = config["cooldown"]
         log(f"got cooldown with value '{cooldown}'")
-
 
     number_to_ranks = [
         color('Unrated', fore=(46, 46, 46)),
@@ -113,8 +117,6 @@ try:
         color('Radiant', fore=(255, 253, 205)),
     ]
 
-
-
     symbol = "■"
     partyIconList = [color(symbol, fore=(227, 67, 67)),
                      color(symbol, fore=(216, 67, 227)),
@@ -137,7 +139,8 @@ try:
                 if '.a.pvp.net/account-xp/v1/' in line:
                     pd_url = line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
                 elif 'https://glz' in line:
-                    glz_url = [(line.split('https://glz-')[1].split(".")[0]), (line.split('https://glz-')[1].split(".")[1])]
+                    glz_url = [(line.split('https://glz-')[1].split(".")[0]),
+                               (line.split('https://glz-')[1].split(".")[1])]
                 if "pd_url" in locals().keys() and "glz_url" in locals().keys():
                     return [pd_url, glz_url]
 
@@ -174,7 +177,8 @@ try:
                 if not response.ok:
                     headers = {}
                     fetch(url_type, endpoint, method)
-                log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
+                log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
+                    f" response code: {response.status_code}")
                 return response.json()
             elif url_type == "pd":
                 response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
@@ -182,7 +186,8 @@ try:
                     headers = {}
                     fetch(url_type, endpoint, method)
                 log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
+                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
+                    f" response code: {response.status_code}")
                 return response
             elif url_type == "local":
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
@@ -191,13 +196,15 @@ try:
                                             headers=local_headers,
                                             verify=False)
                 log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
+                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
+                    f" response code: {response.status_code}")
                 return response.json()
             elif url_type == "custom":
                 response = requests.request(method, f"{endpoint}", headers=get_headers(), verify=False)
                 if not response.ok: headers = {}
                 log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method}, response code: {response.status_code}")
+                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
+                    f" response code: {response.status_code}")
                 return response.json()
         except json.decoder.JSONDecodeError:
             log(f"JSONDecodeError in fetch function, resp.code: {response.status_code}, resp_text: '{response.text}")
@@ -229,16 +236,16 @@ try:
             global puuid
             local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                 ('riot:' + lockfile['password']).encode()).decode()}
-            response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token", headers=local_headers,
-                                    verify=False)
+            response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token",
+                                    headers=local_headers, verify=False)
             entitlements = response.json()
             puuid = entitlements['subject']
             headers = {
                 'Authorization': f"Bearer {entitlements['accessToken']}",
                 'X-Riot-Entitlements-JWT': entitlements['token'],
-                'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Z"
-                                         "m9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0I"
-                                         "jogIlVua25vd24iDQp9",
+                'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjog"
+                                         "IldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5"
+                                         "MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
                 'X-Riot-ClientVersion': get_current_version()
             }
         return headers
@@ -255,7 +262,6 @@ try:
             log(f"cannot find coregame match id: ")
             print(f"No match id found. {response}")
             return 0
-
 
 
     def get_pregame_match_id():
@@ -291,7 +297,7 @@ try:
                 if int(rankTIER) >= 21:
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"],]
+                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"], ]
                 elif int(rankTIER) not in (0, 1, 2, 3):
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
@@ -320,7 +326,6 @@ try:
         else:
             rank.append(max_rank)
         return [rank, response.ok]
-
 
 
     def get_name_from_puuid(puuid):
@@ -380,7 +385,6 @@ try:
         }
 
 
-
     def get_party_json(GamePlayersPuuid, presences):
         party_json = {}
         for presence in presences:
@@ -405,16 +409,15 @@ try:
                 if decodedPresence["isValid"]:
                     party_id = decodedPresence["partyId"]
                     res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
-                                                                                     decodedPresence["accountLevel"]}})
+                                                                                 decodedPresence["accountLevel"]}})
         for presence in presences:
             decodedPresence = decode_presence(presence["private"])
             if decodedPresence["isValid"]:
                 if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
                     res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
-                                                                                     decodedPresence["accountLevel"]}})
+                                                                                 decodedPresence["accountLevel"]}})
         log(f"gotten party members: {res}")
         return res
-
 
 
     def level_to_color(level):
@@ -431,11 +434,9 @@ try:
 
 
     def get_names_from_puuids(players):
-        players_puuid = []
         for player in players:
-            players_puuid.append(player["Subject"])
+            players_puuid = [player["Subject"]]
         return get_multiple_names_from_puuid(players_puuid)
-
 
 
     def get_color_from_team(team, name, playerPuuid, selfPuuid, agent=None):
@@ -454,6 +455,7 @@ try:
             Teamcolor = color(name, fore=(221, 224, 41))
         return Teamcolor
 
+
     def get_PlayersPuuid(Players):
         return [player["Subject"] for player in Players]
 
@@ -469,7 +471,6 @@ try:
     seasonID = get_latest_season_id(content)
     log(f"gotten season id: {seasonID}")
     lastGameState = ""
-
 
     while True:
         table = PrettyTable()
@@ -487,7 +488,7 @@ try:
                 "PREGAME": color('Agent Select', fore=(103, 237, 76)),
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
             }
-            #color showcase
+            # color showcase
             # for game_state in game_state_dict:
             #     print(game_state_dict[game_state])
             # print("")
@@ -538,7 +539,8 @@ try:
                             rankStatus = rank[1]
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
-                        Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"], puuid)
+                        Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"],
+                                                        puuid)
                         PLcolor = level_to_color(player_level)
 
                         # AGENT
@@ -553,8 +555,8 @@ try:
                         # RANK RATING
                         rr = rank[1]
 
-                        #peek rank
-                        peekRank = number_to_ranks[rank[3]]
+                        # PEAK RANK
+                        peakRank = number_to_ranks[rank[3]]
 
                         # LEADERBOARD
                         leaderboard = rank[2]
@@ -562,14 +564,12 @@ try:
                         # LEVEL
                         level = PLcolor
 
-
-
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
                                             rankName,
                                             rr,
-                                            peekRank,
+                                            peakRank,
                                             leaderboard,
                                             level
                                             ])
@@ -613,14 +613,17 @@ try:
                                                             names[player["Subject"]],
                                                             player["Subject"], puuid, agent=player["CharacterID"])
                         else:
-                            NameColor = get_color_from_team(pregame_stats['Teams'][0]['TeamID'], names[player["Subject"]],
+                            NameColor = get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
+                                                            names[player["Subject"]],
                                                             player["Subject"], puuid)
 
                         PLcolor = level_to_color(player_level)
                         if player["CharacterSelectionState"] == "locked":
-                            agent_color = color(str(agent_dict.get(player["CharacterID"].lower())), fore=(255, 255, 255))
+                            agent_color = color(str(agent_dict.get(player["CharacterID"].lower())),
+                                                fore=(255, 255, 255))
                         elif player["CharacterSelectionState"] == "selected":
-                            agent_color = color(str(agent_dict.get(player["CharacterID"].lower())), fore=(128, 128, 128))
+                            agent_color = color(str(agent_dict.get(player["CharacterID"].lower())),
+                                                fore=(128, 128, 128))
                         else:
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())), fore=(54, 53, 51))
 
@@ -636,9 +639,8 @@ try:
                         # RANK RATING
                         rr = rank[1]
 
-
-                        # peek rank
-                        peekRank = number_to_ranks[rank[3]]
+                        # PEAK RANK
+                        peakRank = number_to_ranks[rank[3]]
 
                         # LEADERBOARD
                         leaderboard = rank[2]
@@ -646,14 +648,12 @@ try:
                         # LEVEL
                         level = PLcolor
 
-
-
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
                                             rankName,
                                             rr,
-                                            peekRank,
+                                            peakRank,
                                             leaderboard,
                                             level,
                                             ])
@@ -689,8 +689,8 @@ try:
                         # RANK RATING
                         rr = rank[1]
 
-                        # peek rank
-                        peekRank = number_to_ranks[rank[3]]
+                        # PEAK RANK
+                        peakRank = number_to_ranks[rank[3]]
 
                         # LEADERBOARD
                         leaderboard = rank[2]
@@ -703,7 +703,7 @@ try:
                                             name,
                                             rankName,
                                             rr,
-                                            peekRank,
+                                            peakRank,
                                             leaderboard,
                                             level
                                             ])
@@ -712,14 +712,16 @@ try:
             if (title := game_state_dict.get(game_state)) is None:
                 exit(1)
             table.title = f"Valorant status: {title}"
-            table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak rank", "Leaderboard Position", "Level"]
+            table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak Rank", "Leaderboard Position", "Level"]
             print(table)
         if cooldown == 0:
             input("Press enter to fetch again...")
         else:
             time.sleep(cooldown)
 except:
-    print(color("The program has encountered an error. If the problem persist please create an issue with traceback bellow!", fore=(255, 0, 0)))
+    print(color(
+        "The program has encountered an error. If the problem persists, please reach support"
+        " with the logs found in .../logs", fore=(255, 0, 0)))
     traceback.print_exc()
     input("press enter to exit...\n")
     os._exit(1)
