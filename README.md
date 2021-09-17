@@ -1,3 +1,4 @@
+### THANK YOU FOR 400 :DDD 
 <!-- PROJECT LOGO -->
 <p align="center">
 <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/">
