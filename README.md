@@ -89,9 +89,9 @@
 * Displays Each Players' Peak Rank
 
  Displays for each player:
-|Their Premade|Current Rank|Rank Rating|Leaderboard Position|Account Level|
+|Their Premade|Current Rank|Rank Rating|Peak Rank|Account Level|
 |:---:|:---:|:---:|:---:|:---:|
-|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Leaderboard](assets/Leaderboard.png)|![Level](assets/Level.png)|
+|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
 
 
     
