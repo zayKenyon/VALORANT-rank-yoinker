@@ -434,8 +434,9 @@ try:
 
 
     def get_names_from_puuids(players):
+        players_puuid = []
         for player in players:
-            players_puuid = [player["Subject"]]
+            players_puuid.append(player["Subject"])
         return get_multiple_names_from_puuid(players_puuid)
 
 
@@ -526,10 +527,10 @@ try:
                                     partyIcons.update({party: partyIconList[partyCount]})
                                     # PARTY_ICON
                                     party_icon = partyIconList[partyCount]
+                                    partyCount += 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
-                                partyCount += 1
                         rank = getRank(player["Subject"], seasonID)
                         rankStatus = rank[1]
                         while not rankStatus:
