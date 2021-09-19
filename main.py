@@ -286,26 +286,6 @@ try:
         response = fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
         return response
 
-    def getWinRatio(puuid, seasonID):
-        response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
-        winratio = 0
-        if response.ok:
-            log("gotten winratio successfully")
-            r = response.json()
-            try:
-                wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWins"]
-                totalgames = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
-            except:
-                return "Unknown"
-
-            winratio = (wins / totalgames) * 100
-            winratio = str(round(winratio, 2)) + " %"
-        else:
-            log("failed getting winratio")
-            log(response.text)
-            winratio =  "Error"
-
-        return winratio
 
     def getRank(puuid, seasonID):
         response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
@@ -484,7 +464,8 @@ try:
     def addRowTable(table: PrettyTable, args: list):
         # for arg in args:
         table.add_rows([args])
-        
+
+
     content = get_content()
     agent_dict = get_all_agents(content)
     log(f"gotten agent dict: {agent_dict}")
@@ -494,7 +475,6 @@ try:
 
     while True:
         table = PrettyTable()
-        rtlimitmsg = "You have been rate limited, 😞 waiting 10 seconds!"
         # current in-game status
         try:
             presence = get_presence()
@@ -553,18 +533,12 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         rank = getRank(player["Subject"], seasonID)
-                        winRatio = getWinRatio(player["Subject"], seasonID)
                         rankStatus = rank[1]
-                        winStatus = winRatio
                         while not rankStatus:
-                            print(rtlimitmsg)
+                            print("You have been rate limited, 😞 waiting 10 seconds!")
                             time.sleep(10)
                             rank = getRank(player["Subject"], seasonID)
                             rankStatus = rank[1]
-                        while not winRatio:
-                            print(rtlimitmsg)
-                            time.sleep(10)
-                            winRatio = getWinRatio(player["Subject"], seasonID)
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"],
@@ -601,8 +575,7 @@ try:
                                             rr,
                                             peakRank,
                                             leaderboard,
-                                            level,
-                                            winRatio
+                                            level
                                             ])
                         bar()
             elif game_state == "PREGAME":
@@ -631,18 +604,12 @@ try:
                                     party_icon = partyIcons[party]
                                 partyCount += 1
                         rank = getRank(player["Subject"], seasonID)
-                        winRatio = getWinRatio(player["Subject"], seasonID)
                         rankStatus = rank[1]
-                        winStatus = winRatio
                         while not rankStatus:
-                            print(rtlimitmsg)
+                            print("You have been rate limited, 😞 waiting 10 seconds!")
                             time.sleep(10)
                             rank = getRank(player["Subject"], seasonID)
                             rankStatus = rank[1]
-                        while not winRatio:
-                            print(rtlimitmsg)
-                            time.sleep(10)
-                            winRatio = getWinRatio(player["Subject"], seasonID)
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
@@ -693,7 +660,6 @@ try:
                                             peakRank,
                                             leaderboard,
                                             level,
-                                            winRatio
                                             ])
                         bar()
             if game_state == "MENUS":
@@ -705,18 +671,12 @@ try:
                     for player in Players:
                         party_icon = partyIconList[0]
                         rank = getRank(player["Subject"], seasonID)
-                        winRatio = getWinRatio(player["Subject"], seasonID)
                         rankStatus = rank[1]
-                        winStatus = winRatio
                         while not rankStatus:
-                            print(rtlimitmsg)
+                            print("You have been rate limited, 😞 waiting 10 seconds!")
                             time.sleep(10)
                             rank = getRank(player["Subject"], seasonID)
                             rankStatus = rank[1]
-                        while not winRatio:
-                            print(rtlimitmsg)
-                            time.sleep(10)
-                            winRatio = getWinRatio(player["Subject"], seasonID)
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         PLcolor = level_to_color(player_level)
@@ -749,15 +709,14 @@ try:
                                             rr,
                                             peakRank,
                                             leaderboard,
-                                            level,
-                                            winRatio
+                                            level
                                             ])
                         # table.add_rows([])
                         bar()
             if (title := game_state_dict.get(game_state)) is None:
                 exit(1)
             table.title = f"Valorant status: {title}"
-            table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak Rank", "Leaderboard Position", "Level","Win Rate"]
+            table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak Rank", "Leaderboard Position", "Level"]
             print(table)
         if cooldown == 0:
             input("Press enter to fetch again...")
