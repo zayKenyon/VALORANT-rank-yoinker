@@ -517,6 +517,7 @@ try:
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
                     partyIcons = {}
+                    lastTeam = "Red"
                     for player in Players:
                         party_icon = ''
 
@@ -542,6 +543,9 @@ try:
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"],
                                                         puuid)
+                        if lastTeam != player['TeamID']:
+                            addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-"])
+                        lastTeam = player['TeamID']
                         PLcolor = level_to_color(player_level)
 
                         # AGENT
@@ -564,7 +568,6 @@ try:
 
                         # LEVEL
                         level = PLcolor
-
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
