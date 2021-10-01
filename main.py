@@ -37,4 +37,3 @@ if __name__ == "__main__":
         with open("config.json", "r") as configFile:
             parsedConfig = json.load(configFile)
             main(parsedConfig)
-    
