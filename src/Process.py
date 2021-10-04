@@ -1,4 +1,5 @@
 import os
+from threading import local
 import time
 from src.Utils import Utils
 from src.Auth import Auth
@@ -11,10 +12,11 @@ from src.Collector.AsyncRequests import AsyncFunctions
 
 from alive_progress import alive_bar
 class Proc:
-    def __init__(self, config:dict) -> None:
-        self.UtilsObj = Utils()
-        self.authObj = Auth()
+    def __init__(self, config:dict, locale:dict) -> None:
+        self.locale = locale
         self.config = config
+        self.UtilsObj = Utils(locale=locale)
+        self.authObj = Auth(locale=locale)
         pass
 
     def init(self) -> None:
@@ -47,7 +49,7 @@ class Proc:
             if success:
                 authenticated = True
             pass
-        self.asyncFunc = AsyncFunctions(headers=self.headers["data"],URLs=self.URLs)
+        self.asyncFunc = AsyncFunctions(headers=self.headers["data"],URLs=self.URLs, locale=self.locale)
         #Initialize Presence
         while True:
             
@@ -56,14 +58,14 @@ class Proc:
             
             if currentState["gameState"]["data"] == "MENUS":
                 os.system("cls")
-                print("Waiting for a game...")
+                print(self.locale["in_lobby"])
                 time.sleep(3)
                 continue
 
             os.system("cls")
             while currentState["gameState"]["data"] != "INGAME":
                 os.system("cls")
-                with alive_bar(title='Fetching Players', bar='classic2') as bar:
+                with alive_bar(title=self.locale["fetching_players"], bar='classic2') as bar:
                     renderedTable = self.start(currentState["presences"]["data"], currentState["gameState"]["data"])
                     bar()
                 print(renderedTable)
@@ -71,23 +73,24 @@ class Proc:
                 currentState = self.refreshState()
                 
             os.system("cls")
-            with alive_bar(title='Fetching Players', bar='classic2') as bar:
+            with alive_bar(title=self.locale["fetching_players"], bar='classic2') as bar:
                 renderedTable = self.start(currentState["presences"]["data"], currentState["gameState"]["data"])
                 bar()
             print(renderedTable)
-            another = input("Fetch another Data from the game? Y/N : ")
+            another = input(self.locale["question_fetch_again"])
 
             if another.upper() == "Y": self.tableObj.table = PrettyTable()
             else:
-                print("Goodbye!")
-                time.sleep(3)
+                input(self.locale["exit"])
                 exit()
 
     def refreshState(self):
-        self.PresenceObj = Presence(headers=self.authObj.localHeaders, urls=self.authObj.localUrl, self_puuid=self.authObj.self_puuid)
+        self.PresenceObj = Presence(headers=self.authObj.localHeaders, urls=self.authObj.localUrl, self_puuid=self.authObj.self_puuid, locale=self.locale)
 
         presences = self.PresenceObj.getPresence()
-        if not self.UtilsObj.isOpSuccess(presences): return
+        if not self.UtilsObj.isOpSuccess(presences): 
+            if presences["error"] == KeyError('presences'): print(self.locale["err_presence_not_found"])
+            return
 
         selfPrivate = self.PresenceObj.fetchSelfPrivate(presences["data"])
         if not self.UtilsObj.isOpSuccess(selfPrivate): return
@@ -102,9 +105,8 @@ class Proc:
 
     def start(self, presences, state):
         #Initialize Collector Objects
-        matchAnalyzer = MatchData(headers=self.headers["data"], urls=self.URLs)
-        dataFetcher = Collector(headers=self.headers["data"], urls=self.URLs)
-        localFetcher = Collector(headers=self.authObj.localHeaders, urls=self.authObj.localUrl)
+        matchAnalyzer = MatchData(headers=self.headers["data"], urls=self.URLs, locale=self.locale)
+        dataFetcher = Collector(headers=self.headers["data"], urls=self.URLs, locale=self.locale)
         #Fetch content
         self.content = dataFetcher.getContent()
         if not self.UtilsObj.isOpSuccess(self.content): return

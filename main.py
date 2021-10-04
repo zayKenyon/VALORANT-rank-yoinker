@@ -1,39 +1,73 @@
-def main(config:dict):
-    Proc(config).init()
+def main(config:dict, locale:dict):
+    Proc(config, locale).init()
+
+def createConfig():
+    print("Please remember that you can always change these values in \"config.json\" under the same folder.\n")
+    defaultConfig = {"colors":False,
+                            "respectPrivacy":True,
+                            "sortingMethod":"DESC_LEVEL",
+                            "locale":"en-US"}
+
+    locales = []
+    casedLocales = []
+    localeFiles = glob.glob("./locales/*.json")          
+    for k,localeCode in enumerate(localeFiles):
+        localeName = localeCode.replace("./locales\\", "").replace("./locales/", "").split(".")[0]
+        locales.append(localeName)
+        casedLocales.append(localeName.upper())
+    
+    chosenLocale = None
+
+    while chosenLocale == None:
+        locale = input(f"Choose your locale {locales} : ")
+        if locale.upper() in casedLocales:
+            with open(f"./locales/{locale}.json", "r") as localeFile:
+                chosenLocale = json.load(localeFile)
+                break
+        else: print(f"Please choose one in the following: {locales}")
+
+    colors = input(chosenLocale["question_colors"])
+    showNames = input(chosenLocale["question_names"])
+    sortingMethod = input(chosenLocale["question_sorting_method"]+chosenLocale["sorting_rank_ascending"]+", "+chosenLocale["sorting_rank_descending"]+", "+chosenLocale["sorting_level_ascending"]+", "+chosenLocale["sorting_level_descending"]+": ")
+
+    if colors[0].upper() == chosenLocale["yes_uppercase"]: defaultConfig["colors"] = True
+    if showNames[0].upper() == chosenLocale["no_uppercase"]: defaultConfig["respectPrivacy"] = False
+    if sortingMethod.upper() == chosenLocale["sorting_rank_ascending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_ascending"]
+    elif sortingMethod.upper() == chosenLocale["sorting_level_ascending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_level_ascending"]
+    elif sortingMethod.upper() == chosenLocale["sorting_rank_descending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_descending"]
+    elif sortingMethod.upper() == chosenLocale["sorting_level_descending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_level_descending"]
+    else:
+        print(chosenLocale["err_invalid_input"])
+        input(chosenLocale["exit"])
+        exit()
+
+    with open("config.json", "w") as configFile:
+        json.dump(defaultConfig, configFile)
 
 if __name__ == "__main__":
     from src.Process import Proc
     import json
+    import glob
+    from ctypes import windll
     
+    #CONFIG KEYS
+    configKeys = ["colors", "respectPrivacy", "sortingMethod", "locale"]
     try:
         with open("config.json", "r") as configFile:
             parsedConfig = json.load(configFile)
-            if "colors" in parsedConfig and "respectPrivacy" in parsedConfig and "sortingMethod" in parsedConfig:
-                main(parsedConfig)
-            else:
-                print("Configuration file is outdated!")
-                raise FileNotFoundError
+            for key in configKeys:
+                if key not in parsedConfig:
+                    print("Configuration file is outdated!")
+                    raise FileNotFoundError
+
+        with open(f"./locales/{parsedConfig['locale']}.json", "r") as localeFile: locale = json.load(localeFile)
+        main(parsedConfig, locale)
     except (FileNotFoundError, json.decoder.JSONDecodeError):
-        print("Please remember that you can always change these values in \"config.json\" under the same folder.\n")
-        
-        defaultConfig = {"colors":False,
-                            "respectPrivacy":True,
-                            "sortingMethod":"LEVEL"}
-        colors = input("Do you love colors? Y/n: ")
-        showNames = input("Do you want to respect other player's privacy? Y/n: ")
-        sortingMethod = input("What sorting method you would like to use? ASC_LEVEL, DESC_LEVEL, ASC_RANK, DESC_RANK: ")
+        if not windll.shell32.IsUserAnAdmin():
+            from elevate import elevate
+            elevate()
+        createConfig()
 
-        if colors.upper() == "Y": defaultConfig["colors"] = True
-        if showNames.upper() == "N": defaultConfig["respectPrivacy"] = False
-        if sortingMethod.upper() == "ASC_RANK": defaultConfig["sortingMethod"] = "ASC_RANK"
-        elif sortingMethod.upper() == "ASC_LEVEL": defaultConfig["sortingMethod"] = "ASC_LEVEL"
-        elif sortingMethod.upper() == "DESC_RANK": defaultConfig["sortingMethod"] = "DESC_RANK"
-        elif sortingMethod.upper() == "DESC_LEVEL": defaultConfig["sortingMethod"] = "DESC_LEVEL"
-        else: print("Invalid input. exiting...")
-
-        with open("config.json", "w") as configFile:
-            json.dump(defaultConfig, configFile)
-
-        with open("config.json", "r") as configFile:
-            parsedConfig = json.load(configFile)
-            main(parsedConfig)
+        with open("config.json", "r") as configFile: parsedConfig = json.load(configFile)
+        with open(f"./locales/{parsedConfig['locale']}.json", "r") as localeFile: locale = json.load(localeFile)
+        main(parsedConfig, locale)

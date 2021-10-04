@@ -6,10 +6,10 @@ from src.Collector.Collector import Collector
 
 class AsyncFunctions:
 
-    def __init__(self, headers:dict, URLs:dict) -> None:
+    def __init__(self, headers:dict, URLs:dict, locale:dict) -> None:
         self.URLs = URLs
         self.headers = headers
-        self.collector = Collector(headers, URLs)
+        self.collector = Collector(headers, URLs, locale)
         pass
 
     def getPlayerNames(self, playersData:list, PUUIDs:list):
@@ -24,14 +24,6 @@ class AsyncFunctions:
         return {"success":True, "data":playersData}
 
     def getPlayerRanks(self, playersData:list, PUUIDs:list):
-        '''for k,player in enumerate(playersData):
-            try:
-                response = asyncio.run(self.collector.getPlayerRank(player["Subject"]))
-                responses = asyncio.run(self.asyncGetRank(PUUIDs))
-                print(responses)
-                playersData[k].update({"MMRData":response["data"]})
-            except Exception as e:
-                return {"success":False, "error":e}'''
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         try:
             responses = asyncio.run(self.asyncGetRank(PUUIDs))

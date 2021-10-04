@@ -1,9 +1,11 @@
+from threading import local
 import time
 import requests
 
 class MatchData:
 
-    def __init__(self, headers:dict, urls:dict) -> None:
+    def __init__(self, headers:dict, urls:dict, locale:dict) -> None:
+        self.locale = locale
         self.headers = headers
         self.URLs = urls
         pass
@@ -14,10 +16,11 @@ class MatchData:
             response = requests.get(self.URLs["glzUrl"]+f"/pregame/v1/players/{puuid}", headers=self.headers)
             while "MatchID" not in response.json():
                 if not printed:
-                    print("Loading screen...")
+                    print(self.locale["loading_screen"])
                     printed = True
                 time.sleep(1)
                 response = requests.get(self.URLs["glzUrl"]+f"/pregame/v1/players/{puuid}", headers=self.headers)
+                print(response)
         except Exception as e:
             return {"success":False, "error":e}
 
