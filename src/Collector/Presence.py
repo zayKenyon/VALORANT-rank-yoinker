@@ -7,11 +7,12 @@ from src.Utils import Utils
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class Presence:
-    def __init__(self, headers:dict, urls:dict, self_puuid:str) -> None:
+    def __init__(self, headers:dict, urls:dict, self_puuid:str, locale:dict) -> None:
+        self.locale = locale
         self.headers = headers
         self.URLs = urls
         self.self_puuid = self_puuid
-        self.Utils = Utils()
+        self.Utils = Utils(locale=locale)
         pass
 
     def getPresence(self):
@@ -28,7 +29,7 @@ class Presence:
         except Exception as e:
             return {"success":False, "error":e}
         if not selfPresence:
-            return {"success":False, "error":"Player: SELF, Not found in presences. Please enter the lobby."}
+            return {"success":False, "error":self.locale["err_presence_not_found"], "cooldown":3}
         return {"success":True, "data":selfPresence["private"]}
 
     def presenceDecode(self, encodedPresence:str):

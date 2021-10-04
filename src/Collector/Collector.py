@@ -2,7 +2,8 @@ import requests
 
 class Collector:
 
-    def __init__(self, headers:dict, urls:dict) -> None:
+    def __init__(self, headers:dict, urls:dict, locale:dict) -> None:
+        self.locale = locale
         self.headers = headers
         self.URLs = urls
         self.agentDict = {}
@@ -22,7 +23,7 @@ class Collector:
         for agent in content["Characters"]:
             if "NPE" not in agent["AssetName"].upper(): agentDict[agent["ID"].lower()] = agent["Name"]
         if agentDict == {}:
-            return {"success":False, "error":"Failed to get all agents."}
+            return {"success":False, "error":self.locale["err_agents_failed"]}
         self.agentDict = agentDict
         return {"success":True, "data":agentDict}
 
@@ -31,7 +32,7 @@ class Collector:
         for season in content["Seasons"]:
             if season["IsActive"] and season["Type"] == "act": seasonId = season["ID"]
         if seasonId == "":
-            return {"success":False, "error":"Failed to get Current Season."}
+            return {"success":False, "error":self.locale["err_season_failed"]}
         self.activeSeason = seasonId
         return {"success":True, "data":seasonId}
 

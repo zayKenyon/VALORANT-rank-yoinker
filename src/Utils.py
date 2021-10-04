@@ -3,12 +3,15 @@ import os
 import time
 class Utils:
 
+    def __init__(self, locale:dict) -> None:
+        self.locale = locale
+        pass
     def getBetween(self, startString:str, endString:str, haystack:str) -> dict:
         inBetween = ""
         try:
             inBetween = haystack.split(startString)[1].split(endString)[0]
         except IndexError:
-            return {"error":"Bad Haystack.","success":False}
+            return {"error":self.locale["err_bad_haystack"],"success":False}
         return {"success":True, "data":inBetween}
     
     def getRegion(self) -> dict:
@@ -23,7 +26,7 @@ class Utils:
                 isSuccess = glzUrl
                 logFileIndex += 1
         except IndexError:
-            return {"error":"Cannot determine region.","success":False}
+            return {"error":self.locale["err_region_failed"],"success":False}
 
         region = self.getBetween("https://glz-", ".", glzUrl["data"])
         shard = self.getBetween(region["data"] + ".", ".a.", glzUrl["data"])
@@ -44,7 +47,7 @@ class Utils:
                 isSuccess = ci_version
                 logFileIndex += 1
         except IndexError:
-            return {"error":"Cannot determine Version.","success":False}
+            return {"error":self.locale["err_version_failed"],"success":False}
 
         versionArray = ci_version["data"].split("-")
         versionArray.insert(2, "shipping")
@@ -60,12 +63,14 @@ class Utils:
     
     def isOpSuccess(self,response:dict):
         if not response["success"]:
+            os.system("cls")
             print(response["error"])
-            i = 5
-            while i != 0:
-                print(i)
+            try: wait = response["cooldown"]
+            except: wait = 5
+            while wait != 0:
+                print(wait)
                 time.sleep(1)
-                i -= 1
+                wait -= 1
             return False
         return True
 
