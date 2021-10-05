@@ -1,6 +1,7 @@
 import os
 from threading import local
 import time
+from typing import Match
 from src.Utils import Utils
 from src.Auth import Auth
 from src.Cosmetics.Tables import Tables
@@ -79,7 +80,7 @@ class Proc:
             print(renderedTable)
             another = input(self.locale["question_fetch_again"])
 
-            if another.upper() == "Y": self.tableObj.table = PrettyTable()
+            if another.upper() == self.locale["yes_uppercase"]: self.tableObj.table = PrettyTable()
             else:
                 input(self.locale["exit"])
                 exit()
@@ -114,10 +115,11 @@ class Proc:
         activeSeason = dataFetcher.getActiveSeason(self.content["data"])
         if not self.UtilsObj.isOpSuccess(activeSeason): return
         #Init tables
-        self.tableObj = Tables(self.authObj.self_puuid, dataFetcher.getAgents(self.content["data"])["data"], self.config)
+        self.tableObj = Tables(self.authObj.self_puuid, dataFetcher.getAgents(self.content["data"])["data"], self.config, self.locale)
         if state == "PREGAME":
             MatchID = matchAnalyzer.getPreGame_Id(self.authObj.self_puuid)
             if not self.UtilsObj.isOpSuccess(MatchID): return
+            if not MatchID["data"]: return
             MatchID = MatchID["data"]
             
             matchDetails = matchAnalyzer.getPreGameFromID(MatchID)

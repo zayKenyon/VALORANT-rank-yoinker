@@ -21,7 +21,7 @@ def createConfig():
     while chosenLocale == None:
         locale = input(f"Choose your locale {locales} : ")
         if locale.upper() in casedLocales:
-            with open(f"./locales/{locale}.json", "r") as localeFile:
+            with open(f"./locales/{locale}.json", "r", encoding='utf-8') as localeFile:
                 chosenLocale = json.load(localeFile)
                 break
         else: print(f"Please choose one in the following: {locales}")
@@ -31,11 +31,11 @@ def createConfig():
     sortingMethod = input(chosenLocale["question_sorting_method"]+chosenLocale["sorting_rank_ascending"]+", "+chosenLocale["sorting_rank_descending"]+", "+chosenLocale["sorting_level_ascending"]+", "+chosenLocale["sorting_level_descending"]+": ")
 
     if colors[0].upper() == chosenLocale["yes_uppercase"]: defaultConfig["colors"] = True
-    if showNames[0].upper() == chosenLocale["no_uppercase"]: defaultConfig["respectPrivacy"] = False
-    if sortingMethod.upper() == chosenLocale["sorting_rank_ascending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_ascending"]
-    elif sortingMethod.upper() == chosenLocale["sorting_level_ascending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_level_ascending"]
-    elif sortingMethod.upper() == chosenLocale["sorting_rank_descending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_descending"]
-    elif sortingMethod.upper() == chosenLocale["sorting_level_descending"]: defaultConfig["sortingMethod"] = chosenLocale["sorting_level_descending"]
+    if showNames[0].upper() == chosenLocale["yes_uppercase"]: defaultConfig["respectPrivacy"] = False
+    if sortingMethod.upper() == chosenLocale["sorting_rank_ascending"].upper(): defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_ascending"].upper()
+    elif sortingMethod.upper() == chosenLocale["sorting_level_ascending"].upper(): defaultConfig["sortingMethod"] = chosenLocale["sorting_level_ascending"].upper()
+    elif sortingMethod.upper() == chosenLocale["sorting_rank_descending"].upper(): defaultConfig["sortingMethod"] = chosenLocale["sorting_rank_descending"].upper()
+    elif sortingMethod.upper() == chosenLocale["sorting_level_descending"].upper(): defaultConfig["sortingMethod"] = chosenLocale["sorting_level_descending"].upper()
     else:
         print(chosenLocale["err_invalid_input"])
         input(chosenLocale["exit"])
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                     print("Configuration file is outdated!")
                     raise FileNotFoundError
 
-        with open(f"./locales/{parsedConfig['locale']}.json", "r") as localeFile: locale = json.load(localeFile)
+        with open(f"./locales/{parsedConfig['locale']}.json", "r", encoding='utf-8') as localeFile: locale = json.load(localeFile)
         main(parsedConfig, locale)
     except (FileNotFoundError, json.decoder.JSONDecodeError):
         if not windll.shell32.IsUserAnAdmin():
@@ -69,5 +69,5 @@ if __name__ == "__main__":
         createConfig()
 
         with open("config.json", "r") as configFile: parsedConfig = json.load(configFile)
-        with open(f"./locales/{parsedConfig['locale']}.json", "r") as localeFile: locale = json.load(localeFile)
+        with open(f"./locales/{parsedConfig['locale']}.json", "r", encoding='utf-8') as localeFile: locale = json.load(localeFile)
         main(parsedConfig, locale)
