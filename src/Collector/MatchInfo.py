@@ -20,7 +20,6 @@ class MatchData:
                     printed = True
                 time.sleep(1)
                 response = requests.get(self.URLs["glzUrl"]+f"/pregame/v1/players/{puuid}", headers=self.headers)
-                print(response)
         except Exception as e:
             return {"success":False, "error":e}
 
