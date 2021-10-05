@@ -1,14 +1,16 @@
+from threading import local
 from prettytable import PrettyTable
 from src.Cosmetics.Colors import Colors
 
 class Tables:
-    def __init__(self, selfpuuid:str, agent_dict:dict, config:dict) -> None:
+    def __init__(self, selfpuuid:str, agent_dict:dict, config:dict, locale:dict) -> None:
+        self.config = config
+        self.locale = locale
         self.table = PrettyTable()
         self.colors = Colors(config["colors"])
         self.partyIcons = {}
         self.partyCount = 0
         self.puuid = selfpuuid
-        self.config = config
         self.agent_dict = agent_dict
         pass
     
@@ -17,13 +19,27 @@ class Tables:
 
     def renderPlayers(self, players:list, parties:dict, teamid:str=None):
         lastTeam = "Red"
-        if self.config["sortingMethod"].upper() == "ASC_RANK": players.sort(key=lambda players: players["MMRData"]["currentTier"], reverse=False)
-        if self.config["sortingMethod"].upper() == "DESC_RANK": players.sort(key=lambda players: players["MMRData"]["currentTier"], reverse=True)
-
-        if self.config["sortingMethod"].upper() == "ASC_LEVEL": players.sort(key=lambda players: players["AccountLevel"], reverse=False)
-        if self.config["sortingMethod"].upper() == "DESC_LEVEL": players.sort(key=lambda players: players["AccountLevel"], reverse=True)
-
-        players.sort(key=lambda players: players["TeamID"], reverse=True)
+        blue = []
+        red = []
+        for player in players:
+            if player["TeamID"] == "Blue": blue.append(player)
+            else: red.append(player)
+        if self.config["sortingMethod"].upper() == self.locale["sorting_rank_ascending"].upper(): 
+            blue.sort(key=lambda blue: blue["MMRData"]["currentTier"], reverse=False) 
+            red.sort(key=lambda red: red["MMRData"]["currentTier"], reverse=False)
+        if self.config["sortingMethod"].upper() == self.locale["sorting_rank_descending"].upper():
+            blue.sort(key=lambda blue: blue["MMRData"]["currentTier"], reverse=True) 
+            red.sort(key=lambda red: red["MMRData"]["currentTier"], reverse=True)
+        if self.config["sortingMethod"].upper() == self.locale["sorting_level_ascending"].upper():
+            blue.sort(key=lambda blue: blue["AccountLevel"], reverse=False)
+            red.sort(key=lambda red: red["AccountLevel"], reverse=False)
+        if self.config["sortingMethod"].upper() == self.locale["sorting_level_descending"].upper():
+            blue.sort(key=lambda blue: blue["AccountLevel"], reverse=True)
+            red.sort(key=lambda red: red["AccountLevel"], reverse=True)
+            
+        blue.extend(red)
+        players = blue
+        #players.sort(key=lambda players: players["TeamID"], reverse=True)
         for player in players:
             partyIcon = "-"
             for party in parties["data"]:

@@ -26,6 +26,8 @@ class Presence:
     def fetchSelfPrivate(self, presences:dict):
         try:
             selfPresence = next((player for player in presences["presences"] if player["puuid"] == self.self_puuid), False)
+        except KeyError:
+            return {"success":False, "error":self.locale["err_presence_not_found"], "cooldown":3}
         except Exception as e:
             return {"success":False, "error":e}
         if not selfPresence:

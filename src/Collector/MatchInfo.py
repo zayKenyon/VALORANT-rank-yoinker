@@ -14,17 +14,20 @@ class MatchData:
         printed = False
         try:
             response = requests.get(self.URLs["glzUrl"]+f"/pregame/v1/players/{puuid}", headers=self.headers)
-            while "MatchID" not in response.json():
+            pregame = response.json()
+            while "MatchID" not in pregame and "errorCode" not in pregame:
                 if not printed:
                     print(self.locale["loading_screen"])
                     printed = True
                 time.sleep(1)
                 response = requests.get(self.URLs["glzUrl"]+f"/pregame/v1/players/{puuid}", headers=self.headers)
-                print(response)
+                pregame = response.json()
+                if "errorCode" in pregame:
+                    return {"success":True, "data":False}
         except Exception as e:
             return {"success":False, "error":e}
 
-        matchId = response.json()["MatchID"]
+        matchId = pregame["MatchID"]
         return {"success":True, "data":matchId}
 
     def getCoreGame_Id(self, puuid:str):
