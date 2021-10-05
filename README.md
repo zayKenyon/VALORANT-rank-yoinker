@@ -1,11 +1,10 @@
-### THANK YOU FOR 400 :DDD 
+### THANK YOU FOR 500 :DDD 
 <!-- PROJECT LOGO -->
 <p align="center">
 <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/">
     <img src="assets/Logo.png" alt="Logo" width="160" height="160">
   </a>
 </p>
-<h3 align="center">vRY</h3>
 <h5 align="center">VALORANT rank yoinker</h5>
 
   <p align="center">
@@ -132,6 +131,12 @@ Any contributions you make are **greatly appreciated**.
 1. Fork the Project
 2. Commit your Changes 
 3. Open a Pull Request
+    
+### If you wish to help with translating vRY into different languages:
+
+(Once complete show proof that you have to recieve a special role on the server!)
+
+https://poeditor.com/join/project?hash=xSxq7UspIW
 
 
  
@@ -153,6 +158,7 @@ Join the community discord:
 ## Acknowledgements
 - [Valorant-API.com](https://valorant-api.com/)
 - [Hamper for all his amazing work](https://github.com/OwOHamper)
+- [JP for re-writing the code to make it more manageable](https://github.com/weedeej)
 
  
  
