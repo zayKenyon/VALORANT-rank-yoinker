@@ -15,12 +15,16 @@ from io import TextIOWrapper
 from json.decoder import JSONDecodeError
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+version = "1.01"
+
 os.system('cls')
+os.system(f"title VALORANT rank yoinker {version}")
 enablePrivateLogging = False
 
 
 def exit(status: int):  # so we don't need to import the entire sys module
-    log(f"exited program with error code {status}")
+    log(f"exited program with error code v{status}")
     raise SystemExit(status)
 
 
@@ -555,6 +559,7 @@ try:
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
                     partyIcons = {}
+                    lastTeamBoolean = False
                     lastTeam = "Red"
                     for player in Players:
                         party_icon = ''
@@ -582,8 +587,10 @@ try:
                         Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"],
                                                         puuid)
                         if lastTeam != player['TeamID']:
-                            addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-", "-"])
+                            if lastTeamBoolean:
+                                addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-", "-"])
                         lastTeam = player['TeamID']
+                        lastTeamBoolean = True
                         PLcolor = level_to_color(player_level)
 
                         # AGENT
@@ -762,6 +769,7 @@ try:
             table.title = f"Valorant status: {title}"
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             print(table)
+            print(f"VALORANT rank yoinker v{version}")
         if cooldown == 0:
             input("Press enter to fetch again...")
         else:
