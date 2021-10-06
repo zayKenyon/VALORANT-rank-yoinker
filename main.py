@@ -1,4 +1,6 @@
 import traceback
+
+import pyperclip
 import requests
 import urllib3
 import os
@@ -222,7 +224,6 @@ try:
         except FileNotFoundError:
             log("lockfile not found")
             raise Exception("Lockfile not found, you're not in a game!")
-            exit(1)
 
 
     lockfile = get_lockfile()
@@ -456,6 +457,41 @@ try:
             Teamcolor = color(name, fore=(221, 224, 41))
         return Teamcolor
 
+    def get_rgb_color_from_skin(skin_id, valoApiSkins):
+        tierDict = {
+            "0cebb8be-46d7-c12a-d306-e9907bfc5a25": (0, 149, 135),
+            "e046854e-406c-37f4-6607-19a9ba8426fc": (241, 184, 45),
+            "60bca009-4182-7998-dee7-b8a2558dc369": (209, 84, 141),
+            "12683d76-48d7-84a3-4e09-6985794f0445": (90, 159, 226),
+            "411e4a55-4e59-7757-41f0-86a53f101bb5": (239, 235, 101),
+            None: None
+        }
+        for skin in valoApiSkins.json()["data"]:
+            if skin_id == skin["uuid"]:
+                return tierDict[skin["contentTierUuid"]]
+
+
+
+
+    def get_matchLoadouts(players, content, weaponChoose, valoApiSkins):
+        match_id = get_coregame_match_id()
+        weaponLists = {}
+        PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
+        for player in range(len(players)):
+            inv = PlayerInventorys["Loadouts"][player]
+            for weapon in content["Equips"]:
+                if weapon["Name"].lower() == weaponChoose.lower():
+                    skin_id = inv["Loadout"]["Items"][weapon["ID"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
+                    for skin in content["Skins"]:
+                        if skin_id.lower() == skin["ID"].lower():
+                            rgb_color = get_rgb_color_from_skin(skin["ID"].lower(), valoApiSkins)
+                            # if rgb_color is not None:
+                            weaponLists.update({players[player]["Subject"]: color(skin["Name"], fore=rgb_color)})
+                            # else:
+                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+        return weaponLists
+
+
 
     def get_PlayersPuuid(Players):
         return [player["Subject"] for player in Players]
@@ -466,6 +502,7 @@ try:
         table.add_rows([args])
 
 
+    valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     content = get_content()
     agent_dict = get_all_agents(content)
     log(f"gotten agent dict: {agent_dict}")
@@ -511,6 +548,7 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
+                    loadouts = get_matchLoadouts(Players, content, "vandal", valoApiSkins)
                     names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -544,7 +582,7 @@ try:
                         Namecolor = get_color_from_team(player['TeamID'], names[player["Subject"]], player["Subject"],
                                                         puuid)
                         if lastTeam != player['TeamID']:
-                            addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-"])
+                            addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-", "-"])
                         lastTeam = player['TeamID']
                         PLcolor = level_to_color(player_level)
 
@@ -553,6 +591,9 @@ try:
 
                         # NAME
                         name = Namecolor
+
+                        # skin
+                        skin = loadouts[player["Subject"]]
 
                         # RANK
                         rankName = number_to_ranks[rank[0]]
@@ -571,6 +612,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
+                                            skin,
                                             rankName,
                                             rr,
                                             peakRank,
@@ -655,6 +697,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
+                                            " - ",
                                             rankName,
                                             rr,
                                             peakRank,
@@ -705,6 +748,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
+                                            " - ",
                                             rankName,
                                             rr,
                                             peakRank,
@@ -716,7 +760,7 @@ try:
             if (title := game_state_dict.get(game_state)) is None:
                 exit(1)
             table.title = f"Valorant status: {title}"
-            table.field_names = ["Party", "Agent", "Name", "Rank", "RR", "Peak Rank", "Leaderboard Position", "Level"]
+            table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             print(table)
         if cooldown == 0:
             input("Press enter to fetch again...")
