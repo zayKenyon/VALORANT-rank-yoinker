@@ -16,7 +16,7 @@ from json.decoder import JSONDecodeError
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-version = "1.01"
+version = "1.12"
 
 os.system('cls')
 os.system(f"title VALORANT rank yoinker {version}")
@@ -53,7 +53,7 @@ try:
                 logFileOpened = True
                 logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}]"
                               f" {stringToLog.encode('ascii', 'replace').decode()}\n")
-
+    log(f"VALORANT rank yoinker v{version}")
 
     def configDialog(fileToWrite: TextIOWrapper):
         while True:
@@ -159,8 +159,6 @@ try:
 
 
     def get_current_version():
-        # version = f"{data['branch']}-shipping-{data['buildVersion']}-{data['version'].split('.')[3]}"
-        # release-03.02-shipping-9-587972
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
         with open(path, "r", encoding="utf8") as file:
             while True:
