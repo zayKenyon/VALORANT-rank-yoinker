@@ -1,7 +1,5 @@
 import os
-from threading import local
 import time
-from typing import Match
 from src.Utils import Utils
 from src.Auth import Auth
 from src.Cosmetics.Tables import Tables

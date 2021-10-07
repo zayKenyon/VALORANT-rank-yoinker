@@ -1,4 +1,3 @@
-from threading import local
 from prettytable import PrettyTable
 from src.Cosmetics.Colors import Colors
 

@@ -1,5 +1,3 @@
-from threading import local
-from typing import Protocol
 import requests
 import urllib3
 import base64
