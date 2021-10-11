@@ -65,12 +65,28 @@ def createConfig():
     with open("config.json", "w") as configFile:
         json.dump(defaultConfig, configFile)
 
+def copyLocales():
+    os.mkdir("locales")
+    branch = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/branches/dev")
+    branchHash = branch.json()["commit"]["sha"]
+    files = requests.get(f"https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/git/trees/{branchHash}").json()["tree"]
+    localesFolder = next(folder for folder in files if folder["path"] == "locales")
+    locales = requests.get(localesFolder["url"]).json()["tree"]
+    for locale in locales:
+        localeJson = requests.get(f"https://raw.githubusercontent.com/isaacKenyon/VALORANT-rank-yoinker/dev/locales/{locale['path']}").json()
+        with open("./locales/"+locale["path"], "w") as localeFile: json.dump(localeJson, localeFile)
+
 if __name__ == "__main__":
     from src.Process import Proc
     import json
     import glob
     from ctypes import windll
-    
+    import os
+    import requests
+
+    if not os.path.exists(R"locales"):
+        copyLocales()
+
     #CONFIG KEYS
     configKeys = ["colors", "respectPrivacy", "sortingMethod", "locale"]
     try:
