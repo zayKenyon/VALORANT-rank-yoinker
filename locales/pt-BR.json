@@ -1,1 +1,24 @@
-{"yes_uppercase": "S", "no_uppercase": "N", "exit": "Pressione qualquer tecla para sair.", "in_lobby": "Esperando pelo jogo...", "fetching_players": "Buscando Jogadores", "loading_screen": "Carregando tela...", "question_colors": "Voc\u00ea deseja cores? S/N: ", "question_names": "Nomes ativos? (Ativando isso disrespeita a privacidade alheia) S/N: ", "question_fetch_again": "Buscar novamente? S/N: ", "question_sorting_method": "Que m\u00e9todo voc\u00ea deseja usar pra ordenar? ", "sorting_rank_ascending": "RANQUE_CRESC", "sorting_rank_descending": "RANQUE_DECRESC", "sorting_level_ascending": "N\u00cdVEL_CRESC", "sorting_level_descending": "N\u00cdVEL_DECRESC", "err_not_in_lobby": "Por favor esteja em um lobby antes de rodar isso. Checando novamente em 3 segundos.", "err_presence_not_found": "Jogador n\u00e3o p\u00f4de ser encontrado nas presen\u00e7as. Favor entrar no lobby.", "err_agents_failed": "Falha ao pegar todos os agentes.", "err_season_failed": "Falha ao pegar temporada atual.", "err_region_failed": "N\u00e3o foi poss\u00edvel determinar a regi\u00e3o.", "err_version_failed": "N\u00e3o foi poss\u00edvel determinar a vers\u00e3o.", "err_bad_haystack": "Haystack falho.", "err_invalid_input": "Entrada inv\u00e1lida."}
+{
+    "yes_uppercase": "S",
+    "no_uppercase": "N",
+    "exit": "Pressione qualquer tecla para sair.",
+    "in_lobby": "Esperando pelo jogo...",
+    "fetching_players": "Buscando Jogadores",
+    "loading_screen": "Carregando tela...",
+    "question_colors": "Você deseja cores? S/N: ",
+    "question_names": "Nomes ativos? (Ativando isso disrespeita a privacidade alheia) S/N: ",
+    "question_fetch_again": "Buscar novamente? S/N: ",
+    "question_sorting_method": "Que método você deseja usar pra ordenar? ",
+    "sorting_rank_ascending": "RANQUE_CRESC",
+    "sorting_rank_descending": "RANQUE_DECRESC",
+    "sorting_level_ascending": "NÍVEL_CRESC",
+    "sorting_level_descending": "NÍVEL_DECRESC",
+    "err_not_in_lobby": "Por favor esteja em um lobby antes de rodar isso. Checando novamente em 3 segundos.",
+    "err_presence_not_found": "Jogador não pôde ser encontrado nas presenças. Favor entrar no lobby.",
+    "err_agents_failed": "Falha ao pegar todos os agentes.",
+    "err_season_failed": "Falha ao pegar temporada atual.",
+    "err_region_failed": "Não foi possível determinar a região.",
+    "err_version_failed": "Não foi possível determinar a versão.",
+    "err_bad_haystack": "Haystack falho.",
+    "err_invalid_input": "Entrada inválida."
+}
