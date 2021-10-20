@@ -11,6 +11,7 @@ from prettytable import PrettyTable
 from alive_progress import alive_bar
 from io import TextIOWrapper
 from json.decoder import JSONDecodeError
+import subprocess
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -23,13 +24,23 @@ enablePrivateLogging = False
 # checking for latest release
 r = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases")
 json_data = r.json()
-releases = json_data[0]["tag_name"]
-link = json_data[0]["assets"][0]["browser_download_url"]
+release_version = json_data[0]["tag_name"] # get release version
+link = json_data[0]["assets"][0]["browser_download_url"] # link for the latest release
+filename = link.rsplit("/", 1)[1] # get's the exe name from the link
 
-if releases != version:
-    print()
-    print(f"New version available! please download the latest version from {link}")
-    print()
+if release_version != version:
+    print("New version available!")
+    LatestDownload = requests.get(link)
+    file_size = int(LatestDownload.headers.get("Content-Length", 0))
+    with alive_bar(total=file_size, title=f"Installing version v{release_version}", bar='classic2') as bar:
+
+        open(f"./{filename}", "wb").write(LatestDownload.content)
+        # ehhhh shows progress bar after download is finished xD
+        for _ in range(file_size):
+            bar()
+    print(f"Finished Downloading v{release_version}!")
+    # run the executable after download is finished.
+    subprocess.run(f"./{filename}")
     exit(1)
 
 
