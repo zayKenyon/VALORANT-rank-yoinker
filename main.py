@@ -20,6 +20,18 @@ os.system('cls')
 os.system(f"title VALORANT rank yoinker {version}")
 enablePrivateLogging = False
 
+# checking for latest release
+r = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases")
+json_data = r.json()
+releases = json_data[0]["tag_name"]
+link = json_data[0]["assets"][0]["browser_download_url"]
+
+if releases != version:
+    print()
+    print(f"New version available! please download the latest version from {link}")
+    print()
+    exit(1)
+
 
 def exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code v{status}")
