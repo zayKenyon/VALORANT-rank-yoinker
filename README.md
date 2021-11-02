@@ -5,7 +5,6 @@
     <img src="assets/Logo.png" alt="Logo" width="160" height="160">
   </a>
 </p>
-<h3 align="center">vRY</h3>
 <h5 align="center">VALORANT rank yoinker</h5>
 
   <p align="center">
@@ -39,7 +38,7 @@
   <summary>Table of Contents</summary>
   <ol>
       <li>
-          <a href="Terms-of-Use">Terms of Use</a>
+          <a href="#terms-of-use">Terms of Use</a>
       </li>
     <li>
       <a href="#about-the-project">About The Project</a>
