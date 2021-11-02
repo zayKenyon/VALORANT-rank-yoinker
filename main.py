@@ -1,27 +1,150 @@
+import sys
 import traceback
-
-import pyperclip
 import requests
 import urllib3
 import os
 import base64
 import json
+from json.decoder import JSONDecodeError
 import time
 import glob
 from colr import color
 from prettytable import PrettyTable
 from alive_progress import alive_bar
 from io import TextIOWrapper
-from json.decoder import JSONDecodeError
+import subprocess
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-version = "1.12"
+version = "1.2"
 
 os.system('cls')
 os.system(f"title VALORANT rank yoinker {version}")
 enablePrivateLogging = False
 
+hideNames = False
+
+agentColorList = {
+            "viper": (48, 186, 135),
+            "yoru": (52, 76, 207),
+            "astra": (113, 42, 232),
+            "breach": (217, 122, 46),
+            "brimstone": (217, 122, 46),
+            "cypher": (245, 240, 230),
+            "jett": (245, 240, 230),
+            "kay/o": (133, 146, 156),
+            "killjoy": (255, 217, 31),
+            "omen": (71, 80, 143),
+            "phoenix": (254, 130, 102),
+            "raze": (217, 122, 46),
+            "reyna": (181, 101, 181),
+            "sage": (90, 230, 213),
+            "skye": (192, 230, 158),
+            "sova": (37, 143, 204)
+        }
+
+
+gamePods = {
+    "aresriot.aws-rclusterprod-mes1-1.eu-gp-bahrain-awsedge-1": "Bahrain",
+    "aresriot.aws-rclusterprod-mes1-1.ext1-gp-bahrain-awsedge-1": "Bahrain",
+    "aresriot.aws-rclusterprod-mes1-1.tournament-gp-bahrain-awsedge-1": "Bahrain",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-1": "CMOB 1",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-2": "CMOB 2",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-3": "CMOB 3",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-4": "CMOB 4",
+    "aresriot.mtl-riot-ord2-3.latam-gp-chicago-1": "Chicago",
+    "aresqa.aws-rclusterprod-dfw1-1.dev1-gp-dallas-1": "Dallas",
+    "aresqa.aws-rclusterprod-usw2-3.dev1-gp-tournament-2": "Esports New",
+    "aresqa.aws-rclusterprod-usw2-3.dev1-gp-tournament-1": "Esports Old",
+    "aresqa.aws-rclusterprod-euc1-1.dev1-gp-frankfurt-1": "Frankfurt",
+    "aresqa.aws-rclusterprod-euc1-1.stage1-gp-frankfurt-1": "Frankfurt",
+    "aresriot.aws-rclusterprod-euc1-1.ext1-gp-eu1": "Frankfurt",
+    "aresriot.aws-rclusterprod-euc1-1.tournament-gp-frankfurt-1": "Frankfurt",
+    "aresriot.aws-rclusterprod-euc1-1.eu-gp-frankfurt-1": "Frankfurt 1",
+    "aresriot.aws-rclusterprod-euc1-1.eu-gp-frankfurt-awsedge-1": "Frankfurt 2",
+    "aresriot.aws-rclusterprod-ape1-1.ext1-gp-hongkong-1": "Hong Kong",
+    "aresriot.aws-rclusterprod-ape1-1.tournament-gp-hongkong-1": "Hong Kong",
+    "aresriot.aws-rclusterprod-ape1-1.ap-gp-hongkong-1": "Hong Kong 1",
+    "aresriot.aws-rclusterprod-ape1-1.ap-gp-hongkong-awsedge-1": "Hong Kong 2",
+    "aresriot.mtl-riot-ist1-2.eu-gp-istanbul-1": "Istanbul",
+    "aresriot.mtl-riot-ist1-2.tournament-gp-istanbul-1": "Istanbul",
+    "aresriot.aws-rclusterprod-euw2-1.eu-gp-london-awsedge-1": "London",
+    "aresriot.aws-rclusterprod-euw2-1.tournament-gp-london-awsedge-1": "London",
+    "aresriot.aws-rclusterprod-mad1-1.eu-gp-madrid-1": "Madrid",
+    "aresriot.aws-rclusterprod-mad1-1.tournament-gp-madrid-1": "Madrid",
+    "aresriot.mtl-tmx-mex1-1.ext1-gp-mexicocity-1": "Mexico City",
+    "aresriot.mtl-tmx-mex1-1.latam-gp-mexicocity-1": "Mexico City",
+    "aresriot.mtl-tmx-mex1-1.tournament-gp-mexicocity-1": "Mexico City",
+    "aresriot.mia1.latam-gp-miami-1": "Miami",
+    "aresriot.mia1.tournament-gp-miami-1": "Miami",
+    "aresriot.aws-rclusterprod-aps1-1.ap-gp-mumbai-awsedge-1": "Mumbai",
+    "aresriot.aws-rclusterprod-aps1-1.tournament-gp-mumbai-awsedge-1": "Mumbai",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-1": "Offline 1",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-2": "Offline 2",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-3": "Offline 3",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-4": "Offline 4",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-5": "Offline 5",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-6": "Offline 6",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-7": "Offline 7",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-offline-8": "Offline 8",
+    "aresriot.aws-rclusterprod-euw3-1.tournament-gp-paris-1": "Paris",
+    "aresriot.aws-rclusterprod-euw3-1.eu-gp-paris-1": "Paris 1",
+    "aresriot.aws-rclusterprod-euw3-1.eu-gp-paris-awsedge-1": "Paris 2",
+    "aresriot.mtl-ctl-scl2-2.ext1-gp-santiago-1": "Santiago",
+    "aresriot.mtl-ctl-scl2-2.latam-gp-santiago-1": "Santiago",
+    "aresriot.mtl-ctl-scl2-2.tournament-gp-santiago-1": "Santiago",
+    "aresriot.aws-rclusterprod-sae1-1.ext1-gp-saopaulo-1": "Sao Paulo",
+    "aresriot.aws-rclusterprod-sae1-1.tournament-gp-saopaulo-1": "Sao Paulo",
+    "aresriot.aws-rclusterprod-sae1-1.br-gp-saopaulo-1": "Sao Paulo 1",
+    "aresriot.aws-rclusterprod-sae1-1.br-gp-saopaulo-awsedge-1": "Sao Paulo 2",
+    "aresriot.aws-rclusterprod-apne2-1.ext1-gp-seoul-1": "Seoul",
+    "aresriot.aws-rclusterprod-apne2-1.tournament-gp-seoul-1": "Seoul",
+    "aresriot.aws-rclusterprod-apne2-1.kr-gp-seoul-1": "Seoul 1",
+    "aresriot.aws-rclusterprod-apne2-1.kr-gp-seoul-awsedge-1": "Seoul 2",
+    "aresriot.aws-rclusterprod-apse1-1.ext1-gp-singapore-1": "Singapore",
+    "aresriot.aws-rclusterprod-apse1-1.tournament-gp-singapore-1": "Singapore",
+    "aresriot.aws-rclusterprod-apse1-1.ap-gp-singapore-1": "Singapore 1",
+    "aresriot.aws-rclusterprod-apse1-1.ap-gp-singapore-awsedge-1": "Singapore 2",
+    "aresriot.aws-rclusterprod-eun1-1.tournament-gp-stockholm-1": "Stockholm",
+    "aresriot.aws-rclusterprod-eun1-1.eu-gp-stockholm-1": "Stockholm 1",
+    "aresriot.aws-rclusterprod-eun1-1.eu-gp-stockholm-awsedge-1": "Stockholm 2",
+    "aresriot.aws-rclusterprod-apse2-1.ext1-gp-sydney-1": "Sydney",
+    "aresriot.aws-rclusterprod-apse2-1.tournament-gp-sydney-1": "Sydney",
+    "aresriot.aws-rclusterprod-apse2-1.ap-gp-sydney-1": "Sydney 1",
+    "aresriot.aws-rclusterprod-apse2-1.ap-gp-sydney-awsedge-1": "Sydney 2",
+    "aresriot.aws-rclusterprod-apne1-1.eu-gp-tokyo-1": "Tokyo",
+    "aresriot.aws-rclusterprod-apne1-1.ext1-gp-kr1": "Tokyo",
+    "aresriot.aws-rclusterprod-apne1-1.tournament-gp-tokyo-1": "Tokyo",
+    "aresriot.aws-rclusterprod-apne1-1.ap-gp-tokyo-1": "Tokyo 1",
+    "aresriot.aws-rclusterprod-apne1-1.ap-gp-tokyo-awsedge-1": "Tokyo 2",
+    "aresriot.aws-rclusterprod-atl1-1.na-gp-atlanta-1": "US Central (Georgia)",
+    "aresriot.aws-rclusterprod-atl1-1.tournament-gp-atlanta-1": "US Central (Georgia)",
+    "aresriot.mtl-riot-ord2-3.na-gp-chicago-1": "US Central (Illinois)",
+    "aresriot.mtl-riot-ord2-3.tournament-gp-chicago-1": "US Central (Illinois)",
+    "aresriot.aws-rclusterprod-dfw1-1.na-gp-dallas-1": "US Central (Texas)",
+    "aresriot.aws-rclusterprod-dfw1-1.tournament-gp-dallas-1": "US Central (Texas)",
+    "aresriot.aws-rclusterprod-use1-1.na-gp-ashburn-1": "US East (N. Virginia 1)",
+    "aresriot.aws-rclusterprod-use1-1.na-gp-ashburn-awsedge-1": "US East (N. Virginia 2)",
+    "aresriot.aws-rclusterprod-use1-1.ext1-gp-ashburn-1": "US East (N. Virginia)",
+    "aresriot.aws-rclusterprod-use1-1.pbe-gp-ashburn-1": "US East (N. Virginia)",
+    "aresriot.aws-rclusterprod-use1-1.tournament-gp-ashburn-1": "US East (N. Virginia)",
+    "aresriot.aws-rclusterprod-usw1-1.na-gp-norcal-1": "US West (N. California 1)",
+    "aresriot.aws-rclusterprod-usw1-1.na-gp-norcal-awsedge-1": "US West (N. California 2)",
+    "aresriot.aws-rclusterprod-usw1-1.ext1-gp-na2": "US West (N. California)",
+    "aresriot.aws-rclusterprod-usw1-1.pbe-gp-norcal-1": "US West (N. California)",
+    "aresriot.aws-rclusterprod-usw1-1.tournament-gp-norcal-1": "US West (N. California)",
+    "aresriot.aws-rclusterprod-usw2-1.na-gp-oregon-1": "US West (Oregon 1)",
+    "aresriot.aws-rclusterprod-usw2-1.na-gp-oregon-awsedge-1": "US West (Oregon 2)",
+    "aresriot.aws-rclusterprod-usw2-1.pbe-gp-oregon-1": "US West (Oregon)",
+    "aresriot.aws-rclusterprod-usw2-1.tournament-gp-oregon-1": "US West (Oregon)",
+    "aresqa.aws-rclusterprod-usw2-3.dev1-gp-1": "US West 1",
+    "aresqa.aws-rclusterprod-usw2-3.stage1-gp-1": "US West 1",
+    "aresqa.aws-rclusterprod-usw2-3.dev1-gp-4": "US West 2",
+    "aresriot.aws-rclusterprod-waw1-1.eu-gp-warsaw-1": "Warsaw",
+    "aresriot.aws-rclusterprod-waw1-1.tournament-gp-warsaw-1": "Warsaw"
+}
+
+server = ""
 
 def exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code v{status}")
@@ -29,6 +152,16 @@ def exit(status: int):  # so we don't need to import the entire sys module
 
 
 try:
+    # checking for latest release
+    r = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases")
+    json_data = r.json()
+    release_version = json_data[0]["tag_name"]  # get release version
+    link = json_data[0]["assets"][0]["browser_download_url"]  # link for the latest release
+
+    if float(release_version) > float(version):
+        print(f"New version available! {link}")
+
+
     logFileOpened = False
 
 
@@ -123,6 +256,7 @@ try:
         color('Radiant', fore=(255, 253, 205)),
     ]
 
+
     symbol = "■"
     partyIconList = [color(symbol, fore=(227, 67, 67)),
                      color(symbol, fore=(216, 67, 227)),
@@ -178,20 +312,22 @@ try:
         try:
             if url_type == "glz":
                 response = requests.request(method, glz_url + endpoint, headers=get_headers(), verify=False)
-                if not response.ok:
-                    headers = {}
-                    fetch(url_type, endpoint, method)
                 log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
+                if not response.ok:
+                    time.sleep(5)
+                    headers = {}
+                    fetch(url_type, endpoint, method)
                 return response.json()
             elif url_type == "pd":
                 response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
-                if not response.ok:
-                    headers = {}
-                    fetch(url_type, endpoint, method)
                 log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
+                if not response.ok:
+                    time.sleep(5)
+                    headers = {}
+                    fetch(url_type, endpoint, method)
                 return response
             elif url_type == "local":
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
@@ -205,10 +341,10 @@ try:
                 return response.json()
             elif url_type == "custom":
                 response = requests.request(method, f"{endpoint}", headers=get_headers(), verify=False)
-                if not response.ok: headers = {}
                 log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
+                if not response.ok: headers = {}
                 return response.json()
         except json.decoder.JSONDecodeError:
             log(f"JSONDecodeError in fetch function, resp.code: {response.status_code}, resp_text: '{response.text}")
@@ -445,10 +581,11 @@ try:
 
     def get_color_from_team(team, name, playerPuuid, selfPuuid, agent=None):
         if agent is not None:
-            if agent != "":
-                name = agent_dict[agent]
-            else:
-                name = "Player"
+            if hideNames:
+                if agent != "":
+                    name = agent_dict[agent]
+                else:
+                    name = "Player"
         if team == 'Red':
             Teamcolor = color(name, fore=(238, 77, 77))
         elif team == 'Blue':
@@ -475,15 +612,19 @@ try:
 
 
 
-    def get_matchLoadouts(players, content, weaponChoose, valoApiSkins):
-        match_id = get_coregame_match_id()
+    def get_matchLoadouts(match_id, players, content, weaponChoose, valoApiSkins, state="game"):
         weaponLists = {}
-        PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
+        if state == "game":
+            PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
+        else:
+            PlayerInventorys = fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
             inv = PlayerInventorys["Loadouts"][player]
+            if state == "game":
+                inv = inv["Loadout"]
             for weapon in content["Equips"]:
                 if weapon["Name"].lower() == weaponChoose.lower():
-                    skin_id = inv["Loadout"]["Items"][weapon["ID"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
+                    skin_id = inv["Items"][weapon["ID"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
                     for skin in content["Skins"]:
                         if skin_id.lower() == skin["ID"].lower():
                             rgb_color = get_rgb_color_from_skin(skin["ID"].lower(), valoApiSkins)
@@ -502,6 +643,33 @@ try:
     def addRowTable(table: PrettyTable, args: list):
         # for arg in args:
         table.add_rows([args])
+
+
+    def getViews(name: str):
+        responseViews = requests.get(
+            f"https://tracker.gg/valorant/profile/riot/{name.split('#')[0]}%23{name.split('#')[1]}/overview").text
+        try:
+            result = responseViews.split("views")[1].split(">")[-1]
+            int(result)
+            log(f"Gotten views {result}, {name}")
+            return int(result)
+        except ValueError:
+            log(f"Gotten None views , {name}")
+            return None
+
+    def waitForPresence(PlayersPuuids):
+        while True:
+            presence = get_presence()
+            for puuid in PlayersPuuids:
+                if puuid not in str(presence):
+                    time.sleep(1)
+                    continue
+            break
+
+
+    def getAgentFromUUID(agentUUID):
+        agent = str(agent_dict.get(agentUUID))
+        return color(agent, fore=agentColorList[agent.lower()])
 
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
@@ -528,29 +696,15 @@ try:
                 "PREGAME": color('Agent Select', fore=(103, 237, 76)),
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
             }
-            # color showcase
-            # for game_state in game_state_dict:
-            #     print(game_state_dict[game_state])
-            # print("")
-            # for rank in number_to_ranks:
-            #     print(rank)
-            # print("")
-            # print(get_color_from_team("Red", "Red"))
-            # print(get_color_from_team("Blue", "Blue"))
-            # print("")
-            # print(color("jett", fore=(255, 255, 255)))
-            # print(color("jett", fore=(128, 128, 128)))
-            # print(color("None", fore=(54, 53, 51)))
-            # print("")
-            # for i in range(5):
-            #     print(level_to_color(i*100))
-            # exit(1)
             if game_state == "INGAME":
-                Players = get_coregame_stats()["Players"]
+                coregame_stats = get_coregame_stats()
+                Players = coregame_stats["Players"]
+                server = gamePods[coregame_stats["GamePodID"]]
+                waitForPresence(get_PlayersPuuid(Players))
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-                    loadouts = get_matchLoadouts(Players, content, "vandal", valoApiSkins)
+                    loadouts = get_matchLoadouts(get_coregame_match_id(), Players, content, "vandal", valoApiSkins)
                     names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -586,16 +740,20 @@ try:
                                                         puuid)
                         if lastTeam != player['TeamID']:
                             if lastTeamBoolean:
-                                addRowTable(table, ["-", "-", "-", "-", "-", "-", "-", "-", "-"])
+                                addRowTable(table, ["", "", "", "", "", "", "", "", ""])
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         PLcolor = level_to_color(player_level)
 
                         # AGENT
-                        agent = str(agent_dict.get(player["CharacterID"].lower()))
+                        # agent = str(agent_dict.get(player["CharacterID"].lower()))
+                        agent = getAgentFromUUID(player["CharacterID"].lower())
 
                         # NAME
                         name = Namecolor
+
+                        # VIEWS
+                        # views = getViews(names[player["Subject"]])
 
                         # skin
                         skin = loadouts[player["Subject"]]
@@ -617,6 +775,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
+                                            # views,
                                             skin,
                                             rankName,
                                             rr,
@@ -627,10 +786,13 @@ try:
                         bar()
             elif game_state == "PREGAME":
                 pregame_stats = get_pregame_stats()
+                server = gamePods[pregame_stats["GamePodID"]]
                 Players = pregame_stats["AllyTeam"]["Players"]
+                waitForPresence(get_PlayersPuuid(Players))
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
+                    loadouts = get_matchLoadouts(get_pregame_match_id(), Players, content, "vandal", valoApiSkins, state="pregame")
                     names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -684,6 +846,12 @@ try:
                         # NAME
                         name = NameColor
 
+                        # VIEWS
+                        # views = getViews(names[player["Subject"]])
+
+                        #skin
+                        skin = loadouts[player["Subject"]]
+
                         # RANK
                         rankName = number_to_ranks[rank[0]]
 
@@ -702,7 +870,8 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
-                                            " - ",
+                                            # views,
+                                            skin,
                                             rankName,
                                             rr,
                                             peakRank,
@@ -753,7 +922,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
-                                            " - ",
+                                            "-",
                                             rankName,
                                             rr,
                                             peakRank,
@@ -764,7 +933,11 @@ try:
                         bar()
             if (title := game_state_dict.get(game_state)) is None:
                 exit(1)
-            table.title = f"Valorant status: {title}"
+            if server != "":
+                table.title = f"Valorant status: {title} - {server}"
+            else:
+                table.title = f"Valorant status: {title}"
+            server = ""
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             print(table)
             print(f"VALORANT rank yoinker v{version}")
@@ -775,7 +948,7 @@ try:
 except:
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
-        " with the logs found in .../logs", fore=(255, 0, 0)))
+        f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
     traceback.print_exc()
     input("press enter to exit...\n")
     os._exit(1)
