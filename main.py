@@ -480,7 +480,7 @@ try:
 
 
     def get_content():
-        content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v2/content", "get")
+        content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v3/content", "get")
         return content
 
 
