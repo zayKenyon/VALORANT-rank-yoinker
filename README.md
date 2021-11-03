@@ -1,5 +1,4 @@
-### THANK YOU FOR 1000 :DDD 
-<!-- PROJECT LOGO -->
+ <!-- PROJECT LOGO -->
 <p align="center">
 <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/">
     <img src="assets/Logo.png" alt="Logo" width="160" height="160">
@@ -30,7 +29,9 @@
      <a href="https://www.python.org/">
          <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/isaacKenyon/Valorant-rank-yoinker?logo=python&logoColor=yellow&style=for-the-badge">
      </a>
-        
+     <a href="https://youtu.be/TSLRd8Y9PiE">
+         <img alt="YouTube Tutorial" src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white">
+    </a>  
      
      
 <!-- TABLE OF CONTENTS -->
@@ -48,15 +49,8 @@
             </li>
         </ul>
     </li>
-    <li>
-     <a href="#installation">Installation</a>
-        <ul>
-            <li>
-                <a href="#video-tutorial">Video Tutorial</a>
-            </li>
-        </ul>
-    </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#video-tutorial">Video Tutorial</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -81,27 +75,15 @@
 
 ![Screenshot](assets/Example.png)
 
-### Current Features
-* Automatic Sorting Of Team
- 
-* Automatic Sorting Of Account Level
-   
-* Displays Each Players' Peak Rank
+### Current Features   
+* Displays Each Player's Peak Rank
+* Categorises Agents & Skins with Colours
+* Displays Information About a Player's Queue
 
  Displays for each player:
-|Their Premade|Current Rank|Rank Rating|Peak Rank|Account Level|
-|:---:|:---:|:---:|:---:|:---:|
-|![Parties](assets/Party.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
-
-
-    
-<!-- Installation -->
-## Installation
-    
-Download the [latest release](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), and run it.  
-
-### Video Tutorial
-https://www.youtube.com/watch?v=TSLRd8Y9PiE
+|Their Queue|Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|![Parties](assets/Party.png)|![Skin](assets/Skin.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
     
 
 <!-- USAGE EXAMPLES -->
@@ -110,7 +92,9 @@ https://www.youtube.com/watch?v=TSLRd8Y9PiE
 VALORANT must be open for this to work.
 
 #### Recommended:   
-If you are using the [release.exe](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/releases/latest), all you have to do is run it.
+If you are using the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest), all you have to do is run the .exe.
+    
+    NOTE: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.
 
 #### Not Recommended:    
 If you are running the code directly:
@@ -122,7 +106,8 @@ If you are running the code directly:
 
 Alternatively if you have python 2 installed run `python3 main.py`
 
-
+### Video Tutorial
+https://www.youtube.com/watch?v=TSLRd8Y9PiE
  
 <!-- CONTRIBUTING -->
 ## Contributing
