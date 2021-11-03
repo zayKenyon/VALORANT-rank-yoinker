@@ -1,5 +1,5 @@
 {
    "status_ok": true,
-   "message": "There seems to be no issues.",
-   "print_message": false
+   "message": "Skins may be switched with other players.",
+   "print_message": true
 }
