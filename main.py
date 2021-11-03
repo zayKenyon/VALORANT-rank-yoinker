@@ -16,7 +16,7 @@ import subprocess
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-version = "1.2"
+version = "1.22"
 
 os.system('cls')
 os.system(f"title VALORANT rank yoinker {version}")
@@ -152,6 +152,13 @@ def exit(status: int):  # so we don't need to import the entire sys module
 
 
 try:
+    #checking status
+    rStatus = requests.get("https://raw.githubusercontent.com/isaacKenyon/VALORANT-rank-yoinker/main/status.json").json()
+    if not rStatus["status_ok"] or rStatus["print_message"]:
+        status_color = (255, 0, 0) if not rStatus["status_ok"] else (0, 255, 0)
+        print(color(rStatus["message"], fore=status_color))
+
+
     # checking for latest release
     r = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases")
     json_data = r.json()
@@ -480,7 +487,7 @@ try:
 
 
     def get_content():
-        content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v2/content", "get")
+        content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v3/content", "get")
         return content
 
 
@@ -490,11 +497,11 @@ try:
                 return season["ID"]
 
 
-    def get_all_agents(content):
+    def get_all_agents():
+        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
         agent_dict = {}
-        for agent in content["Characters"]:
-            if "NPE" not in agent["AssetName"]:
-                agent_dict.update({agent['ID'].lower(): agent['Name']})
+        for agent in rAgents["data"]:
+                agent_dict.update({agent['uuid'].lower(): agent['displayName']})
         return agent_dict
 
 
@@ -612,24 +619,25 @@ try:
 
 
 
-    def get_matchLoadouts(match_id, players, content, weaponChoose, valoApiSkins, state="game"):
+    def get_matchLoadouts(match_id, players, weaponChoose, valoApiSkins, state="game"):
         weaponLists = {}
+        valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
         if state == "game":
             PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
-        else:
+        elif state == "pregame":
             PlayerInventorys = fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
             inv = PlayerInventorys["Loadouts"][player]
             if state == "game":
                 inv = inv["Loadout"]
-            for weapon in content["Equips"]:
-                if weapon["Name"].lower() == weaponChoose.lower():
-                    skin_id = inv["Items"][weapon["ID"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
-                    for skin in content["Skins"]:
-                        if skin_id.lower() == skin["ID"].lower():
-                            rgb_color = get_rgb_color_from_skin(skin["ID"].lower(), valoApiSkins)
+            for weapon in valApiWeapons["data"]:
+                if weapon["displayName"].lower() == weaponChoose.lower():
+                    skin_id = inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
+                    for skin in valoApiSkins.json()["data"]:
+                        if skin_id.lower() == skin["uuid"].lower():
+                            rgb_color = get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                             # if rgb_color is not None:
-                            weaponLists.update({players[player]["Subject"]: color(skin["Name"], fore=rgb_color)})
+                            weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
                             # else:
                             #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
         return weaponLists
@@ -674,7 +682,7 @@ try:
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     content = get_content()
-    agent_dict = get_all_agents(content)
+    agent_dict = get_all_agents()
     log(f"gotten agent dict: {agent_dict}")
     seasonID = get_latest_season_id(content)
     log(f"gotten season id: {seasonID}")
@@ -704,7 +712,7 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-                    loadouts = get_matchLoadouts(get_coregame_match_id(), Players, content, "vandal", valoApiSkins)
+                    loadouts = get_matchLoadouts(get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
                     names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -792,7 +800,7 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-                    loadouts = get_matchLoadouts(get_pregame_match_id(), Players, content, "vandal", valoApiSkins, state="pregame")
+                    loadouts = get_matchLoadouts(get_pregame_match_id(), Players, "vandal", valoApiSkins, state="pregame")
                     names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -922,7 +930,7 @@ try:
                         addRowTable(table, [party_icon,
                                             agent,
                                             name,
-                                            "-",
+                                            "",
                                             rankName,
                                             rr,
                                             peakRank,
