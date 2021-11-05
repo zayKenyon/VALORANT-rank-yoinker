@@ -1,6 +1,4 @@
 import traceback
-
-import pyperclip
 import requests
 import urllib3
 import os
