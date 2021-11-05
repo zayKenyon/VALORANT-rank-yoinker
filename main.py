@@ -1,5 +1,7 @@
 import sys
 import traceback
+
+import pyperclip
 import requests
 import urllib3
 import os
@@ -35,8 +37,8 @@ agentColorList = {
             "kay/o": (133, 146, 156),
             "killjoy": (255, 217, 31),
             "omen": (71, 80, 143),
-            "phoenix": (254, 130, 102),
-            "raze": (217, 122, 46),
+            "phoenix": (225, 22, 19),
+            "raze": (225, 154, 0),
             "reyna": (181, 101, 181),
             "sage": (90, 230, 213),
             "skye": (192, 230, 158),
@@ -623,11 +625,19 @@ try:
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
         if state == "game":
+            teamID = "Blue"
             PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
         elif state == "pregame":
+            pregame_stats = players
+            players = players["AllyTeam"]["Players"]
+            teamID = pregame_stats['Teams'][0]['TeamID']
             PlayerInventorys = fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
-            inv = PlayerInventorys["Loadouts"][player]
+            if teamID == "Red":
+                invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
+            else:
+                invindex = player
+            inv = PlayerInventorys["Loadouts"][invindex]
             if state == "game":
                 inv = inv["Loadout"]
             for weapon in valApiWeapons["data"]:
@@ -709,11 +719,11 @@ try:
                 Players = coregame_stats["Players"]
                 server = gamePods[coregame_stats["GamePodID"]]
                 waitForPresence(get_PlayersPuuid(Players))
+                loadouts = get_matchLoadouts(get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
+                names = get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-                    loadouts = get_matchLoadouts(get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
-                    names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
@@ -797,11 +807,12 @@ try:
                 server = gamePods[pregame_stats["GamePodID"]]
                 Players = pregame_stats["AllyTeam"]["Players"]
                 waitForPresence(get_PlayersPuuid(Players))
+                loadouts = get_matchLoadouts(get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
+                                             state="pregame")
+                names = get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_PlayersPuuid(Players), presence)
-                    loadouts = get_matchLoadouts(get_pregame_match_id(), Players, "vandal", valoApiSkins, state="pregame")
-                    names = get_names_from_puuids(Players)
                     log(f"Gotten names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
