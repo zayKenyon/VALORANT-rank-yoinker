@@ -1,4 +1,3 @@
- <!-- PROJECT LOGO -->
 <p align="center">
 <a href="https://github.com/isaacKenyon/valorant-live-match-rank-grabber/">
     <img src="assets/Logo.png" alt="Logo" width="160" height="160">
@@ -12,7 +11,6 @@
 
     
     
-<!-- PROJECT BADGES -->    
 <p align="center">
      <a href="https://discord.gg/HeTKed64Ka">
          <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
@@ -34,51 +32,32 @@
     </a>  
      
      
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary>Table of Contents</summary>
   <ol>
-      <li>
-          <a href="#terms-of-use">Terms of Use</a>
-      </li>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-         <ul>
-            <li>
-               <a href="#current-features">Current Features</a>
-            </li>
-        </ul>
-    </li>
+    <li><a href="#terms-of-use">Terms of Use</a></li>
+    <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#video-tutorial">Video Tutorial</a></li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
     <li><a href="#disclaimer">Disclaimer</a></li>
   </ol>
-</details> 
+
  
 
     
-<!-- NOTE -->
  # Terms of Use
- * Use this tool with good intent **ONLY**
- * Do not 'doxx' or 'expose' people for their ranks
- * Do not pretend to 'hack' people
- * Do not pretend to have infected people's VALORANT accounts
+ 
+  * Use this tool with good intent **ONLY**
+  * Do not 'doxx' or 'expose' people for their ranks
+  * Do not pretend to 'hack' people
+  * Do not pretend to have infected people's VALORANT accounts
  
     
     
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![Screenshot](assets/Example.png)
-
-### Current Features   
-* Displays Each Player's Peak Rank
-* Categorises Agents & Skins with Colours
-* Displays Information About a Player's Queue
+ ![Screenshot](assets/Example.png)
 
  Displays for each player:
 |Their Queue|Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
@@ -86,63 +65,60 @@
 |![Parties](assets/Party.png)|![Skin](assets/Skin.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
     
 
-<!-- USAGE EXAMPLES -->
 ## Usage
     
-VALORANT must be open for this to work.
+ VALORANT must be open for this to work.
 
 #### Recommended:   
-If you are using the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest), all you have to do is run the .exe.
+
+ If you are using the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest), all you have to do is run the .exe.
     
-    NOTE: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.
+     NOTE: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.
 
 #### Not Recommended:    
-If you are running the code directly:
-1. Install [Python](https://www.python.org/downloads)
-2. Download the source code and navigate to its folder
-3. In the path, write `cmd` 
-4. Execute `pip install -r requirements.txt`
-5. Execute `main.py`
 
-Alternatively if you have python 2 installed run `python3 main.py`
+ If you are running the code directly:
+ 1. Install [Python](https://www.python.org/downloads)
+ 2. Download the source code and navigate to its folder
+ 3. In the path, write `cmd` 
+ 4. Execute `pip install -r requirements.txt`
+ 5. Execute `main.py`
+
+ Alternatively if you have python 2 installed run `python3 main.py`
+
 
 ### Video Tutorial
-https://www.youtube.com/watch?v=TSLRd8Y9PiE
  
-<!-- CONTRIBUTING -->
+ https://www.youtube.com/watch?v=TSLRd8Y9PiE
+
+
 ## Contributing
-Any contributions you make are **greatly appreciated**.
 
-1. Fork the Project
-2. Commit your Changes 
-3. Open a Pull Request
+ Any contributions you make are **greatly appreciated**.
 
-
- 
-<!-- LICENSE -->
-## License
-This project uses the [MIT License.](https://github.com/isaacKenyon/valorant-live-match-rank-grabber/blob/main/LICENSE)
+ 1. Fork the Project
+ 2. Commit your Changes 
+ 3. Open a Pull Request
 
  
- 
-<!-- CONTACT -->
 ## Contact 
-Join the community discord:         
-<a href="https://discord.gg/HeTKed64Ka">
-         <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
-</a>
+
+ Join the community discord:         
+ <a href="https://discord.gg/HeTKed64Ka">
+          <img alt="Discord" src="https://img.shields.io/discord/872101595037446144?color=7289da&logo=discord&logoColor=7289da&style=for-the-badge">
+ </a>
  
  
-<!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
-- [Valorant-API.com](https://valorant-api.com/)
-- [Hamper for all his amazing work](https://github.com/OwOHamper)
+
+ - [Valorant-API.com](https://valorant-api.com/)
+ - [Hamper for all his amazing work](https://github.com/OwOHamper)
 
  
  
-<!-- DISCLAIMER -->
 ## Disclaimer
-THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+
+ THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
     
-Also Rito, if you send a cease-and-desist, just know that I will frame it inside my bedroom
+ Also Rito, if you send a cease-and-desist, just know that I will frame it inside my bedroom
     
