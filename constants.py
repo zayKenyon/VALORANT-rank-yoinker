@@ -1,3 +1,5 @@
+from colr import color
+
 AGENTCOLOURLIST = {
             "viper": (48, 186, 135),
             "yoru": (52, 76, 207),
@@ -117,3 +119,45 @@ GAMEPODS = {
     "aresriot.aws-rclusterprod-waw1-1.eu-gp-warsaw-1": "Warsaw",
     "aresriot.aws-rclusterprod-waw1-1.tournament-gp-warsaw-1": "Warsaw"
 }
+
+
+symbol = "■"
+PARTYICONLIST = {
+            color(symbol, fore=(227, 67, 67)),
+            color(symbol, fore=(216, 67, 227)),
+            color(symbol, fore=(67, 70, 227)),
+            color(symbol, fore=(67, 227, 208)),
+            color(symbol, fore=(94, 227, 67)),
+            color(symbol, fore=(226, 237, 57)),
+            color(symbol, fore=(212, 82, 207)),
+            symbol
+        }
+
+
+NUMBERTORANKS = {
+            color('Unrated', fore=(46, 46, 46)),
+            color('Unrated', fore=(46, 46, 46)),
+            color('Unrated', fore=(46, 46, 46)),
+            color('Iron 1', fore=(72, 69, 62)),
+            color('Iron 2', fore=(72, 69, 62)),
+            color('Iron 3', fore=(72, 69, 62)),
+            color('Bronze 1', fore=(187, 143, 90)),
+            color('Bronze 2', fore=(187, 143, 90)),
+            color('Bronze 3', fore=(187, 143, 90)),
+            color('Silver 1', fore=(174, 178, 178)),
+            color('Silver 2', fore=(174, 178, 178)),
+            color('Silver 3', fore=(174, 178, 178)),
+            color('Gold 1', fore=(197, 186, 63)),
+            color('Gold 2', fore=(197, 186, 63)),
+            color('Gold 3', fore=(197, 186, 63)),
+            color('Platinum 1', fore=(24, 167, 185)),
+            color('Platinum 2', fore=(24, 167, 185)),
+            color('Platinum 3', fore=(24, 167, 185)),
+            color('Diamond 1', fore=(216, 100, 199)),
+            color('Diamond 2', fore=(216, 100, 199)),
+            color('Diamond 3', fore=(216, 100, 199)),
+            color('Immortal 1', fore=(221, 68, 68)),
+            color('Immortal 2', fore=(221, 68, 68)),
+            color('Immortal 3', fore=(221, 68, 68)),
+            color('Radiant', fore=(255, 253, 205)),
+        }
