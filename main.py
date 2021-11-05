@@ -17,7 +17,7 @@ from constants import *
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-version = "1.22"
+version = "1.23"
 
 os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
