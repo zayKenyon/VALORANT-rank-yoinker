@@ -25,29 +25,6 @@ enablePrivateLogging = False
 
 hideNames = False
 
-<<<<<<< HEAD
-agentColorList = {
-            "viper": (48, 186, 135),
-            "yoru": (52, 76, 207),
-            "astra": (113, 42, 232),
-            "breach": (217, 122, 46),
-            "brimstone": (217, 122, 46),
-            "cypher": (245, 240, 230),
-            "jett": (245, 240, 230),
-            "kay/o": (133, 146, 156),
-            "killjoy": (255, 217, 31),
-            "omen": (71, 80, 143),
-            "phoenix": (225, 22, 19),
-            "raze": (225, 154, 0),
-            "reyna": (181, 101, 181),
-            "sage": (90, 230, 213),
-            "skye": (192, 230, 158),
-            "sova": (37, 143, 204)
-        }
-
-=======
->>>>>>> 022c944f96939608b2dfbaceef782c0545a76519
-
 
 server = ""
 
