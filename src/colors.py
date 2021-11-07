@@ -2,10 +2,11 @@ from colr import color
 from src.constants import tierDict
 
 class Colors:
-    def __init__(self, hide_names, agent_dict):
+    def __init__(self, hide_names, agent_dict, AGENTCOLORLIST):
         self.hide_names = hide_names
         self.agent_dict = agent_dict
         self.tier_dict = tierDict
+        self.AGENTCOLORLIST = AGENTCOLORLIST
 
     def get_color_from_team(self, team, name, playerPuuid, selfPuuid, agent=None):
         if agent is not None:
@@ -41,3 +42,7 @@ class Colors:
             return color(level, fore=(241, 144, 54))
         elif level < 100:
             return color(level, fore=(211, 211, 211))
+
+    def get_agent_from_uuid(self, agentUUID):
+        agent = str(self.agent_dict.get(agentUUID))
+        return color(agent, fore=self.AGENTCOLORLIST[agent.lower()])

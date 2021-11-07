@@ -67,7 +67,7 @@ try:
 
     agent_dict = content.get_all_agents()
 
-    colors = Colors(hide_names, agent_dict)
+    colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
 
 
@@ -190,11 +190,6 @@ try:
             break
 
 
-    def get_agent_from_uuid(agentUUID):
-        agent = str(agent_dict.get(agentUUID))
-        return color(agent, fore=AGENTCOLOURLIST[agent.lower()])
-
-
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)
@@ -267,7 +262,7 @@ try:
 
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
-                        agent = get_agent_from_uuid(player["CharacterID"].lower())
+                        agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
 
                         # NAME
                         name = Namecolor

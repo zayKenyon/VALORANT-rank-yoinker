@@ -1,6 +1,6 @@
 from colr import color
 
-AGENTCOLOURLIST = {
+AGENTCOLORLIST = {
             "none": (100, 100, 100),
             "viper": (48, 186, 135),
             "yoru": (52, 76, 207),
