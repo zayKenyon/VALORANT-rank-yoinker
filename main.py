@@ -49,133 +49,13 @@ try:
 
 
 
-    headers = {}
 
-
-    def get_region():
-        path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
-        with open(path, "r", encoding="utf8") as file:
-            while True:
-                line = file.readline()
-                if '.a.pvp.net/account-xp/v1/' in line:
-                    pd_url = line.split('.a.pvp.net/account-xp/v1/')[0].split('.')[-1]
-                elif 'https://glz' in line:
-                    glz_url = [(line.split('https://glz-')[1].split(".")[0]),
-                               (line.split('https://glz-')[1].split(".")[1])]
-                if "pd_url" in locals().keys() and "glz_url" in locals().keys():
-                    return [pd_url, glz_url]
-
-
-    region = get_region()
-    pd_url = f"https://pd.{region[0]}.a.pvp.net"
-    glz_url = f"https://glz-{region[1][0]}.{region[1][1]}.a.pvp.net"
-    log(f"Api urls: pd_url: '{pd_url}', glz_url: '{glz_url}'")
-    region = region[0]
-
-
-    def get_current_version():
-        path = os.path.join(os.getenv('LOCALAPPDATA'), R'VALORANT\Saved\Logs\ShooterGame.log')
-        with open(path, "r", encoding="utf8") as file:
-            while True:
-                line = file.readline()
-                if 'CI server version:' in line:
-                    version_without_shipping = line.split('CI server version: ')[1].strip()
-                    version = version_without_shipping.split("-")
-                    version.insert(2, "shipping")
-                    version = "-".join(version)
-                    log(f"got version from logs '{version}'")
-                    return version
-
-
-    def fetch(url_type: str, endpoint: str, method: str):
-        global response
-        global headers
-        try:
-            if url_type == "glz":
-                response = requests.request(method, glz_url + endpoint, headers=get_headers(), verify=False)
-                log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
-                if not response.ok:
-                    time.sleep(5)
-                    headers = {}
-                    fetch(url_type, endpoint, method)
-                return response.json()
-            elif url_type == "pd":
-                response = requests.request(method, pd_url + endpoint, headers=get_headers(), verify=False)
-                log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
-                if not response.ok:
-                    time.sleep(5)
-                    headers = {}
-                    fetch(url_type, endpoint, method)
-                return response
-            elif url_type == "local":
-                local_headers = {'Authorization': 'Basic ' + base64.b64encode(
-                    ('riot:' + lockfile['password']).encode()).decode()}
-                response = requests.request(method, f"https://127.0.0.1:{lockfile['port']}{endpoint}",
-                                            headers=local_headers,
-                                            verify=False)
-                log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
-                return response.json()
-            elif url_type == "custom":
-                response = requests.request(method, f"{endpoint}", headers=get_headers(), verify=False)
-                log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
-                if not response.ok: headers = {}
-                return response.json()
-        except json.decoder.JSONDecodeError:
-            log(f"JSONDecodeError in fetch function, resp.code: {response.status_code}, resp_text: '{response.text}")
-            print(response)
-            print(response.text)
-
-
-    def get_lockfile():
-        try:
-            with open(os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')) as lockfile:
-                log("opened log file")
-                data = lockfile.read().split(':')
-                keys = ['name', 'PID', 'port', 'password', 'protocol']
-                return dict(zip(keys, data))
-        except FileNotFoundError:
-            log("lockfile not found")
-            raise Exception("Lockfile not found, you're not in a game!")
-
-
-    lockfile = get_lockfile()
-
-    puuid = ''
-
-
-    def get_headers():
-        global headers
-        if headers == {}:
-            global puuid
-            local_headers = {'Authorization': 'Basic ' + base64.b64encode(
-                ('riot:' + lockfile['password']).encode()).decode()}
-            response = requests.get(f"https://127.0.0.1:{lockfile['port']}/entitlements/v1/token",
-                                    headers=local_headers, verify=False)
-            entitlements = response.json()
-            puuid = entitlements['subject']
-            headers = {
-                'Authorization': f"Bearer {entitlements['accessToken']}",
-                'X-Riot-Entitlements-JWT': entitlements['token'],
-                'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjog"
-                                         "IldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5"
-                                         "MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
-                'X-Riot-ClientVersion': get_current_version(),
-                "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
-            }
-        return headers
 
 
     def get_coregame_match_id():
         global response
         try:
-            response = fetch(url_type="glz", endpoint=f"/core-game/v1/players/{puuid}", method="get")
+            response = Requests.fetch(url_type="glz", endpoint=f"/core-game/v1/players/{Requests.puuid}", method="get")
             match_id = response['MatchID']
             log(f"retrieved coregame match id: '{match_id}'")
             return match_id
@@ -188,7 +68,7 @@ try:
     def get_pregame_match_id():
         global response
         try:
-            response = fetch(url_type="glz", endpoint=f"/pregame/v1/players/{puuid}", method="get")
+            response = Requests.fetch(url_type="glz", endpoint=f"/pregame/v1/players/{Requests.puuid}", method="get")
             match_id = response['MatchID']
             log(f"retrieved pregame match id: '{match_id}'")
             return match_id
@@ -199,17 +79,17 @@ try:
 
 
     def get_coregame_stats():
-        response = fetch("glz", f"/core-game/v1/matches/{get_coregame_match_id()}", "get")
+        response = Requests.fetch("glz", f"/core-game/v1/matches/{get_coregame_match_id()}", "get")
         return response
 
 
     def get_pregame_stats():
-        response = fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
+        response = Requests.fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
         return response
 
 
     def get_rank(puuid, seasonID):
-        response = fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+        response = Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
         try:
             if response.ok:
                 log("retrieved rank successfully")
@@ -250,19 +130,19 @@ try:
 
 
     def get_name_from_puuid(puuid):
-        response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=[puuid], verify=False)
+        response = requests.put(Requests.pd_url + "/name-service/v2/players", headers=Requests.get_headers(), json=[puuid], verify=False)
         return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
 
     def get_multiple_names_from_puuid(puuids):
-        response = requests.put(pd_url + "/name-service/v2/players", headers=get_headers(), json=puuids, verify=False)
+        response = requests.put(Requests.pd_url + "/name-service/v2/players", headers=Requests.get_headers(), json=puuids, verify=False)
         name_dict = {player["Subject"]: f"{player['GameName']}#{player['TagLine']}"
                      for player in response.json()}
         return name_dict
 
 
     def get_content():
-        content = fetch("custom", f"https://shared.{region}.a.pvp.net/content-service/v3/content", "get")
+        content = Requests.fetch("custom", f"https://shared.{Requests.region}.a.pvp.net/content-service/v3/content", "get")
         return content
 
 
@@ -282,14 +162,14 @@ try:
 
 
     def get_presence():
-        presences = fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
+        presences = Requests.fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
         log(f"fethced presences:")
         return presences['presences']
 
 
     def get_game_state(presences):
         for presence in presences:
-            if presence['puuid'] == puuid:
+            if presence['puuid'] == Requests.puuid:
                 return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
 
 
@@ -391,12 +271,12 @@ try:
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
         if state == "game":
             team_id = "Blue"
-            PlayerInventorys = fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
+            PlayerInventorys = Requests.fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
         elif state == "pregame":
             pregame_stats = players
             players = players["AllyTeam"]["Players"]
             team_id = pregame_stats['Teams'][0]['team_id']
-            PlayerInventorys = fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
+            PlayerInventorys = Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
             if team_id == "Red":
                 invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
@@ -522,7 +402,7 @@ try:
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         Namecolor = get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
-                                                        puuid)
+                                                        Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 add_row_table(table, ["", "", "", "", "", "", "", "", ""])
@@ -610,11 +490,11 @@ try:
                         if player["PlayerIdentity"]["Incognito"]:
                             NameColor = get_color_from_team(pregame_stats['Teams'][0]['team_id'],
                                                             names[player["Subject"]],
-                                                            player["Subject"], puuid, agent=player["CharacterID"])
+                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"])
                         else:
                             NameColor = get_color_from_team(pregame_stats['Teams'][0]['team_id'],
                                                             names[player["Subject"]],
-                                                            player["Subject"], puuid)
+                                                            player["Subject"], Requests.puuid)
 
                         PLcolor = level_to_color(player_level)
                         if player["CharacterSelectionState"] == "locked":
@@ -666,7 +546,7 @@ try:
                                               ])
                         bar()
             if game_state == "MENUS":
-                Players = get_party_members(puuid, presence)
+                Players = get_party_members(Requests.puuid, presence)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     names = get_names_from_puuids(Players)
                     log(f"retrieved names dict: {names}")
