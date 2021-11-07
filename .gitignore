@@ -139,4 +139,8 @@ cython_debug/
 
 #config file
 .config.json
-config.json
+.idea/discord.xml
+.idea/modules.xml
+.idea/VALORANT-rank-yoinker.iml
+.idea/vcs.xml
+.idea/workspace.xml
