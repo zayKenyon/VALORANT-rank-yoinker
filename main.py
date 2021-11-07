@@ -272,7 +272,8 @@ try:
                 'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjog"
                                          "IldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5"
                                          "MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
-                'X-Riot-ClientVersion': get_current_version()
+                'X-Riot-ClientVersion': get_current_version(),
+                'User-Agent': 'ShooterGame/13 Windows/10.0.19043.1.256.64bit'
             }
         return headers
 
