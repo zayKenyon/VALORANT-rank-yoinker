@@ -15,7 +15,8 @@ from src.constants import *
 from src.requests import Requests
 from src.logs import Logging
 from src.config import Config
-
+from src.coregame import Coregame
+from src.colors import Colors
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -25,7 +26,7 @@ os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
 enablePrivateLogging = False
 
-hideNames = False
+hide_names = False
 
 server = ""
 
@@ -44,6 +45,12 @@ try:
     log = Logging.log
 
     cfg = Config()
+
+    coregame = Coregame(Requests)
+
+    agent_dict = Requests.get_all_agents()
+
+    Colors = Colors(hide_names, agent_dict)
     log(f"VALORANT rank yoinker v{version}")
 
 
@@ -52,17 +59,6 @@ try:
 
 
 
-    def get_coregame_match_id():
-        global response
-        try:
-            response = Requests.fetch(url_type="glz", endpoint=f"/core-game/v1/players/{Requests.puuid}", method="get")
-            match_id = response['MatchID']
-            log(f"retrieved coregame match id: '{match_id}'")
-            return match_id
-        except (KeyError, TypeError):
-            log(f"cannot find coregame match id: ")
-            print(f"No match id found. {response}")
-            return 0
 
 
     def get_pregame_match_id():
@@ -77,10 +73,6 @@ try:
             print(f"No match id found. {response}")
             return 0
 
-
-    def get_coregame_stats():
-        response = Requests.fetch("glz", f"/core-game/v1/matches/{get_coregame_match_id()}", "get")
-        return response
 
 
     def get_pregame_stats():
@@ -150,15 +142,6 @@ try:
         for season in content["Seasons"]:
             if season["IsActive"]:
                 return season["ID"]
-
-
-    def get_all_agents():
-        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
-        agent_dict = {}
-        agent_dict.update({None: None})
-        for agent in rAgents["data"]:
-            agent_dict.update({agent['uuid'].lower(): agent['displayName']})
-        return agent_dict
 
 
     def get_presence():
@@ -242,28 +225,6 @@ try:
         return get_multiple_names_from_puuid(players_puuid)
 
 
-    def get_color_from_team(team, name, playerPuuid, selfPuuid, agent=None):
-        if agent is not None:
-            if hideNames:
-                if agent != "":
-                    name = agent_dict[agent]
-                else:
-                    name = "Player"
-        if team == 'Red':
-            Teamcolor = color(name, fore=(238, 77, 77))
-        elif team == 'Blue':
-            Teamcolor = color(name, fore=(76, 151, 237))
-        else:
-            Teamcolor = ''
-        if playerPuuid == selfPuuid:
-            Teamcolor = color(name, fore=(221, 224, 41))
-        return Teamcolor
-
-
-    def get_rgb_color_from_skin(skin_id, valoApiSkins):
-        for skin in valoApiSkins.json()["data"]:
-            if skin_id == skin["uuid"]:
-                return tierDict[skin["contentTierUuid"]]
 
 
     def get_match_loadouts(match_id, players, weaponChoose, valoApiSkins, state="game"):
@@ -275,7 +236,7 @@ try:
         elif state == "pregame":
             pregame_stats = players
             players = players["AllyTeam"]["Players"]
-            team_id = pregame_stats['Teams'][0]['team_id']
+            team_id = pregame_stats['Teams'][0]['TeamID']
             PlayerInventorys = Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
             if team_id == "Red":
@@ -292,7 +253,7 @@ try:
                             "ID"]
                     for skin in valoApiSkins.json()["data"]:
                         if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
+                            rgb_color = Colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                             # if rgb_color is not None:
                             weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
                             # else:
@@ -339,7 +300,6 @@ try:
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     content = get_content()
-    agent_dict = get_all_agents()
     log(f"retrieved agent dict: {agent_dict}")
     seasonID = get_latest_season_id(content)
     log(f"retrieved season id: {seasonID}")
@@ -362,11 +322,11 @@ try:
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
             }
             if game_state == "INGAME":
-                coregame_stats = get_coregame_stats()
+                coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
                 server = GAMEPODS[coregame_stats["GamePodID"]]
                 wait_for_presence(get_players_puuid(Players))
-                loadouts = get_match_loadouts(get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
+                loadouts = get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
                 names = get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
@@ -401,7 +361,7 @@ try:
                             rankStatus = rank[1]
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
-                        Namecolor = get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
+                        Namecolor = Colors.get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
                                                         Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
@@ -488,11 +448,11 @@ try:
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
-                            NameColor = get_color_from_team(pregame_stats['Teams'][0]['team_id'],
+                            NameColor = Colors.get_color_from_team(pregame_stats['Teams'][0]['team_id'],
                                                             names[player["Subject"]],
                                                             player["Subject"], Requests.puuid, agent=player["CharacterID"])
                         else:
-                            NameColor = get_color_from_team(pregame_stats['Teams'][0]['team_id'],
+                            NameColor = Colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
                                                             names[player["Subject"]],
                                                             player["Subject"], Requests.puuid)
 

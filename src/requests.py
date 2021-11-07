@@ -23,9 +23,9 @@ class Requests:
         self.region = self.region[0]
         self.lockfile = self.get_lockfile()
 
-
         self.puuid = ''
-
+        #fetch puuid so its avaible outsite
+        self.get_headers()
 
     def check_version(self):
         # checking status
@@ -53,8 +53,6 @@ class Requests:
             print(color(rStatus["message"], fore=status_color))
             
     def fetch(self, url_type: str, endpoint: str, method: str):
-        global response
-        global headers
         try:
             if url_type == "glz":
                 response = requests.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
@@ -62,7 +60,7 @@ class Requests:
                     f" response code: {response.status_code}")
                 if not response.ok:
                     time.sleep(5)
-                    headers = {}
+                    self.headers = {}
                     self.fetch(url_type, endpoint, method)
                 return response.json()
             elif url_type == "pd":
@@ -72,7 +70,7 @@ class Requests:
                     f" response code: {response.status_code}")
                 if not response.ok:
                     time.sleep(5)
-                    headers = {}
+                    self.headers = {}
                     self.fetch(url_type, endpoint, method)
                 return response
             elif url_type == "local":
@@ -90,7 +88,7 @@ class Requests:
                 self.log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
-                if not response.ok: headers = {}
+                if not response.ok: self.headers = {}
                 return response.json()
         except json.decoder.JSONDecodeError:
             self.log(f"JSONDecodeError in fetch function, resp.code: {response.status_code}, resp_text: '{response.text}")
@@ -153,5 +151,14 @@ class Requests:
                 "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
             }
         return headers
+
+
+    def get_all_agents(self):
+        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
+        agent_dict = {}
+        agent_dict.update({None: None})
+        for agent in rAgents["data"]:
+            agent_dict.update({agent['uuid'].lower(): agent['displayName']})
+        return agent_dict
 
 
