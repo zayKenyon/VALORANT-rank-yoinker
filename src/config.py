@@ -5,10 +5,8 @@ from json import JSONDecodeError
 from src.logs import Logging
 
 class Config:
-    def __init__(self):
-        self.Logging = Logging()
-        self.log = self.Logging.log
-
+    def __init__(self, log):
+        self.log = log
         try:
             with open("config.json", "r") as file:
                 self.log("config opened")

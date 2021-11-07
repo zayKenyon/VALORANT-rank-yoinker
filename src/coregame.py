@@ -1,13 +1,11 @@
-from src.requests import Requests
 from src.logs import Logging
 
 
 
 
 class Coregame:
-    def __init__(self, Requests):
-        self.Logging = Logging()
-        self.log = self.Logging.log
+    def __init__(self, Requests, log):
+        self.log = log
 
         self.Requests = Requests
 

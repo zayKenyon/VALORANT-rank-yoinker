@@ -153,12 +153,3 @@ class Requests:
         return headers
 
 
-    def get_all_agents(self):
-        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
-        agent_dict = {}
-        agent_dict.update({None: None})
-        for agent in rAgents["data"]:
-            agent_dict.update({agent['uuid'].lower(): agent['displayName']})
-        return agent_dict
-
-

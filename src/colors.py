@@ -29,3 +29,15 @@ class Colors:
         for skin in valoApiSkins.json()["data"]:
             if skin_id == skin["uuid"]:
                 return self.tier_dict[skin["contentTierUuid"]]
+
+    def level_to_color(self, level):
+        if level >= 400:
+            return color(level, fore=(0, 255, 255))
+        elif level >= 300:
+            return color(level, fore=(255, 255, 0))
+        elif level >= 200:
+            return color(level, fore=(0, 0, 255))
+        elif level >= 100:
+            return color(level, fore=(241, 144, 54))
+        elif level < 100:
+            return color(level, fore=(211, 211, 211))
