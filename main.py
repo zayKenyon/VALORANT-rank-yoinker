@@ -10,7 +10,7 @@ from json.decoder import JSONDecodeError
 from prettytable import PrettyTable
 from alive_progress import alive_bar
 from io import TextIOWrapper
-from constants import *
+from src.constants import *
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -343,6 +343,7 @@ try:
     def get_all_agents():
         rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
         agent_dict = {}
+        agent_dict.update({None: None})
         for agent in rAgents["data"]:
             agent_dict.update({agent['uuid'].lower(): agent['displayName']})
         return agent_dict
@@ -448,14 +449,6 @@ try:
 
 
     def get_rgb_color_from_skin(skin_id, valoApiSkins):
-        tierDict = {
-            "0cebb8be-46d7-c12a-d306-e9907bfc5a25": (0, 149, 135),
-            "e046854e-406c-37f4-6607-19a9ba8426fc": (241, 184, 45),
-            "60bca009-4182-7998-dee7-b8a2558dc369": (209, 84, 141),
-            "12683d76-48d7-84a3-4e09-6985794f0445": (90, 159, 226),
-            "411e4a55-4e59-7757-41f0-86a53f101bb5": (239, 235, 101),
-            None: None
-        }
         for skin in valoApiSkins.json()["data"]:
             if skin_id == skin["uuid"]:
                 return tierDict[skin["contentTierUuid"]]
@@ -568,7 +561,7 @@ try:
                     partyOBJ = get_party_json(get_players_puuid(Players), presence)
                     log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
-                    Players.sort(key=lambda Players: Players["team_id"], reverse=True)
+                    Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
                     partyIcons = {}
                     lastTeamBoolean = False
@@ -596,12 +589,12 @@ try:
                             rankStatus = rank[1]
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
-                        Namecolor = get_color_from_team(player['team_id'], names[player["Subject"]], player["Subject"],
+                        Namecolor = get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
                                                         puuid)
-                        if lastTeam != player['team_id']:
+                        if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 add_row_table(table, ["", "", "", "", "", "", "", "", ""])
-                        lastTeam = player['team_id']
+                        lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         PLcolor = level_to_color(player_level)
 
