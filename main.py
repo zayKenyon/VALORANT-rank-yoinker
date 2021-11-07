@@ -5,21 +5,22 @@ import os
 import base64
 import json
 import time
-import glob
-from json.decoder import JSONDecodeError
 from prettytable import PrettyTable
 from alive_progress import alive_bar
-from io import TextIOWrapper
 
 from src.constants import *
 from src.requests import Requests
 from src.logs import Logging
 from src.config import Config
-from src.coregame import Coregame
 from src.colors import Colors
-from src.pregame import Pregame
 from src.rank import Rank
 from src.content import Content
+from src.names import Names
+
+
+from src.states.menu import Menu
+from src.states.pregame import Pregame
+from src.states.coregame import Coregame
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -49,13 +50,17 @@ try:
 
     cfg = Config(log)
 
-    coregame = Coregame(Requests, log)
+
+    menu = Menu(Requests, log)
     pregame = Pregame(Requests, log)
+    coregame = Coregame(Requests, log)
+
 
     rank = Rank(Requests, log)
 
     content = Content(Requests, log)
 
+    namesClass = Names(Requests, log)
 
 
 
@@ -69,18 +74,6 @@ try:
 
     log(f"VALORANT rank yoinker v{version}")
 
-
-
-    def get_name_from_puuid(puuid):
-        response = requests.put(Requests.pd_url + "/name-service/v2/players", headers=Requests.get_headers(), json=[puuid], verify=False)
-        return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
-
-
-    def get_multiple_names_from_puuid(puuids):
-        response = requests.put(Requests.pd_url + "/name-service/v2/players", headers=Requests.get_headers(), json=puuids, verify=False)
-        name_dict = {player["Subject"]: f"{player['GameName']}#{player['TagLine']}"
-                     for player in response.json()}
-        return name_dict
 
     def get_presence():
         presences = Requests.fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
@@ -141,15 +134,6 @@ try:
                                 decodedPresence["accountLevel"]}})
         log(f"retrieved party members: {res}")
         return res
-
-
-
-    def get_names_from_puuids(players):
-        players_puuid = []
-        for player in players:
-            players_puuid.append(player["Subject"])
-        return get_multiple_names_from_puuid(players_puuid)
-
 
 
 
@@ -238,7 +222,7 @@ try:
                 server = GAMEPODS[coregame_stats["GamePodID"]]
                 wait_for_presence(get_players_puuid(Players))
                 loadouts = get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
-                names = get_names_from_puuids(Players)
+                names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_players_puuid(Players), presence)
@@ -327,7 +311,7 @@ try:
                 wait_for_presence(get_players_puuid(Players))
                 loadouts = get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
                                               state="pregame")
-                names = get_names_from_puuids(Players)
+                names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = get_presence()
                     partyOBJ = get_party_json(get_players_puuid(Players), presence)
@@ -418,8 +402,8 @@ try:
                         bar()
             if game_state == "MENUS":
                 Players = get_party_members(Requests.puuid, presence)
+                names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    names = get_names_from_puuids(Players)
                     log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     for player in Players:
