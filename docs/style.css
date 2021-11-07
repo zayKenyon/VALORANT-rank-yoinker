@@ -197,7 +197,7 @@ small { font-size: var(--ui-typography-s); }
 
 .ui-text-note {
   color: var(--ui-color-typography-note);
-  line-height: 1;
+  line-height: 1.25;
 }
 
 /*--------------------------------------------------------------
