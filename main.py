@@ -66,13 +66,14 @@ try:
     pregame = Pregame(Requests, log)
     coregame = Coregame(Requests, log)
 
-    loadoutsClass = Loadouts(Requests, log)
+
 
 
     agent_dict = content.get_all_agents()
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
+    loadoutsClass = Loadouts(Requests, log, colors)
     tableClass = Table()
 
 

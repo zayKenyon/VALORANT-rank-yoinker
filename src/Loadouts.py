@@ -3,9 +3,10 @@ from colr import color
 
 
 class Loadouts:
-    def __init__(self, Requests, log):
+    def __init__(self, Requests, log, colors):
         self.Requests = Requests
         self.log = log
+        self.colors = colors
 
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, state="game"):
         weaponLists = {}
@@ -33,7 +34,7 @@ class Loadouts:
                             "ID"]
                     for skin in valoApiSkins.json()["data"]:
                         if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = color.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
+                            rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                             # if rgb_color is not None:
                             weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
                             # else:
