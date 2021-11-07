@@ -16,11 +16,14 @@ from src.colors import Colors
 from src.rank import Rank
 from src.content import Content
 from src.names import Names
-
+from src.presences import Presences
+from src.Loadouts import Loadouts
 
 from src.states.menu import Menu
 from src.states.pregame import Pregame
 from src.states.coregame import Coregame
+
+from src.table import Table
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -50,24 +53,27 @@ try:
 
     cfg = Config(log)
 
-
-    menu = Menu(Requests, log)
-    pregame = Pregame(Requests, log)
-    coregame = Coregame(Requests, log)
-
-
     rank = Rank(Requests, log)
 
     content = Content(Requests, log)
 
     namesClass = Names(Requests, log)
 
+    presences = Presences(Requests, log)
 
+
+    menu = Menu(Requests, log, presences)
+    pregame = Pregame(Requests, log)
+    coregame = Coregame(Requests, log)
+
+    loadoutsClass = Loadouts(Requests, log)
 
 
     agent_dict = content.get_all_agents()
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
+
+    tableClass = Table()
 
 
 
@@ -75,119 +81,6 @@ try:
     log(f"VALORANT rank yoinker v{version}")
 
 
-    def get_presence():
-        presences = Requests.fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
-        log(f"fethced presences:")
-        return presences['presences']
-
-
-    def get_game_state(presences):
-        for presence in presences:
-            if presence['puuid'] == Requests.puuid:
-                return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
-
-
-    def decode_presence(private):
-        # try:
-        if "{" not in str(private) and private is not None and str(private) != "":
-            dict = json.loads(base64.b64decode(str(private)).decode("utf-8"))
-            if dict.get("isValid"):
-                return dict
-        return {
-            "isValid": False,
-            "partyId": 0,
-            "partySize": 0,
-            "partyVersion": 0,
-        }
-
-
-    def get_party_json(GamePlayersPuuid, presences):
-        party_json = {}
-        for presence in presences:
-            if presence["puuid"] in GamePlayersPuuid:
-                decodedPresence = decode_presence(presence["private"])
-                if decodedPresence["isValid"]:
-                    if decodedPresence["partySize"] > 1:
-                        try:
-                            party_json[decodedPresence["partyId"]].append(presence["puuid"])
-                        except KeyError:
-                            party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
-        log(f"retrieved party json: {party_json}")
-        return party_json
-
-
-    def get_party_members(self_puuid, presences):
-        res = []
-        for presence in presences:
-            # print(presence)
-            if presence["puuid"] == self_puuid:
-                decodedPresence = decode_presence(presence["private"])
-                if decodedPresence["isValid"]:
-                    party_id = decodedPresence["partyId"]
-                    res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
-                                decodedPresence["accountLevel"]}})
-        for presence in presences:
-            decodedPresence = decode_presence(presence["private"])
-            if decodedPresence["isValid"]:
-                if decodedPresence["partyId"] == party_id and presence["puuid"] != self_puuid:
-                    res.append({"Subject": presence["puuid"], "PlayerIdentity": {"AccountLevel":
-                                decodedPresence["accountLevel"]}})
-        log(f"retrieved party members: {res}")
-        return res
-
-
-
-    def get_match_loadouts(match_id, players, weaponChoose, valoApiSkins, state="game"):
-        weaponLists = {}
-        valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
-        if state == "game":
-            team_id = "Blue"
-            PlayerInventorys = Requests.fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
-        elif state == "pregame":
-            pregame_stats = players
-            players = players["AllyTeam"]["Players"]
-            team_id = pregame_stats['Teams'][0]['TeamID']
-            PlayerInventorys = Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
-        for player in range(len(players)):
-            if team_id == "Red":
-                invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
-            else:
-                invindex = player
-            inv = PlayerInventorys["Loadouts"][invindex]
-            if state == "game":
-                inv = inv["Loadout"]
-            for weapon in valApiWeapons["data"]:
-                if weapon["displayName"].lower() == weaponChoose.lower():
-                    skin_id = \
-                        inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
-                            "ID"]
-                    for skin in valoApiSkins.json()["data"]:
-                        if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
-                            # if rgb_color is not None:
-                            weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
-                            # else:
-                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
-        return weaponLists
-
-
-    def get_players_puuid(Players):
-        return [player["Subject"] for player in Players]
-
-
-    def add_row_table(table: PrettyTable, args: list):
-        # for arg in args:
-        table.add_rows([args])
-
-
-    def wait_for_presence(PlayersPuuids):
-        while True:
-            presence = get_presence()
-            for puuid in PlayersPuuids:
-                if puuid not in str(presence):
-                    time.sleep(1)
-                    continue
-            break
 
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
@@ -197,10 +90,9 @@ try:
 
     while True:
         table = PrettyTable()
-        # current in-game status
         try:
-            presence = get_presence()
-            game_state = get_game_state(presence)
+            presence = presences.get_presence()
+            game_state = presences.get_game_state(presence)
         except TypeError:
             raise Exception("Game has not started yet!")
         if cfg.cooldown == 0 or game_state != lastGameState:
@@ -215,12 +107,12 @@ try:
                 coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
                 server = GAMEPODS[coregame_stats["GamePodID"]]
-                wait_for_presence(get_players_puuid(Players))
-                loadouts = get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
+                presences.wait_for_presence(namesClass.get_players_puuid(Players))
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    presence = get_presence()
-                    partyOBJ = get_party_json(get_players_puuid(Players), presence)
+                    presence = presences.get_presence()
+                    partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
@@ -242,20 +134,20 @@ try:
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
-                        rank = rank.get_rank(player["Subject"], seasonID)
-                        rankStatus = rank[1]
+                        playerRank = rank.get_rank(player["Subject"], seasonID)
+                        rankStatus = playerRank[1]
                         while not rankStatus:
                             print("You have been rate limited, 😞 waiting 10 seconds!")
                             time.sleep(10)
-                            rank = rank.get_rank(player["Subject"], seasonID)
-                            rankStatus = rank[1]
-                        rank = rank[0]
+                            playerRank = rank.get_rank(player["Subject"], seasonID)
+                            rankStatus = playerRank[1]
+                        playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         Namecolor = colors.get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
                                                         Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
-                                add_row_table(table, ["", "", "", "", "", "", "", "", ""])
+                                tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         PLcolor = colors.level_to_color(player_level)
@@ -274,20 +166,21 @@ try:
                         skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[rank[0]]
+                        rankName = NUMBERTORANKS[playerRank[0]]
 
                         # RANK RATING
-                        rr = rank[1]
+                        rr = playerRank[1]
+
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[rank[3]]
+                        peakRank = NUMBERTORANKS[playerRank[3]]
 
                         # LEADERBOARD
-                        leaderboard = rank[2]
+                        leaderboard = playerRank[2]
 
                         # LEVEL
                         level = PLcolor
-                        add_row_table(table, [party_icon,
+                        tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
                                               # views,
@@ -303,13 +196,13 @@ try:
                 pregame_stats = pregame.get_pregame_stats()
                 server = GAMEPODS[pregame_stats["GamePodID"]]
                 Players = pregame_stats["AllyTeam"]["Players"]
-                wait_for_presence(get_players_puuid(Players))
-                loadouts = get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
+                presences.wait_for_presence(namesClass.get_players_puuid(Players))
+                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
                                               state="pregame")
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    presence = get_presence()
-                    partyOBJ = get_party_json(get_players_puuid(Players), presence)
+                    presence = presences.get_presence()
+                    partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
@@ -383,7 +276,7 @@ try:
                         # LEVEL
                         level = PLcolor
 
-                        add_row_table(table, [party_icon,
+                        tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
                                               # views,
@@ -396,7 +289,7 @@ try:
                                               ])
                         bar()
             if game_state == "MENUS":
-                Players = get_party_members(Requests.puuid, presence)
+                Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     log(f"retrieved names dict: {names}")
@@ -435,7 +328,7 @@ try:
                         # LEVEL
                         level = str(player_level)
 
-                        add_row_table(table, [party_icon,
+                        tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
                                               "",

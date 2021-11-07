@@ -23,3 +23,6 @@ class Names:
         for player in players:
             players_puuid.append(player["Subject"])
         return self.get_multiple_names_from_puuid(players_puuid)
+
+    def get_players_puuid(self, Players):
+        return [player["Subject"] for player in Players]
