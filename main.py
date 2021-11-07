@@ -17,6 +17,7 @@ from src.logs import Logging
 from src.config import Config
 from src.coregame import Coregame
 from src.colors import Colors
+from src.pregame import Pregame
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -47,6 +48,7 @@ try:
     cfg = Config()
 
     coregame = Coregame(Requests)
+    pregame = Pregame(Requests)
 
     agent_dict = Requests.get_all_agents()
 
@@ -55,29 +57,6 @@ try:
 
 
 
-
-
-
-
-
-
-    def get_pregame_match_id():
-        global response
-        try:
-            response = Requests.fetch(url_type="glz", endpoint=f"/pregame/v1/players/{Requests.puuid}", method="get")
-            match_id = response['MatchID']
-            log(f"retrieved pregame match id: '{match_id}'")
-            return match_id
-        except (KeyError, TypeError):
-            log(f"cannot find pregame match id: ")
-            print(f"No match id found. {response}")
-            return 0
-
-
-
-    def get_pregame_stats():
-        response = Requests.fetch("glz", f"/pregame/v1/matches/{get_pregame_match_id()}", "get")
-        return response
 
 
     def get_rank(puuid, seasonID):
@@ -410,11 +389,11 @@ try:
                                               ])
                         bar()
             elif game_state == "PREGAME":
-                pregame_stats = get_pregame_stats()
+                pregame_stats = pregame.get_pregame_stats()
                 server = GAMEPODS[pregame_stats["GamePodID"]]
                 Players = pregame_stats["AllyTeam"]["Players"]
                 wait_for_presence(get_players_puuid(Players))
-                loadouts = get_match_loadouts(get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
+                loadouts = get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
                                               state="pregame")
                 names = get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
@@ -448,7 +427,7 @@ try:
                         rank = rank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
-                            NameColor = Colors.get_color_from_team(pregame_stats['Teams'][0]['team_id'],
+                            NameColor = Colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
                                                             names[player["Subject"]],
                                                             player["Subject"], Requests.puuid, agent=player["CharacterID"])
                         else:
