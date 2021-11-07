@@ -10,7 +10,12 @@ from json.decoder import JSONDecodeError
 from prettytable import PrettyTable
 from alive_progress import alive_bar
 from io import TextIOWrapper
+
 from src.constants import *
+from src.requests import Requests
+from src.logs import Logging
+from src.config import Config
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -31,92 +36,18 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
 
 
 try:
-    # checking status
-    rStatus = requests.get(
-        "https://raw.githubusercontent.com/isaacKenyon/VALORANT-rank-yoinker/main/status.json").json()
-    if not rStatus["status_ok"] or rStatus["print_message"]:
-        status_color = (255, 0, 0) if not rStatus["status_ok"] else (0, 255, 0)
-        print(color(rStatus["message"], fore=status_color))
+    Requests = Requests(version)
+    Requests.check_version()
+    Requests.check_status()
 
-    # checking for latest release
-    r = requests.get("https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases")
-    json_data = r.json()
-    release_version = json_data[0]["tag_name"]  # get release version
-    link = json_data[0]["assets"][0]["browser_download_url"]  # link for the latest release
+    Logging = Logging()
+    log = Logging.log
 
-    if float(release_version) > float(version):
-        print(f"New version available! {link}")
-
-    logFileOpened = False
-
-
-    def log(stringToLog: str):
-        global logFileOpened
-        # creating logs folder
-        try:
-            os.mkdir(os.getcwd() + "\logs")
-        except FileExistsError:
-            pass
-        filenames = []
-        for filename in glob.glob(r"logs/log-*.txt"):
-            filenames.append(int(filename[9:-4]))
-        if len(filenames) == 0:
-            filenames.append(0)
-        if logFileOpened:
-            with open(f"logs/log-{max(filenames)}.txt", "a") as logFile:
-                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}]"
-                              f" {stringToLog.encode('ascii', 'replace').decode()}\n")
-        else:
-            with open(f"logs/log-{max(filenames) + 1}.txt", "w") as logFile:
-                logFileOpened = True
-                logFile.write(f"[{time.strftime('%Y.%m.%d-%H.%M.%S', time.localtime(time.time()))}]"
-                              f" {stringToLog.encode('ascii', 'replace').decode()}\n")
-
-
+    cfg = Config()
     log(f"VALORANT rank yoinker v{version}")
 
 
-    def config_dialog(fileToWrite: TextIOWrapper):
-        while True:
-            log("color config prompt called")
-            """
-             enableColors = input("Would you like to have colours? (Must use Windows Terminal - check README!) (y/n): ")
-             if enableColors in ("y", "n"):
-                 log(f"color option set: '{enableColors}'")
-                 enableColors = enableColors == "y"
-             else:
-                 log(f"invalid color option: '{enableColors}'")
-                 print('Avaible options are: "y", "n"')
-                 continue
-             while True:
-             log("cooldown prompt displayed")
-             cooldown = input(
-                 "How often should the program scan for new a game state (seconds)?  (0 to disable automatic "
-                 "refreshing): ")
-             if not cooldown.isdigit():
-                 log(f"invalid cooldown option: '{cooldown}'")
-                 print('You need to enter a number.')
-                 continue
-            """
-            jsonToWrite = {"cooldown": 1}
-            json.dump(jsonToWrite, fileToWrite)
-            return jsonToWrite
 
-
-    try:
-        with open("config.json", "r") as file:
-            log("config opened")
-            config = json.load(file)
-            if config.get("cooldown") is None:
-                log("some config values are None, getting new config")
-                config = config_dialog(file)
-    except (FileNotFoundError, JSONDecodeError):
-        log("file not found or invalid file")
-        with open("config.json", "w") as file:
-            config = config_dialog(file)
-    finally:
-        cooldown = config["cooldown"]
-        log(f"got cooldown with value '{cooldown}'")
 
     headers = {}
 
@@ -235,7 +166,8 @@ try:
                 'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjog"
                                          "IldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5"
                                          "MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
-                'X-Riot-ClientVersion': get_current_version()
+                'X-Riot-ClientVersion': get_current_version(),
+                "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
             }
         return headers
 
@@ -541,7 +473,7 @@ try:
             game_state = get_game_state(presence)
         except TypeError:
             raise Exception("Game has not started yet!")
-        if cooldown == 0 or game_state != lastGameState:
+        if cfg.cooldown == 0 or game_state != lastGameState:
             log(f"getting new {game_state} scoreboard")
             lastGameState = game_state
             game_state_dict = {
@@ -795,10 +727,10 @@ try:
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             print(table)
             print(f"VALORANT rank yoinker v{version}")
-        if cooldown == 0:
+        if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
-            time.sleep(cooldown)
+            time.sleep(cfg.cooldown)
 except:
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
