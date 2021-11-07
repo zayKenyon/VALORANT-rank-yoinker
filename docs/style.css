@@ -277,7 +277,11 @@ svg {
 
 .ui-component-button-big { width: 100%; }
 
-.ui-component-button-normal { width: fit-content; }
+.ui-component-button-normal {
+  width: -moz-fit-content;
+  width: fit-content;
+
+}
 
 /*--------------------------------------------------------------
 |
@@ -379,6 +383,7 @@ div label[for=ui-component-toggle__yearly] {
 .white-box {
   background-color: white;
   border-radius: 15px;
+  width: -moz-fit-content;
   width: fit-content;
   padding: 5px;
   box-sizing: border-box;
