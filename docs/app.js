@@ -8,7 +8,7 @@ function process_data(data) {
     for (let i = 0; i < data.length; i++) {
         downloads_count += data[i].assets[0].download_count;
     }
-    document.getElementById("downloads").innerHTML = "Only Supports Windows<br>Total Downloads: " + downloads_count;
+    document.getElementById("downloads").innerHTML = "Total Downloads: " + downloads_count;
 }
 
 
