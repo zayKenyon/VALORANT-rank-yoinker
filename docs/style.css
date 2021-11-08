@@ -367,7 +367,6 @@ div label[for=ui-component-toggle__yearly] {
 .zoom {
   transition: transform .2s; /* Animation */
   margin: 0 auto;
-  border-radius: 8px;
 }
 
 .zoom:hover {
