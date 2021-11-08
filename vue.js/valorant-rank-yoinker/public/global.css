@@ -1,0 +1,10 @@
+:root {
+    --text: #e8e8e8;
+    --background: #151418;
+    --box: #c6c6c6;
+    --box-200: #e8e8e8;
+    --inventory-background: #5775aa;
+    --inventory-slot: rgba(255, 255, 255, 0.3);
+    --placeholder-div: rgba(255, 255, 255, 0.3);
+    --placeholder-text: rgba(0, 0, 0, 255);
+}
