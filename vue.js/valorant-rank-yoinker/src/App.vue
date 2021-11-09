@@ -2,7 +2,7 @@
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"> -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
 
-  <img alt="vRY Logo" src="./assets/logo.png" class="logo">
+  <img alt="vRY Logo" src="../../assets/Logo.png" class="logo">
   <player-component v-for="Player in loadoutJSON"
   :key=Player.name :PlayerLoadout="Player" @openModal="openModal"/>
 
