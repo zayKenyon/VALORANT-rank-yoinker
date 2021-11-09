@@ -8,6 +8,7 @@
       <div v-if="imgPath!==null" class="placeholderDiv">
         <span class="placeholderText">{{skinDisplayName}}</span>
       </div>
+      <img v-if="buddyIMG!==null" :src="buddyIMG" alt="skin_buddy" class="buddyIMG">
   </div>
 </template>
 
@@ -21,6 +22,10 @@ export default {
             if (skinArray["weapon"] == this.weaponName) {
                 this.imgPath = skinArray.skinDisplayIcon
                 this.skinDisplayName = skinArray.skinDisplayName
+                if (skinArray.buddy_displayIcon) {
+                    this.buddyIMG = skinArray.buddy_displayIcon
+                }
+                this.buddyIMG
             }
         }
         if (this.weaponName.startsWith("Spray")) {
@@ -35,7 +40,8 @@ export default {
         return {
             imgPath: null,
             isSpray: false,
-            skinDisplayName: null
+            skinDisplayName: null,
+            buddyIMG: null,
         }
     }
 }
@@ -58,12 +64,13 @@ export default {
 
     .box:hover {
         padding: 5px;
+        background-color: var(--inventory-slot-hover);
     }
 
     .box:hover .placeholderDiv{
         padding: 0 5px;
         left: -5px;
-        margin: 86px 0;
+        margin: 111px 0;
     }
 
     .box-invisible {
@@ -95,6 +102,8 @@ export default {
     .weaponIMG {
         position: absolute;
         width: 100%;
+        /* height: 100%; */
+        /* object-fit: cover; */
         top: 0;
         bottom: 0;
         margin: auto;
@@ -113,8 +122,8 @@ export default {
         margin: auto;
         box-sizing: border-box;
         
-        border-radius: 20px;
-        border: 1px solid black;
+        border-radius: 10px;
+        /* border: 1px solid black; */
     }
     
     .placeholderDiv {
@@ -123,7 +132,7 @@ export default {
         z-index: 2;
         width: 100%;
         height: 10%;
-        margin: 90px 0;
+        margin: 115px 0;
         left: 0;
         transition-duration: 0.1s;
     }
@@ -138,4 +147,14 @@ export default {
         top: -1px;
         color: var(--placeholder-text);
     }
+
+    .buddyIMG {
+        z-index: 3;
+        position: absolute;
+        bottom: 2%;
+        left: 0;
+        width: 18%;
+    }
+
+
 </style>

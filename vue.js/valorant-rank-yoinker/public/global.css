@@ -1,10 +1,27 @@
 :root {
-    --text: #e8e8e8;
-    --background: #151418;
-    --box: #c6c6c6;
-    --box-200: #e8e8e8;
-    --inventory-background: #5775aa;
-    --inventory-slot: rgba(255, 255, 255, 0.3);
-    --placeholder-div: rgba(255, 255, 255, 0.3);
+    --text: var(--blue-600);
+    --background: var(--blue-200);
+    --box: var(--blue-300);
+    --box-200: var(--blue-400);
+    --inventory-background: var(--background-color);
+    --inventory-slot: rgba(255, 255, 255, 0.2);
+    --inventory-slot-hover: rgba(255, 255, 255, 0.6);
+    --placeholder-div: rgba(255, 255, 255, 0.5);
     --placeholder-text: rgba(0, 0, 0, 255);
+    --modal-text: rgba(127, 127, 127, 1);
+
+    --blue-100: #03045e;
+    --blue-200: #023e8a;
+    --blue-300: #0077b6;
+    --blue-400: #0096c7;
+    --blue-500: #00b4d8;
+    --blue-600: #48cae4;
+    --blue-700: #90e0ef;
+    --blue-800: #ade8f4;
+    --blue-900: #caf0f8;
+
+    --background-color: #0f1923;
+    --background: var(--background-color);
+    --name-div-color: #eaeeb2;
+
 }
