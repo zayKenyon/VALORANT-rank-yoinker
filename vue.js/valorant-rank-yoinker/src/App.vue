@@ -2,9 +2,13 @@
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"> -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
 
+<<<<<<< HEAD
   <img alt="vRY Logo" src="./assets/logo.png" class="logo">
   <img src="./assets/PhoenixArtwork.png" alt="Phoenix" class="img phoenix">
   <img src="./assets/KilljoyArtwork.png" alt="Killjoy" class="img killjoy">
+=======
+  <img alt="vRY Logo" src="../../assets/Logo.png" class="logo">
+>>>>>>> 49d0caf2914a3465a13882789731b0c382ee005e
   <player-component v-for="Player in loadoutJSON"
   :key=Player.name :PlayerLoadout="Player" @openModal="openModal"/>
 
