@@ -1,5 +1,21 @@
 from colr import color
 
+version = "1.251"
+enablePrivateLogging = False
+hide_names = False
+
+
+
+sockets = {
+    "skin": "bcef87d6-209b-46c6-8b19-fbe40bd95abc",
+    "skin_level": "e7c63390-eda7-46e0-bb7a-a6abdacd2433",
+    "skin_chroma": "3ad1b2b2-acdb-4524-852f-954a76ddae0a",
+    "skin_buddy": "77258665-71d1-4623-bc72-44db9bd5b3b3",
+    "skin_buddy_level": "dd3bf334-87f3-40bd-b043-682a57a8dc3a"
+}
+
+
+
 AGENTCOLORLIST = {
             "none": (100, 100, 100),
             "viper": (48, 186, 135),

@@ -24,16 +24,14 @@ from src.states.pregame import Pregame
 from src.states.coregame import Coregame
 
 from src.table import Table
+from src.server import Server
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-version = "1.24"
-
 os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
-enablePrivateLogging = False
 
-hide_names = False
 
 server = ""
 
@@ -66,16 +64,16 @@ try:
     pregame = Pregame(Requests, log)
     coregame = Coregame(Requests, log)
 
-
+    Server = Server(Requests)
+    Server.start_server()
 
 
     agent_dict = content.get_all_agents()
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
-    loadoutsClass = Loadouts(Requests, log, colors)
+    loadoutsClass = Loadouts(Requests, log, colors, Server)
     tableClass = Table()
-
 
 
 
@@ -109,8 +107,8 @@ try:
                 Players = coregame_stats["Players"]
                 server = GAMEPODS[coregame_stats["GamePodID"]]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, state="game")
                 names = namesClass.get_names_from_puuids(Players)
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, names, state="game")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -198,9 +196,9 @@ try:
                 server = GAMEPODS[pregame_stats["GamePodID"]]
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
-                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins,
-                                              state="pregame")
                 names = namesClass.get_names_from_puuids(Players)
+                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins, names,
+                                              state="pregame")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
