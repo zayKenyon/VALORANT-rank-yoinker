@@ -734,10 +734,10 @@ div label[for=ui-component-toggle__yearly] {
 
   @keyframes up-down {
     0% {
-      transform: translateY(30px); 
+      transform: translateY(15px);
     }
     100% {
-      transform: translateY(-30px); 
+      transform: translateY(-15px);
     }
   }
 
