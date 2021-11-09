@@ -538,66 +538,24 @@ div label[for=ui-component-toggle__yearly] {
 
 /*--------------------------------------------------------------
 |
-| 7.5 PRICING
+| 7.5 CONTENT
 |
 --------------------------------------------------------------*/
 
-.ui-section-pricing {
-  background-color: var(--ui-color-background-secondary);
-  padding-bottom: 5rem;
-  padding-top: 5rem;
+.ui-section-content {
+  padding-bottom: 2em;
+  padding-top: 2rem;
   text-align: center;
 }
 
-.ui-section-pricing__layout {
-  justify-content: initial;
-  margin-bottom: var(--ui-gap-pricing);
-  margin-top: var(--ui-gap-pricing);
-  row-gap: var(--ui-gap-card);
+.ui-section-content--image {
+  margin-bottom: var(--ui-gap-content);
+  margin-top: var(--ui-gap-content);
 }
 
-/* CARD */
+.ui-section-content--feature { row-gap: var(--ui-gap-content); }
 
-.ui-component-card--pricing {
-  background-color: var(--ui-color-background-primary);
-  padding: 1.5rem 1.5rem 1.75rem;
-  text-align: left;
-}
-
-.ui-component-card--pricing-price {
-  line-height: 1;
-  margin-bottom: 1.25rem;
-  margin-top: 1.25rem;
-}
-
-.ui-component-card--pricing-amount {
-  font-size: var(--ui-typography-h1);
-  font-weight: 700;
-}
-
-/* AMOUNT */
-
-.ui-component-card--pricing-amount-1::before { content: "$5"; }
-
-#ui-component-toggle__yearly:checked ~ div
-.ui-component-card--pricing-amount-1::before { content: "$3"; }
-
-.ui-component-card--pricing-amount-2::before { content: "$15"; }
-
-#ui-component-toggle__yearly:checked ~ div
-.ui-component-card--pricing-amount-2::before { content: "$13"; }
-
-.ui-component-card--pricing-amount-3::before { content: "$25"; }
-
-#ui-component-toggle__yearly:checked ~ div
-.ui-component-card--pricing-amount-3::before { content: "$23"; }
-
-/* LIST */
-
-.ui-component-list--pricing {
-  margin-bottom: 1.5rem;
-  margin-top: 1.25rem;
-}
+.ui-section-content--icon { margin-bottom: 1rem; }
 
 /*--------------------------------------------------------------
 |
