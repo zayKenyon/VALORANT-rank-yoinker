@@ -20,13 +20,14 @@ export default {
 
         }
     },
-    methods: {
-
+    mounted() {
+        console.log("test")
     }
+
 }
 </script>
 
-<style>
+<style scoped>
     .player {
         background-color: var(--box);
         box-sizing: border-box;

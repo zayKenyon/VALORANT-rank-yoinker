@@ -146,6 +146,11 @@ export default {
         margin: auto;
         top: -1px;
         color: var(--placeholder-text);
+        transition-duration: 0.1s;
+    }
+
+    .box:hover .placeholderText {
+        top: -2px;
     }
 
     .buddyIMG {
