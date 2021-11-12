@@ -6,7 +6,7 @@
     <span class="lastUpdate">Last updated: </span>
     <span class="lastUpdateValue">{{ lastUpdateString }}</span>
   </div>
-  <player-component :max="loadoutJSON.length" v-for="Player in loadoutJSON"
+  <player-component :max="Players.length" v-for="Player in Players"
   :key=Player.name :PlayerLoadout="Player" @openModal="openModal"/>
 
   <player-modal v-if="showModal" :PlayerLoadout="modalArguments" @closeModal="closeModal"/>
@@ -26,7 +26,8 @@ export default {
             showModal: false,
             modalArguments: null,
             lastUpdate: null,
-            lastUpdateString: ""
+            lastUpdateString: "",
+            Players: null
         }
     },
 
@@ -42,12 +43,24 @@ export default {
 
         lastUpdatedLoop() {
             setInterval(() => {
-                this.lastUpdateString = Math.round((+new Date - this.lastUpdate) / 1000) + " seconds ago"
-                // console.log(+new Date)
-                console.log(this.lastUpdateString)
-                // .format('MMMM Do YYYY, h:mm:ss a')
-                //  = new Date().toLocaleString()
-                // this.lastUpdate = this.lastUpdateString
+                this.lastUpdateSeconds = Math.round(+new Date / 1000 - this.lastUpdate)
+                if (this.lastUpdateString == 1) {
+                    this.lastUpdateString = "1 second ago"
+                } else if (this.lastUpdateSeconds < 60) {
+                    this.lastUpdateString = this.lastUpdateSeconds + " seconds ago"
+                } else if (Math.round(this.lastUpdateSeconds / 60) == 1) {
+                    this.lastUpdateString = "1 minute ago"
+                } else if (this.lastUpdateSeconds < 3600) {
+                    this.lastUpdateString = Math.round(this.lastUpdateSeconds / 60) + " minutes ago"
+                } else if (Math.round(this.lastUpdateSeconds / 3600) == 1) {
+                    this.lastUpdateString = "1 hour ago"
+                } else if (this.lastUpdateSeconds < 86400) {
+                    this.lastUpdateString = Math.round(this.lastUpdateSeconds / 3600) + " hours ago"
+                } else if (Math.round(this.lastUpdateSeconds / 86400) == 1) {
+                    this.lastUpdateString = "1 day ago"
+                } else {
+                    this.lastUpdateString = Math.round(this.lastUpdateSeconds / 86400) + " days ago"
+                }
             }, 1000)
         }
     },
@@ -63,9 +76,9 @@ export default {
         }
         console.log(self.loadoutJSON)
 
-        if (localStorage.getItem('lastUpdated') !== null) {
-            self.lastUpdate = localStorage.getItem('lastUpdated')
-        }
+        // if (localStorage.getItem('lastUpdated') !== null) {
+            // self.lastUpdate = localStorage.getItem('lastUpdated')
+        // }
 
 
 
@@ -78,7 +91,10 @@ export default {
             self.loadoutJSON = JSON.parse(event.data)
             localStorage.clear()
             localStorage.setItem("loadoutJSON", JSON.stringify(self.loadoutJSON))
-            self.lastUpdate = +new Date
+            self.Players = self.loadoutJSON.Players
+            // self.lastUpdate = +new Date
+            self.lastUpdate = self.loadoutJSON.time
+            // console.log(+new Date)
             localStorage.setItem("lastUpdated", +new Date)
         }
 
@@ -93,13 +109,19 @@ export default {
 
 <style>
     .lastUpdate {
+        /* left: 0; */
         font-size: 1.5em;
         color: white;
     }
 
     .lastUpdateDiv {
+        width: 22%;
         text-align: center;
+        left: 0;
+        right: 0;
+        margin: auto;
         margin-bottom: 1em;
+        /* border: 1px solid black; */
     }
 
     .lastUpdateValue {

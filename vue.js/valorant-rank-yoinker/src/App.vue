@@ -1,5 +1,10 @@
 <template>
-  <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"> -->
+  <ul>
+    <li>
+      <router-link to="/">Home</router-link>
+      <router-link to="/about">About</router-link>
+    </li>
+  </ul>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
 
   <match-loadouts/>
@@ -67,4 +72,30 @@ body {
   width: 30vmin;
   margin: 0, 0, 100px;
 }
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111;
+}
+
+
 </style>
