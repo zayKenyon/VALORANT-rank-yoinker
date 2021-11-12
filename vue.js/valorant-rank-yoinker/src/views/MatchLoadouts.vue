@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import PlayerComponent from './PlayerComponent.vue'
-import PlayerModal from './PlayerModal.vue'
+import PlayerComponent from '../components/PlayerComponent.vue'
+import PlayerModal from '../components/PlayerModal.vue'
 
 
 export default {
@@ -129,5 +129,13 @@ export default {
         font-size: 1.5em;
         font-weight: bold;
     }
+
+    #app {
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+    }   
 
 </style>
