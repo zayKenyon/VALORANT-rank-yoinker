@@ -4,7 +4,7 @@
   <img src="../assets/KilljoyArtwork.png" alt="Killjoy" class="img killjoy">
   <div class="lastUpdateDiv">
     <span class="lastUpdate">Last updated: </span>
-    <span v-if="lastUpdateSeconds < 0" class="lastUpdateValue">{{ lastUpdateString }}</span>
+    <span v-if="showTime" class="lastUpdateValue">{{ lastUpdateString }}</span>
     <span v-else class="lastUpdateValue red">Couldn't fetch match or no match found in cache!</span>
   </div>
   <player-component :max="Players.length" v-for="Player in Players"
@@ -28,7 +28,8 @@ export default {
             modalArguments: null,
             lastUpdate: null,
             lastUpdateString: "",
-            Players: null
+            Players: null,
+            showTime: false
         }
     },
 
@@ -62,6 +63,15 @@ export default {
                 } else {
                     this.lastUpdateString = Math.round(this.lastUpdateSeconds / 86400) + " days ago"
                 }
+
+                if (this.lastUpdateSeconds < 0) {
+                    this.showTime = false
+                }
+                else {
+                    this.showTime = true
+                }
+
+                console.log(this.showTime)
             }, 1000)
         }
     },
