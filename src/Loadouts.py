@@ -1,3 +1,4 @@
+import time
 from typing import final
 import requests
 from colr import color
@@ -61,7 +62,10 @@ class Loadouts:
         valoApiTitles = requests.get("https://valorant-api.com/v1/playertitles")
         valoApiPlayerCards = requests.get("https://valorant-api.com/v1/playercards")
         self.log("got val apis")
-        final_json = {}
+        final_final_json = {"Players": {}}
+
+        final_final_json.update({"time": int(time.time())})
+        final_json = final_final_json["Players"]
         if state == "game":
             PlayerInventorys = PlayerInventorys["Loadouts"]
             for i in range(len(PlayerInventorys)):
@@ -105,7 +109,6 @@ class Loadouts:
                                 "displayIcon": sprayValApi["displayIcon"],
                                 "fullTransparentIcon": sprayValApi["fullTransparentIcon"]
                                 })
-
 
                 #create weapons field
                 self.log("create weapons field")
@@ -188,4 +191,4 @@ class Loadouts:
                                                 )
                                     if skinValApi["displayName"].startswith("Standard") or skinValApi["displayName"].startswith("Melee"):
                                         final_json[players[i]["Subject"]]["Weapons"][skin]["skinDisplayIcon"] = weapon["displayIcon"]
-        return final_json
+        return final_final_json
