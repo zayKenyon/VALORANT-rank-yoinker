@@ -4,7 +4,8 @@
   <img src="../assets/KilljoyArtwork.png" alt="Killjoy" class="img killjoy">
   <div class="lastUpdateDiv">
     <span class="lastUpdate">Last updated: </span>
-    <span class="lastUpdateValue">{{ lastUpdateString }}</span>
+    <span v-if="lastUpdateSeconds < 0" class="lastUpdateValue">{{ lastUpdateString }}</span>
+    <span v-else class="lastUpdateValue red">Couldn't fetch match or no match found in cache!</span>
   </div>
   <player-component :max="Players.length" v-for="Player in Players"
   :key=Player.name :PlayerLoadout="Player" @openModal="openModal"/>
@@ -67,6 +68,7 @@ export default {
 
     mounted() {
         let self = this
+        console.log(self.lastUpdate)
         self.lastUpdate = +new Date
 
         self.lastUpdatedLoop()
@@ -128,6 +130,10 @@ export default {
         color: green;
         font-size: 1.5em;
         font-weight: bold;
+    }
+
+    .red {
+        color: red;
     }
 
     #app {
