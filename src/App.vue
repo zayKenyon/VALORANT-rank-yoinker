@@ -17,7 +17,7 @@ export default {
   name: 'App',
   methods: {
     redirectToGithub() {
-      window.location.href = "https://github.com/isaacKenyon/VALORANT-rank-yoinker"
+      window.open('https://github.com/isaacKenyon/VALORANT-rank-yoinker')
     }
   }
 }
