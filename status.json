@@ -1,5 +1,5 @@
 {
-   "status_ok": false,
-   "message": "Program is not working because of new agent. New release soon!",
-   "print_message": false
+   "status_ok": true,
+   "message": "Match loadouts available! You need to update to version 1.251 to use it. https://vry.netlify.app/matchLoadouts",
+   "print_message": true
 }
