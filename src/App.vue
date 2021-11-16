@@ -6,6 +6,7 @@
     <router-link to="/">Home</router-link>
     <router-link to="/matchLoadouts">Match Loadouts</router-link>
     <a @click="redirectToGithub" class="github">GitHub</a>
+    <a @click="redirectToDiscord" class="github">Discord</a>
     <!-- <a @click="console.log('test')/> -->
   </div>
   <router-view/>
@@ -18,7 +19,10 @@ export default {
   methods: {
     redirectToGithub() {
       window.open('https://github.com/isaacKenyon/VALORANT-rank-yoinker')
-    }
+    },
+    redirectToDiscord() {
+      window.open('https://discord.gg/HeTKed64Ka')
+    },
   }
 }
 </script>
