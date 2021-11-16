@@ -1,52 +1,197 @@
+<meta charset="UTF-8" xmlns="http://www.w3.org/1999/html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie= ">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
-    <link rel="icon" type="imagepng" sizes="32x32" href="../assets/favicon-32x32.png">
+    <!-- META -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="uisual" content="Made with Uisual (uisual.com)">
+    <meta name="author" content="https://github.com/isaacKenyon/">
+    <meta name="license" content="https://github.com/isaacKenyon/VALORANT-rank-yoinker/blob/main/LICENSE">
+    <meta name="description" content="VALORANT rank yoinker">
+    <meta name="referrer" content="origin">
+    <meta name="robots" content="index, follow">
+    <!-- FAVICON -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../assets/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../assets/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../assets/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../assets/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../assets/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../assets/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../assets/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="../assets/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
-    <link rel="manifest" href="../assets/site.webmanifest">
-    <link rel="mask-icon" href="../assets/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
+    <!-- SPEED -->
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@694&display=swap" rel="stylesheet">
-    <title>VALORANT rank yoinker</title>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <!-- LINK -->
+    <link rel="me" href="#">
+    <link rel="canonical" href="#">
+    <link rel="icon" type="image/png" href="../assets/Logo.png" sizes="48x48">
+    <!-- PERFORMANCE -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="preload" as="style" href="style.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- SCRIPTS -->
+    <script src="app.js"></script>
+    <!-- TITLE -->
+    <title>vRY: View Players' Ranks and Info during Matches</title>
 </head>
 <body>
-<div class="bg"></div>
-<div id="box">
-    <img src="../assets/Logo.png" alt="Logo">
-    <h3>VALORANT rank yoinker</h3>
-    <h2>vRY - A lightweight, easy to use, live match rank viewer</h2>
-    <form action="https://github.com/isaacKenyon/VALORANT-rank-yoinker/releases/latest">
-        <button type="submit" class="btn">
-          <span class="btn__inner">
-            <span class="btn__slide"></span>
-            <span class="btn__content">Download</span>
-          </span>
-        </button>
-    </form>
-    <form action="https://github.com/isaacKenyon/VALORANT-rank-yoinker">
-        <button type="submit" class="btn">
-          <span class="btn__inner">
-            <span class="btn__slide"></span>
-            <span class="btn__content">View On GitHub</span>
-          </span>
-        </button>
-    </form>
-    <form action=" https://discord.gg/HeTKed64Ka">
-        <button type="submit" class="btn">
-        <span class="btn__inner">
-          <span class="btn__slide"></span>
-          <span class="btn__content">Join The Discord</span>
-        </span>
-        </button>
-    </form>
-</div>
+<header role="banner" class="ui-section-header">
+    <div class="ui-layout-container">
+        <div class="ui-section-header__layout ui-layout-flex">
+            <!-- LOGO -->
+            <div class="ui-section-header--logo">
+                <img src="../assets/Logo.png" alt="Logo" style="width:80px;height:80px;">
+            </div>
+            <!-- HAMBURGER -->
+            <input type="checkbox" id="ui-section-header--menu-id">
+            <label for="ui-section-header--menu-id" class="ui-section-header--menu-icon"></label>
+            <!-- MENU -->
+            <nav role="navigation" class="ui-section-header--nav ui-layout-flex">
+                <a href="#Features" role="link" aria-label="#" class="ui-section-header--nav-link">Features</a>
+                <a href="https://discord.gg/HeTKed64Ka" role="link" aria-label="#" class="ui-section-header--nav-link">Support</a>
+                <a href="#Developers" role="link" aria-label="#" class="ui-section-header--nav-link">Developers</a>
+            </nav>
+        </div>
+    </div>
+</header>
+<main role="main">
+    <section class="ui-section-hero">
+        <div class="ui-layout-container">
+            <div class="ui-section-hero__layout ui-layout-grid ui-layout-grid-2">
+                <!-- COPYWRITING -->
+                <div>
+                    <h1>VALORANT rank yoinker</h1>
+                    <p class="ui-text-intro">An App to View Players' Rank & Other Info during a Match</p>
+                    <!-- CTA -->
+                    <div class="ui-component-cta ui-layout-flex">
+                        <a href="https://github.com/isaacKenyon/VALORANT-rank-yoinker/releases/latest" role="link" class="ui-component-button ui-component-button-normal ui-component-button-primary">Download Now</a>
+                        <p class="ui-text-note" id="downloads"></p>
+                    </div>
+                </div>
+                <!-- IMAGE -->
+                <img src="../assets/Example.png" alt="Showcase Image" class="zoom">
+            </div>
+        </div>
+    </section>
+    <section class="ui-section-customer">
+        <div class="ui-layout-container" align="center">
+            <div class="ui-section-customer__layout ui-layout-flex white-box">
+                <a href="https://github.com/isaacKenyon/VALORANT-rank-yoinker">
+                    <img alt="GitHub Logo" src="../assets/GitHub.png" class="ui-section-customer--logo">
+                </a>
+                <a href="https://discord.gg/HeTKed64Ka">
+                    <img alt="Discord Logo" src="../assets/Discord.png" class="ui-section-customer--logo">
+                </a>
+                <a href="https://youtu.be/TSLRd8Y9PiE">
+                    <img alt="YouTube Logo" src="../assets/YouTube.png" style="padding-right: 2px" class="ui-section-customer--logo">
+                </a>
+            </div>
+        </div>
+    </section>
+    <section class="ui-section-feature">
+        <div class="ui-layout-container">
+            <div id="Features" class="ui-section-feature__layout ui-layout-grid ui-layout-grid-2">
+                <!-- IMAGE -->
+                <img src="../assets/PeakRank.png" alt="Peak Rank Showcase Image" class="ui-image">
+                <!-- FEATURE -->
+                <div>
+                    <h2>Peak Rank</h2>
+                    <p class="ui-text-intro">"That Jett who is going 22/9 can't be Bronze 2!" Correct, she used to be Gold 3.</p>
+                    <ul class="ui-component-list ui-component-list-feature ui-layout-grid">
+                        <li class="ui-component-list--item ui-component-list--item-check">Work out if it's a boost.</li>
+                        <li class="ui-component-list--item ui-component-list--item-check">Works for both sides.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ui-section-feature__layout ui-layout-grid ui-layout-grid-2">
+                <!-- FEATURE -->
+                <div>
+                    <h2>Skin Tracking</h2>
+                    <p class="ui-text-intro">Now you can efficiently beg for skins!
+                        <small><br>Note: vRY is not responsible in-case you get muted for being a twerp.</small>
+                    </p>
+                    <ul class="ui-component-list ui-component-list-feature ui-layout-grid">
+                        <li class="ui-component-list--item ui-component-list--item-check">See who's got your favourite skin.</li>
+                        <li class="ui-component-list--item ui-component-list--item-check">Works for both sides.</li>
+                    </ul>
+                </div>
+                <!-- IMAGE -->
+                <img src="../assets/Skin.png" alt="Skin Showcase Image" class="ui-image">
+            </div>
+            <div class="ui-section-feature__layout ui-layout-grid ui-layout-grid-2">
+                <!-- IMAGE -->
+                <img src="../assets/Party.png" alt="Peak Rank Showcase Image" class="ui-image">
+                <!-- FEATURE -->
+                <div>
+                    <h2>Party Indicator</h2>
+                    <p class="ui-text-intro">Have you ever had the sneaking suspicion that the Reyna and Skye who have used their mic once and constantly drop for each other are queued? Well now you can tell for certain.</p>
+                    <ul class="ui-component-list ui-component-list-feature ui-layout-grid">
+                        <li class="ui-component-list--item ui-component-list--item-check">Colour represents party.</li>
+                        <li class="ui-component-list--item ui-component-list--item-check">Works for both sides.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="ui-section-testimonial">
+        <div class="ui-layout-container">
+            <!-- REVIEWS -->
+            <div class="ui-section-testimonial__layout ui-layout-grid ui-layout-grid-2">
+                <div class="ui-layout-column-4">
+                    <img src="../assets/Zombs.png" alt="'Real' Review" class="ui-section-testimonial--avatar">
+                    <p class="ui-section-testimonial--quote ui-text-intro">&ldquo;I used to live a sad life, begging for skins, wondering who owned that majestically beautiful Reaver Vandal, but now, thanks to vRY my life is a lot better - I can now efficiently beg for skins!&rdquo;</p>
+                    <p class="ui-section-testimonial--author"><strong>Zombs</strong><br><small class="ui-text-note">A Funny Person</small></p>
+                </div>
+                <div class="ui-layout-column-4">
+                    <img src="../assets/Ovo.png" alt="Real Review" class="ui-section-testimonial--avatar">
+                    <p class="ui-section-testimonial--quote ui-text-intro">&ldquo;Now I can flame the smurfs more efficiently, by knowing why the Level 2 instalock reyna is completely DESTROYING me.&rdquo;</p>
+                    <p class="ui-section-testimonial--author"><strong>Ovo Simpático</strong><br><small class="ui-text-note">'Chief User Representative'</small></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer role="contentinfo" class="ui-section-footer">
+    <div class="ui-layout-container">
+        <div class="ui-section-footer__layout ui-layout-flex">
+            <!-- MENU -->
+            <div id="Developers" align="center">
+                <h3>Developed and maintained by Zay & Hamper</h3>
+                <div class="row">
+                    <div class="column">
+                        <a href="https://github.com/isaacKenyon">
+                            <img src="https://avatars.githubusercontent.com/u/87788699?v=4" alt="Zay Avatar" style="border-radius: 50%; width: 50%">
+                        </a>
+                    </div>
+                    <div class="column">
+                        <a href="https://github.com/OwOHamper">
+                            <img src="https://avatars.githubusercontent.com/u/74879467?v=4" alt="Hamper Avatar" style="border-radius: 50%; width: 50%">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3' async defer>
+    new Crate({
+        server: '872101595037446144', // VALORANT rank yoinker
+        channel: '872252224359759943' // #🎫support
+    })
+</script>
 </body>
 </html>

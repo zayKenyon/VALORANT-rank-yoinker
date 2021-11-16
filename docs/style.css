@@ -1,0 +1,1085 @@
+/*--------------------------------------------------------------
+TABLE OF CONTENT
+----------------------------------------------------------------
+1.0 VARIABLE
+|  1.1 COLOR
+|  1.2 TYPOGRAPHY
+|  1.3 LAYOUT
+2.0 FOUNDATION
+3.0 TYPOGRAPHY
+4.0 IMAGE
+5.0 LAYOUT
+6.0 COMPONENT
+|  6.1 CTA
+|  6.2 BUTTON
+|  6.3 TOGGLE
+|  6.4 CARD
+|  6.5 LIST
+|  6.6 HOVER
+|  6.7 BOX
+7.0 SECTION
+|  7.1 HEADER
+|  7.2 HERO
+|  7.3 CUSTOMER
+|  7.4 FEATURE
+|  7.5 PRICING
+|  7.6 TESTIMONIAL
+|  7.7 CLOSE
+|  7.8 FOOTER
+8.0 MEDIA
+|  8.1 768PX
+|  8.2 1024PX
+|  8.3 1200PX
+|  8.4 AVATARS
+--------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+1.0 VARIABLE
+--------------------------------------------------------------*/
+
+:root {
+
+  /*------------------------------------------------------------
+  |
+  | 1.1 COLOR
+  |
+  ------------------------------------------------------------*/
+
+  --ui-color-brand: #e8e8e8;
+
+  /* COLOR PALETTE */
+
+  --ui-color-n-000: #151418;
+  --ui-color-n-050: #8d8d8d;
+  --ui-color-n-100: #c6c6c6;
+  --ui-color-n-300: #e3e3e3;
+  --ui-color-n-500: #f1f1f1;
+  --ui-color-n-700: #f8f8f8;
+  --ui-color-n-900: #fff;
+
+
+  /* BACKGROUND COLOR */
+  
+  --ui-color-background-primary  : var(--ui-color-n-000);
+  --ui-color-background-secondary: var(--ui-color-n-050);
+  --ui-color-background-tertiary : var(--ui-color-n-100);
+
+  /* BORDER COLOR */
+
+  --ui-color-border: var(--ui-color-n-100);
+
+  /* TYPOGRAPHY COLOR */
+
+  --ui-color-typography-heading: var(--ui-color-brand);
+  --ui-color-typography-body   : var(--ui-color-n-900);
+  --ui-color-typography-note   : var(--ui-color-n-300);
+  --ui-color-typography-button : var(--ui-color-n-000);
+
+  /*------------------------------------------------------------
+  |
+  | 1.2 TYPOGRAPHY
+  |
+  ------------------------------------------------------------*/
+
+  --ui-typography-typeface: "Inter", sans-serif;
+
+  /* FONT SIZE */
+
+  --ui-typography-h1: 1.9375rem;
+  --ui-typography-h2: 1.5625rem;
+  --ui-typography-h3: 1.25rem;
+  --ui-typography-p : 1rem;
+  --ui-typography-s : .8125rem;
+
+  /* LEADING */
+
+  --ui-typography-h1-leading: 1.2;
+  --ui-typography-h2-leading: 1.2;
+  --ui-typography-p-leading : 1.5;
+
+  /* MARGIN */
+
+  --ui-typography-margin-heading: .75rem;
+  --ui-typography-margin-body   : 1.125rem;
+
+  /*------------------------------------------------------------
+  |
+  | 1.3 LAYOUT
+  |
+  ------------------------------------------------------------*/
+  
+  --ui-layout-container: 1.25rem;
+  --ui-layout-grid     : 3.625rem;
+  --ui-layout-gutter   : 1rem;
+
+  /* GAP */
+  
+  --ui-gap-header     : 1rem;
+  --ui-gap-cta        : .75rem;
+  --ui-gap-hero       : 2rem;
+  --ui-gap-customer   : 2rem;
+  --ui-gap-feature    : 2rem;
+  --ui-gap-card       : 1.25rem;
+  --ui-gap-pricing    : 2rem;
+  --ui-gap-testimonial: 3rem;
+
+  /* BORDER RADIUS */
+  
+  --ui-radius-avatar: 5rem;
+  --ui-radius-button: 5rem;
+  --ui-radius-card  : .5rem;
+
+}
+
+/*--------------------------------------------------------------
+2.0 FOUNDATION
+--------------------------------------------------------------*/
+
+html { box-sizing: border-box; }
+
+*,
+*:before,
+*:after { box-sizing: inherit; }
+
+body {
+  background-color: var(--ui-color-background-primary);
+  color: var(--ui-color-typography-body);
+  font-family: var(--ui-typography-typeface);
+  font-feature-settings: "liga", "kern";
+  font-size: var(--ui-typography-p);
+  font-weight: 400;
+  line-height: var(--ui-typography-p-leading);
+  margin: 0 auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*--------------------------------------------------------------
+3.0 TYPOGRAPHY
+--------------------------------------------------------------*/
+
+a {
+  color: var(--ui-color-brand);
+  text-decoration-color: var(--ui-color-typography-note);
+}
+
+h1,
+h2,
+p,
+ul { margin-top: 0; }
+
+h1,
+h2 {
+  color: var(--ui-color-typography-heading);
+  margin-bottom: var(--ui-typography-margin-heading);
+}
+
+h1 {
+  font-size: var(--ui-typography-h1);
+  line-height: var(--ui-typography-h1-leading);
+}
+
+h2 {
+  font-size: var(--ui-typography-h2);
+  line-height: var(--ui-typography-h2-leading);
+}
+
+p,
+ul { margin-bottom: var(--ui-typography-margin-body); }
+
+p:last-child,
+ul:last-child { margin-bottom: 0; }
+
+ul { padding-left: 0; }
+
+strong { font-weight: 700; }
+
+small { font-size: var(--ui-typography-s); }
+
+.ui-text-note {
+  color: var(--ui-color-typography-note);
+  line-height: 1.25;
+}
+
+/*--------------------------------------------------------------
+4.0 IMAGE
+--------------------------------------------------------------*/
+
+img,
+svg {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/*--------------------------------------------------------------
+5.0 LAYOUT
+--------------------------------------------------------------*/
+
+.ui-layout-container {
+  padding-left: var(--ui-layout-container);
+  padding-right: var(--ui-layout-container);
+}
+
+.ui-layout-flex,
+.ui-layout-grid {
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-layout-flex { display: flex; }
+
+.ui-layout-grid { display: grid; }
+
+/*--------------------------------------------------------------
+6.0 COMPONENT
+--------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+|
+| 6.1 CTA
+|
+--------------------------------------------------------------*/
+
+.ui-component-cta {
+  flex-direction: column;
+  row-gap: var(--ui-gap-cta);
+}
+
+/*--------------------------------------------------------------
+|
+| 6.2 BUTTON
+|
+--------------------------------------------------------------*/
+
+.ui-component-button {
+  border: .0625rem solid var(--ui-color-brand);
+  border-radius: var(--ui-radius-button);
+  display: block;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ui-component-button-primary {
+  background-color: var(--ui-color-brand);
+  color: var(--ui-color-typography-button);
+}
+
+.ui-component-button-secondary {
+  background-color: var(--ui-color-background-secondary);
+  color: var(--ui-color-brand);
+}
+
+.ui-component-button-big,
+.ui-component-button-normal { padding: .75rem 1rem .875rem; }
+
+.ui-component-button-big { width: 100%; }
+
+.ui-component-button-normal {
+  width: -moz-fit-content;
+  width: fit-content;
+
+}
+
+/*--------------------------------------------------------------
+|
+| 6.3 TOGGLE
+|
+--------------------------------------------------------------*/
+
+input[name="toggle"] { display: none; }
+
+.ui-component-toggle {
+  background-color: var(--ui-color-background-tertiary);
+  border-radius: var(--ui-radius-button);
+  color: var(--ui-color-typography-note);
+  font-size: var(--ui-typography-s);
+  font-weight: 700;
+  line-height: 1;
+  margin: var(--ui-gap-pricing) auto .5rem;
+  padding: .25rem;
+  width: max-content;
+}
+
+.ui-component-toggle--label {
+  border-radius: var(--ui-radius-button);
+  cursor: pointer;
+  padding: .5rem .625rem;
+}
+
+#ui-component-toggle__monthly:checked ~
+div label[for=ui-component-toggle__monthly],
+#ui-component-toggle__yearly:checked ~
+div label[for=ui-component-toggle__yearly] {
+  background-color: var(--ui-color-background-primary);
+  color: var(--ui-color-typography-body);
+}
+
+/*--------------------------------------------------------------
+|
+| 6.4 CARD
+|
+--------------------------------------------------------------*/
+
+.ui-component-card {
+  border: .0625rem solid var(--ui-color-border);
+  border-radius: var(--ui-radius-card);
+  overflow: hidden;
+  width: 100%;
+}
+
+/*--------------------------------------------------------------
+|
+| 6.5 LIST
+|
+--------------------------------------------------------------*/
+
+.ui-component-list {
+  grid-template-columns: 1fr;
+  row-gap: .75rem;
+}
+
+.ui-component-list--item {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 1.125rem;
+  list-style: none;
+  padding-left: 1.875rem;
+}
+
+.ui-component-list--item-check {
+  background-image: url(https://res.cloudinary.com/uisual/image/upload/assets/icons/check.svg);
+}
+
+.ui-component-list--item-cross {
+  background-image: url(https://res.cloudinary.com/uisual/image/upload/assets/icons/cross.svg);
+}
+
+
+/*--------------------------------------------------------------
+|
+| 6.6 HOVER
+|
+--------------------------------------------------------------*/
+
+.zoom {
+  transition: transform .2s; /* Animation */
+  margin: 0 auto;
+}
+
+.zoom:hover {
+  transform: scale(1.25); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}
+
+/*--------------------------------------------------------------
+|
+| 6.7 BOX
+|
+--------------------------------------------------------------*/
+
+.white-box {
+  background-color: white;
+  border-radius: 15px;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+/*--------------------------------------------------------------
+7.0 SECTION
+--------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+|
+| 7.1 HEADER
+|
+--------------------------------------------------------------*/
+
+.ui-section-header {
+  padding-bottom: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.ui-section-header__layout {
+  justify-content: space-between;
+}
+
+/* LOGO */
+
+.ui-section-header--logo {
+  z-index: 1;
+}
+
+/* HAMBURGER */
+
+#ui-section-header--menu-id { display: none; }
+
+.ui-section-header--menu-icon {
+  cursor: pointer;
+  display: block;
+  height: 1.125rem;
+  padding-bottom: .25rem;
+  padding-top: .25rem;
+  position: relative;
+  width: 1.125rem;
+  z-index: 1;
+}
+
+.ui-section-header--menu-icon::before,
+.ui-section-header--menu-icon::after {
+  background: var(--ui-color-brand);
+  content: "";
+  height: .125rem;
+  left: 0;
+  position: absolute;
+  transition: all 250ms cubic-bezier(.785, .135, .15, .86);
+  width: 1.125rem;
+}
+
+.ui-section-header--menu-icon::before { top: .3125rem; }
+
+.ui-section-header--menu-icon::after { top: .6875rem; }
+
+#ui-section-header--menu-id:checked ~
+.ui-section-header--menu-icon::before {
+  transform: translateY(3px) rotate(135deg);
+}
+
+#ui-section-header--menu-id:checked ~
+.ui-section-header--menu-icon::after {
+  transform: translateY(-3px) rotate(45deg);
+}
+
+/* MENU */
+
+.ui-section-header--nav {
+  background-color: var(--ui-color-background-primary);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.05);
+  flex-direction: column;
+  gap: var(--ui-gap-header);
+  left: 0;
+  opacity: 0;
+  padding: 7.375rem var(--ui-layout-container) 5rem;
+  position: absolute;
+  right: 0;
+  top: -1rem;
+  transition: all 250ms cubic-bezier(.785, .135, .15, .86);
+  visibility: hidden;
+}
+
+#ui-section-header--menu-id:checked ~
+.ui-section-header--nav {
+  opacity: 1;
+  top: 0;
+  visibility: visible;
+}
+
+.ui-section-header--nav-link {
+  font-size: var(--ui-typography-h3);
+  padding: .5rem;
+  text-decoration: none;
+}
+
+/*--------------------------------------------------------------
+|
+| 7.2 HERO
+|
+--------------------------------------------------------------*/
+
+.ui-section-hero {
+  padding-bottom: 5rem;
+  padding-top: 5rem;
+  text-align: center;
+}
+
+.ui-section-hero__layout { row-gap: var(--ui-gap-hero); }
+
+/*--------------------------------------------------------------
+|
+| 7.3 CUSTOMER
+|
+--------------------------------------------------------------*/
+
+.ui-section-customer__layout {
+  flex-direction: column;
+  row-gap: var(--ui-gap-customer);
+}
+
+.ui-section-customer--logo {
+  height: 1.5rem;
+  width: auto;
+}
+
+.ui-section-customer--logo-str { height: 1.75rem; }
+  
+.ui-section-customer--logo-bhn { height: 1.375rem; }
+
+/*--------------------------------------------------------------
+|
+| 7.4 FEATURE
+|
+--------------------------------------------------------------*/
+
+.ui-section-feature {
+  padding-bottom: 5rem;
+  padding-top: 5rem;
+}
+
+.ui-section-feature__layout { row-gap: var(--ui-gap-feature); }
+
+.ui-section-feature__layout:first-of-type div {
+  grid-row-start: 1;
+}
+
+.ui-section-feature__layout:last-of-type { margin-top: 5rem; }
+
+/*--------------------------------------------------------------
+|
+| 7.5 CONTENT
+|
+--------------------------------------------------------------*/
+
+.ui-section-content {
+  padding-bottom: 2em;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.ui-section-content--image {
+  margin-bottom: var(--ui-gap-content);
+  margin-top: var(--ui-gap-content);
+}
+
+.ui-section-content--feature { row-gap: var(--ui-gap-content); }
+
+.ui-section-content--icon { margin-bottom: 1rem; }
+
+/*--------------------------------------------------------------
+|
+| 7.6 TESTIMONIAL
+|
+--------------------------------------------------------------*/
+
+.ui-section-testimonial {
+  padding-bottom: 5rem;
+  padding-top: 5rem;
+  text-align: center;
+}
+
+.ui-section-testimonial__layout {
+  row-gap: var(--ui-gap-testimonial);
+}
+
+.ui-section-testimonial--avatar {
+  border-radius: var(--ui-radius-avatar);
+  height: 5rem;
+  width: 5rem;
+}
+
+.ui-section-testimonial--quote {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.ui-section-testimonial--author { line-height: 1.25; }
+
+/*--------------------------------------------------------------
+|
+| 7.7 CLOSE
+|
+--------------------------------------------------------------*/
+
+.ui-section-close {
+  background-color: var(--ui-color-background-secondary);
+  padding-bottom: 5rem;
+  padding-top: 5rem;
+  text-align: center;
+}
+
+/*--------------------------------------------------------------
+|
+| 7.8 FOOTER
+|
+--------------------------------------------------------------*/
+
+.ui-section-footer {
+  padding-bottom: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.ui-section-footer__layout {
+  column-gap: var(--ui-layout-gutter);
+}
+
+.ui-section-footer--copyright {
+  margin-bottom: 0;
+  margin-right: auto;
+}
+
+/*--------------------------------------------------------------
+8.0 MEDIA
+--------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+|
+| 8.1 768PX
+|
+--------------------------------------------------------------*/
+
+@media screen and (min-width: 48rem) {
+
+  /*------------------------------------------------------------
+  VARIABLE
+  ------------------------------------------------------------*/
+  
+  :root {
+
+    /*----------------------------------------------------------
+    |
+    | TYPOGRAPHY
+    |
+    ----------------------------------------------------------*/
+
+    /* FONT SIZE */
+
+    --ui-typography-h1: 2.1875rem;
+    --ui-typography-h2: 1.75rem;
+    --ui-typography-p : 1.125rem;
+    --ui-typography-s : .875rem;
+
+    /* MARGIN */
+
+    --ui-typography-margin-body: 1.25rem;
+
+    /*----------------------------------------------------------
+    |
+    | LAYOUT
+    |
+    ----------------------------------------------------------*/
+
+    --ui-layout-container: 4.25rem;
+    --ui-layout-gutter   : 1.5rem;
+
+    /* GAP */
+
+    --ui-gap-header: 1.5rem;
+    --ui-gap-card  : 1.5rem;
+
+  }
+
+  /*------------------------------------------------------------
+  IMAGE
+  ------------------------------------------------------------*/
+
+  .ui-image-half-left {
+    padding-right: var(--ui-layout-gutter);
+
+  }
+
+  .ui-image-half-right {
+    padding-left: var(--ui-layout-gutter);
+
+  }
+
+  .ui-image{
+    border-radius: 8px;
+    animation: up-down 2s ease-in-out infinite alternate-reverse both;
+
+  }
+
+  @keyframes up-down {
+    0% {
+      transform: translateY(15px);
+    }
+    100% {
+      transform: translateY(-15px);
+    }
+  }
+
+  /*------------------------------------------------------------
+  LAYOUT
+  ------------------------------------------------------------*/
+
+  .ui-layout-container,
+  .ui-layout-column-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ui-layout-grid-2,
+  .ui-layout-grid-3 {
+    column-gap: var(--ui-layout-gutter);
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+  }
+
+  .ui-layout-grid-3 div:nth-of-type(3) {
+    left: calc(50% + (var(--ui-layout-gutter) / 2));
+    position: relative;
+  }
+
+  .ui-layout-column-4 {
+    width: calc((var(--ui-layout-grid) * 4) +
+           (var(--ui-layout-gutter) * 3));
+  }
+
+  /*------------------------------------------------------------
+  COMPONENT
+  ------------------------------------------------------------*/
+
+  /*------------------------------------------------------------
+  |
+  | LIST
+  |
+  ------------------------------------------------------------*/
+
+  .ui-component-list--item {
+    background-size: 1.25rem;
+    padding-left: 2rem;
+  }
+
+  /*------------------------------------------------------------
+  SECTION
+  ------------------------------------------------------------*/
+
+  /*------------------------------------------------------------
+  |
+  | HEADER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-header {
+    padding-bottom: 0;
+    padding-top: 2rem;
+  }
+
+  /* ICON */
+
+  .ui-section-header--menu-icon { display: none; }
+
+  /* NAV */
+
+  .ui-section-header--nav {
+    background-color: transparent;
+    box-shadow: none;
+    flex-direction: row;
+    opacity: 1;
+    padding: 0;
+    position: static;
+    visibility: visible;
+  }
+  
+  .ui-section-header--nav-link {
+    font-size: var(--ui-typography-p);
+    padding: 0;
+  }
+
+  /*------------------------------------------------------------
+  |
+  | HERO
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-hero { text-align: left; }
+
+  .ui-section-hero .ui-component-cta { align-items: start; }
+
+  /*------------------------------------------------------------
+  |
+  | CUSTOMER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-customer__layout {
+    column-gap: var(--ui-gap-customer);
+    flex-direction: row;
+  }
+  
+  .ui-section-customer--logo {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /*------------------------------------------------------------
+  |
+  | FEATURE
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-feature__layout:first-of-type div {
+    grid-row-start: initial;
+  }
+
+  /*------------------------------------------------------------
+  |
+  | PRICING
+  |
+  ------------------------------------------------------------*/
+
+  .ui-component-card--pricing { padding: 2rem 2rem 2.25rem; }
+
+  /*------------------------------------------------------------
+  |
+  | FOOTER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-footer {
+    padding-bottom: 2rem;
+    padding-top: 2rem;
+  }
+  
+}
+
+/*--------------------------------------------------------------
+|
+| 8.2 1024PX
+|
+--------------------------------------------------------------*/
+
+@media screen and (min-width: 64rem) {
+
+  /*------------------------------------------------------------
+  VARIABLE
+  ------------------------------------------------------------*/
+
+  :root {
+
+    /*----------------------------------------------------------
+    |
+    | LAYOUT
+    |
+    ----------------------------------------------------------*/
+
+    --ui-layout-container: 0;
+  
+  }
+
+  /*------------------------------------------------------------
+  LAYOUT
+  ------------------------------------------------------------*/
+  
+  .ui-layout-container { width: 60rem; }
+
+  .ui-layout-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .ui-layout-grid-3 div:nth-of-type(3) { position: static; }
+
+  /*------------------------------------------------------------
+  SECTION
+  ------------------------------------------------------------*/
+
+  /*------------------------------------------------------------
+  |
+  | HERO
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-hero .ui-component-cta {
+    align-items: center;
+    column-gap: var(--ui-gap-cta);
+    flex-direction: row;
+    justify-content: start;
+  }
+
+}
+
+/*--------------------------------------------------------------
+|
+| 8.3 1200PX
+|
+--------------------------------------------------------------*/
+
+@media screen and (min-width: 75rem) {
+
+  /*------------------------------------------------------------
+  VARIABLE
+  ------------------------------------------------------------*/
+
+  :root {
+
+    /*----------------------------------------------------------
+    |
+    | TYPOGRAPHY
+    |
+    ----------------------------------------------------------*/
+
+    /* FONT SIZE */
+
+    --ui-typography-h1: 2.75rem;
+    --ui-typography-h2: 2.1875rem;
+    --ui-typography-h4: 1.4375rem;
+
+    /* MARGIN */
+
+    --ui-typography-margin-heading: 1rem;
+    --ui-typography-margin-body   : 1.75rem;
+
+    /*----------------------------------------------------------
+    |
+    | LAYOUT
+    |
+    ----------------------------------------------------------*/
+
+    --ui-layout-grid  : 4rem;
+    --ui-layout-gutter: 2rem;
+
+    /* GAP */
+
+    --ui-gap-header  : 2rem;
+    --ui-gap-customer: 4rem;
+    --ui-gap-card    : 2rem;
+    --ui-gap-pricing : 3rem;
+    
+  }
+
+  /*------------------------------------------------------------
+  TYPOGRAPHY
+  ------------------------------------------------------------*/
+
+  .ui-text-intro { font-size: var(--ui-typography-h4); }
+
+  /*------------------------------------------------------------
+  LAYOUT
+  ------------------------------------------------------------*/
+  
+  .ui-layout-container { width: 70rem; }
+
+  /*------------------------------------------------------------
+  COMPONENT
+  ------------------------------------------------------------*/
+
+  /*------------------------------------------------------------
+  |
+  | BUTTON
+  |
+  ------------------------------------------------------------*/
+
+  .ui-component-button-big,
+  .ui-component-button-normal {
+    padding-bottom: 1.125rem;
+    padding-top: 1rem;
+  }
+
+  /*------------------------------------------------------------
+  SECTION
+  ------------------------------------------------------------*/
+
+  /*------------------------------------------------------------
+  |
+  | HEADER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-header { padding-top: 3rem; }
+
+  /*------------------------------------------------------------
+  |
+  | HERO
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-hero {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+  }
+
+  /*------------------------------------------------------------
+  |
+  | CUSTOMER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-customer--logo { height: 2rem; }
+  
+  .ui-section-customer--logo-str { height: 2.25rem; }
+  
+  .ui-section-customer--logo-bhn { height: 1.75rem; }
+
+  /*------------------------------------------------------------
+  |
+  | FEATURE
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-feature {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+  }
+
+  .ui-section-feature__layout:last-of-type {
+    margin-top: 7.5rem;
+  }
+
+  /* LIST */
+
+  .ui-component-list-feature {
+    column-gap: var(--ui-layout-gutter);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /*------------------------------------------------------------
+  |
+  | PRICING
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-pricing {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+  }
+
+  .ui-component-card--pricing { padding: 3rem; }
+
+  /*------------------------------------------------------------
+  |
+  | TESTIMONIAL
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-testimonial {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+  }
+
+  /*------------------------------------------------------------
+  |
+  | CLOSE
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-close {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+  }
+  
+  /*------------------------------------------------------------
+  |
+  | FOOTER
+  |
+  ------------------------------------------------------------*/
+
+  .ui-section-footer {
+    padding-bottom: 3rem;
+    padding-top: 3rem;
+  }
+
+/*--------------------------------------------------------------
+|
+| 8.4 AVATARS
+|
+--------------------------------------------------------------*/
+
+  /* Three image containers (use 25% for four, and 50% for two, etc) */
+  .column {
+    float: left;
+    width: 50%;
+    padding: 5px;
+    border-radius: 50%;
+  }
+
+}
