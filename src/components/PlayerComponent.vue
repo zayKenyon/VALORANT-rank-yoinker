@@ -27,7 +27,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
     .player {
         background-color: var(--box);
         box-sizing: border-box;

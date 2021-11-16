@@ -5,7 +5,15 @@
   <div class="lastUpdateDiv">
     <span class="lastUpdate">Last updated: </span>
     <span v-if="showTime" class="lastUpdateValue">{{ lastUpdateString }}</span>
-    <span v-else class="lastUpdateValue red">Couldn't fetch match or no match found in cache!</span>
+    <div v-else>
+        <span class="lastUpdateValue red">Couldn't fetch match or no match found in cache! Refresh the website or download vRY below</span>
+        <button @click="hrefToDownload" class="btn vry-button btn--vry">
+            <span class="btn__inner">
+                <span class="btn__slide"></span>
+                <span class="btn__content">Download vRY {{version}}</span>
+            </span>
+        </button>
+    </div>
   </div>
   <player-component :max="Players.length" v-for="Player in Players"
   :key=Player.name :PlayerLoadout="Player" @openModal="openModal"/>
@@ -29,7 +37,8 @@ export default {
             lastUpdate: null,
             lastUpdateString: "",
             Players: null,
-            showTime: false
+            showTime: false,
+            version: "0.00"
         }
     },
 
@@ -71,16 +80,28 @@ export default {
                     this.showTime = true
                 }
 
-                console.log(this.showTime)
             }, 1000)
-        }
+        },
+        getVersion() {
+            fetch('https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases')
+            .then(response => response.json())
+            .then(data => {
+                this.version = data[0].tag_name
+                this.vryhref = data[0].assets[0].browser_download_url
+
+                // console.log(this.version)
+            })
+        },
+
+        hrefToDownload() {
+            window.location.href = this.vryhref
+        },
     },
 
     mounted() {
         let self = this
-        console.log(self.lastUpdate)
         self.lastUpdate = +new Date
-
+ 
         self.lastUpdatedLoop()
 
         if (localStorage.getItem('loadoutJSON') !== null) {
@@ -114,6 +135,9 @@ export default {
             console.log("Successfully connected to websocket server...")
         }
 
+    },
+    created() {
+        this.getVersion()
     }
 
 }
@@ -154,4 +178,15 @@ export default {
         color: #2c3e50;
     }   
 
+    .vry-button {
+        margin-top: 4%;
+    }
+
+    .btn--vry {
+        --button-background-color: var(--background-color);
+        --button-text-color: var(--highlight-color);
+        --button-inner-border-color: var(--highlight-color);
+        --button-text-color-hover: #ece8e1;
+        --button-bits-color-hover: #ece8e1;
+    }
 </style>
