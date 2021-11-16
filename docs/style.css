@@ -1074,12 +1074,12 @@ div label[for=ui-component-toggle__yearly] {
 |
 --------------------------------------------------------------*/
 
-  .avatar{
-    width:150px;
-    height:150px;
-    object-fit:cover;
-    border-radius:50%;
+  /* Three image containers (use 25% for four, and 50% for two, etc) */
+  .column {
+    float: left;
+    width: 50%;
+    padding: 5px;
+    border-radius: 50%;
   }
-
 
 }
