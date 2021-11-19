@@ -40,7 +40,7 @@
 
 Download and run the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
 
-To view a player's entire equipped inventory visit [this website](https://vry.netlify.app/matchLoadouts).
+To view a player's equipped inventory visit [this website](https://vry.netlify.app/matchLoadouts).
 
 
 Tutorial:
