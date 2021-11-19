@@ -25,6 +25,7 @@
 ## About The Project
 
  ![Screenshot](assets/Example.png)
+ ![Skin Showcase Image](assets/SkinShowcase.png)
 
 |Their Queue|Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
 |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -34,12 +35,15 @@
 ## Usage
     
  VALORANT must be open for this to work.
+ 
+**IMPORTANT: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.**
 
- If you are using the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest), all you have to do is run the .exe.
-    
-     NOTE: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.
+Download and run the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
 
-  Tutorial:
+To view a player's entire equipped inventory visit [this website](https://vry.netlify.app/matchLoadouts).
+
+
+Tutorial:
   
   [![YouTube][youtube-shield]][youtube-url]
 
