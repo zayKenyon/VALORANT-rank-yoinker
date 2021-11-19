@@ -1,3 +1,6 @@
+/*jshint esversion: 6 */
+
+// Download Counter
 fetch('https://api.github.com/repos/isaacKenyon/VALORANT-rank-yoinker/releases')
     .then(response => response.json())
     .then(data => process_data(data));
@@ -10,6 +13,3 @@ function process_data(data) {
     }
     document.getElementById("downloads").innerHTML = "Total Downloads: " + downloads_count;
 }
-
-
-
