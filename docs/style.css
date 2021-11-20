@@ -1075,7 +1075,7 @@ div label[for=ui-component-toggle__yearly] {
 --------------------------------------------------------------*/
   .avatar-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
   }
 
   .avatar-container--avatar {
