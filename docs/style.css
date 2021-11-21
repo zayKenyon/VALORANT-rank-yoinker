@@ -1073,13 +1073,13 @@ div label[for=ui-component-toggle__yearly] {
 | 8.4 AVATARS
 |
 --------------------------------------------------------------*/
-
-  /* Three image containers (use 25% for four, and 50% for two, etc) */
-  .column {
-    float: left;
-    width: 50%;
-    padding: 5px;
-    border-radius: 50%;
+  .avatar-container {
+    display: flex;
+    justify-content: space-evenly;
   }
 
+  .avatar-container--avatar {
+    border-radius: 50%;
+    width: 150px;
+  }
 }
