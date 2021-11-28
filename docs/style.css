@@ -135,6 +135,16 @@ TABLE OF CONTENT
 2.0 FOUNDATION
 --------------------------------------------------------------*/
 
+.avatar-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.avatar-container--avatar {
+  border-radius: 50%;
+  width: 9.4rem;
+}
+
 html { box-sizing: border-box; }
 
 *,
@@ -228,7 +238,14 @@ svg {
   justify-content: center;
 }
 
+.ui-layout-flex-start {
+  align-items: flex-start;
+}
+
 .ui-layout-flex { display: flex; }
+
+.ui-layout-flex-wrap { flex-wrap: wrap; }
+
 
 .ui-layout-grid { display: grid; }
 
@@ -576,13 +593,13 @@ div label[for=ui-component-toggle__yearly] {
 
 .ui-section-testimonial--avatar {
   border-radius: var(--ui-radius-avatar);
+  margin-top: 1px;
   height: 5rem;
   width: 5rem;
 }
 
 .ui-section-testimonial--quote {
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin: 1rem;
 }
 
 .ui-section-testimonial--author { line-height: 1.25; }
@@ -1073,13 +1090,6 @@ div label[for=ui-component-toggle__yearly] {
 | 8.4 AVATARS
 |
 --------------------------------------------------------------*/
-  .avatar-container {
-    display: flex;
-    justify-content: space-evenly;
-  }
 
-  .avatar-container--avatar {
-    border-radius: 50%;
-    width: 150px;
-  }
+
 }
