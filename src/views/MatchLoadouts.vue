@@ -5,7 +5,7 @@
   <div class="lastUpdateDiv">
     <span class="lastUpdate">Last updated: </span>
     <span v-if="showTime" class="lastUpdateValue">{{ lastUpdateString }}</span>
-    <div v-else>
+    <div v-else class="noMatch">
         <span class="lastUpdateValue red">Couldn't fetch match or no match found in cache! Refresh the website or download vRY below</span>
         <button @click="hrefToDownload" class="btn vry-button btn--vry">
             <span class="btn__inner">
@@ -144,6 +144,10 @@ export default {
 </script>
 
 <style>
+    .noMatch {
+        display: flex;
+        flex-direction: column;
+    }
     .lastUpdate {
         /* left: 0; */
         font-size: 1.5em;
