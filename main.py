@@ -108,7 +108,8 @@ try:
                 server = GAMEPODS[coregame_stats["GamePodID"]]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, names, state="game")
+                if cfg.showVandal: vandal_loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, names, state="game")
+                if cfg.showPhantom: phantom_loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "phantom", valoApiSkins, names, state="game")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -146,7 +147,7 @@ try:
                                                         Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
-                                tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
+                                tableClass.add_row_table(table, [""] * (8 + int(cfg.showPhantom) + int(cfg.showVandal)))
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         PLcolor = colors.level_to_color(player_level)
@@ -162,7 +163,8 @@ try:
                         # views = get_views(names[player["Subject"]])
 
                         # skin
-                        skin = loadouts[player["Subject"]]
+                        if cfg.showVandal: vandal = vandal_loadouts[player["Subject"]]
+                        if cfg.showPhantom: phantom = phantom_loadouts[player["Subject"]]
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank[0]]
@@ -179,17 +181,12 @@ try:
 
                         # LEVEL
                         level = PLcolor
-                        tableClass.add_row_table(table, [party_icon,
-                                              agent,
-                                              name,
-                                              # views,
-                                              skin,
-                                              rankName,
-                                              rr,
-                                              peakRank,
-                                              leaderboard,
-                                              level
-                                              ])
+                        
+                        outputRow = [party_icon, agent, name]
+                        if cfg.showVandal: outputRow += [vandal]
+                        if cfg.showPhantom: outputRow += [phantom]
+                        outputRow += [rankName, rr, peakRank, leaderboard, level]
+                        tableClass.add_row_table(table, outputRow)
                         bar()
             elif game_state == "PREGAME":
                 pregame_stats = pregame.get_pregame_stats()
@@ -197,8 +194,8 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins, names,
-                                              state="pregame")
+                if cfg.showVandal: vandal_loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins, names, state="pregame")
+                if cfg.showPhantom: phantom_loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "phantom", valoApiSkins, names, state="pregame")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -258,7 +255,8 @@ try:
                         # views = get_views(names[player["Subject"]])
 
                         # skin
-                        skin = loadouts[player["Subject"]]
+                        if cfg.showVandal: vandal = vandal_loadouts[player["Subject"]]
+                        if cfg.showPhantom: phantom = phantom_loadouts[player["Subject"]]
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank[0]]
@@ -275,19 +273,13 @@ try:
                         # LEVEL
                         level = PLcolor
 
-                        tableClass.add_row_table(table, [party_icon,
-                                              agent,
-                                              name,
-                                              # views,
-                                              skin,
-                                              rankName,
-                                              rr,
-                                              peakRank,
-                                              leaderboard,
-                                              level,
-                                              ])
+                        outputRow = [party_icon, agent, name]
+                        if cfg.showVandal: outputRow += [vandal]
+                        if cfg.showPhantom: outputRow += [phantom]
+                        outputRow += [rankName, rr, peakRank, leaderboard, level]
+                        tableClass.add_row_table(table, outputRow)
                         bar()
-            if game_state == "MENUS":
+            elif game_state == "MENUS":
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
@@ -329,9 +321,9 @@ try:
 
                         tableClass.add_row_table(table, [party_icon,
                                               agent,
-                                              name,
-                                              "",
-                                              rankName,
+                                              name]
+                                              + [""]*(int(cfg.showPhantom) + int(cfg.showVandal))
+                                              + [rankName,
                                               rr,
                                               peakRank,
                                               leaderboard,
@@ -346,7 +338,12 @@ try:
             else:
                 table.title = f"Valorant status: {title}"
             server = ""
-            table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
+
+            fields = ["Party", "Agent", "Name"]
+            if cfg.showVandal: fields += ["Vandal Skin"]
+            if cfg.showPhantom: fields += ["Phantom Skin"]
+            fields += ["Rank", "RR", "Peak Rank", "pos.", "Level"]
+            table.field_names = fields
             print(table)
             print(f"VALORANT rank yoinker v{version}")
         if cfg.cooldown == 0:
