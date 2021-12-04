@@ -42,11 +42,18 @@ Download and run the [release](https://github.com/isaacKenyon/valorant-rank-yoin
 
 To view a player's equipped inventory visit [this website](https://vry.netlify.app/matchLoadouts).
 
-
-Tutorial:
+### Tutorial
   
   [![YouTube][youtube-shield]][youtube-url]
 
+### Config Options
+These are the settings you can configure in the `config.json` file.
+
+|Config|Description|
+|:---:|:---:|
+|cooldown|Auto-refresh rate (Set to 0 to only refresh on enter)|
+|show-vandal|Set to `true`/`false` to show/hide vandal skin|
+|show-phantom|Set to `true`/`false` to show/hide phantom skin|
 
 ## Contributing
 
