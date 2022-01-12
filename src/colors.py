@@ -45,4 +45,8 @@ class Colors:
 
     def get_agent_from_uuid(self, agentUUID):
         agent = str(self.agent_dict.get(agentUUID))
-        return color(agent, fore=self.AGENTCOLORLIST[agent.lower()])
+        if self.AGENTCOLORLIST.get(agent.lower()) != None:
+            agent_color = self.AGENTCOLORLIST.get(agent.lower())
+            return color(agent, fore=agent_color)
+        else:
+            return agent
