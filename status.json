@@ -1,5 +1,5 @@
 {
    "status_ok": true,
-   "message": "No issues. (You may need to allow access through firewall)",
-   "print_message": false
+   "message": "New version is avaible with neon fix! (This message displays on newst version too)",
+   "print_message": true
 }
