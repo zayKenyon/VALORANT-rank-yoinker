@@ -1,6 +1,6 @@
 from colr import color
 
-version = "1.251"
+version = "1.252"
 enablePrivateLogging = False
 hide_names = False
 
