@@ -51,6 +51,8 @@ try:
 
     cfg = Config(log)
 
+    weapon = json.load(open("config.json", "r"))["weapon"]
+
     rank = Rank(Requests, log)
 
     content = Content(Requests, log)
@@ -78,6 +80,15 @@ try:
 
 
     log(f"VALORANT rank yoinker v{version}")
+
+    with open("config.json", "r") as f:
+            json_data = json.load(f)
+            if json_data["weapon"] == "":
+                with open("config.json", "w") as f:
+                    weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ")
+                    json_data["weapon"] = weapon
+                    json.dump(json_data, f, indent=4)
+                    log(f"{weapon} weapon has been added to the config file")
 
 
 
@@ -108,7 +119,7 @@ try:
                 server = GAMEPODS[coregame_stats["GamePodID"]]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, "vandal", valoApiSkins, names, state="game")
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, f"{weapon}", valoApiSkins, names, state="game")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -197,7 +208,7 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, "vandal", valoApiSkins, names,
+                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, f"{weapon}", valoApiSkins, names,
                                               state="pregame")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()

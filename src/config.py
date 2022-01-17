@@ -24,6 +24,7 @@ class Config:
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
         self.log("color config prompt called")
-        jsonToWrite = {"cooldown": 1}
+        jsonToWrite = {"cooldown": 1, "weapon":""}
+        
         json.dump(jsonToWrite, fileToWrite)
         return jsonToWrite
