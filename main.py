@@ -81,18 +81,6 @@ try:
 
     log(f"VALORANT rank yoinker v{version}")
 
-    with open("config.json", "r") as f:
-            json_data = json.load(f)
-            if json_data["weapon"] == "":
-                with open("config.json", "w") as f:
-                    weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ")
-                    json_data["weapon"] = weapon
-                    json.dump(json_data, f, indent=4)
-                    log(f"{weapon} weapon has been added to the config file")
-
-
-
-
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)

@@ -14,6 +14,14 @@ class Config:
                 if config.get("cooldown") is None:
                     self.log("some config values are None, getting new config")
                     config = self.config_dialog(file)
+
+                if config["weapon"] == "":
+                    with open("config.json", "w") as f:
+                        weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ")
+                        config["weapon"] = weapon
+                        json.dump(config, f, indent=4)
+                        self.log(f"{weapon} weapon has been added to the config file")
+                
         except (FileNotFoundError, JSONDecodeError):
             self.log("file not found or invalid file")
             with open("config.json", "w") as file:
