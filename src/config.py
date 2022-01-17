@@ -1,6 +1,7 @@
 import json
 from io import TextIOWrapper
 from json import JSONDecodeError
+import requests
 
 from src.logs import Logging
 
@@ -17,10 +18,16 @@ class Config:
 
                 if config["weapon"] == "":
                     with open("config.json", "w") as f:
-                        weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ")
-                        config["weapon"] = weapon
-                        json.dump(config, f, indent=4)
-                        self.log(f"{weapon} weapon has been added to the config file")
+                        weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ").capitalize().strip()
+                        self.log(f"User inputted {weapon} as the weapon")
+                        if weapon not in [weapon["displayName"] for weapon in requests.get("https://valorant-api.com/v1/weapons").json()["data"]]:
+                            config["weapon"] = "vandal"
+                            json.dump(config, f, indent=4)
+                            self.log(f"{weapon} weapon has been added to the config file by default")
+                        else:
+                            config["weapon"] = weapon
+                            json.dump(config, f, indent=4)
+                            self.log(f"{weapon} weapon has been added to the config file by user")
                 
         except (FileNotFoundError, JSONDecodeError):
             self.log("file not found or invalid file")
