@@ -51,8 +51,6 @@ try:
 
     cfg = Config(log)
 
-    weapon = json.load(open("config.json", "r"))["weapon"]
-
     rank = Rank(Requests, log)
 
     content = Content(Requests, log)
@@ -61,6 +59,7 @@ try:
 
     presences = Presences(Requests, log)
 
+    weapon = cfg.weapon
 
     menu = Menu(Requests, log, presences)
     pregame = Pregame(Requests, log)
