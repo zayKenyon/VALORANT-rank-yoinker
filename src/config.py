@@ -24,11 +24,12 @@ class Config:
                     self.log("some config values are None, getting new config")
                     config = self.config_dialog(file)
 
-                if config["weapon"] == "":
+                if config.get("weapon") == "" or config.get("weapon") == None:
                     weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ").capitalize().strip()
                     self.log(f"User inputted {weapon} as the weapon")
                     with open("config.json", "w") as f:
                         if not self.weapon_check(weapon):
+                            print(weapon + " is not known valorant weapon you can edit directly " + os.getcwd() + "\config.json\n")
                             config["weapon"] = "vandal"
                             json.dump(config, f, indent=4)
                             self.log("vandal weapon has been added to the config file by default")
@@ -46,7 +47,7 @@ class Config:
             self.log(f"got cooldown with value '{self.cooldown}'")
 
             if not self.weapon_check(config["weapon"]):
-                    self.weapon = "vandal" # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
+                self.weapon = "vandal" # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
             else:   
                 self.weapon = config["weapon"]
                 

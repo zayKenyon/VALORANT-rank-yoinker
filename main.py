@@ -32,7 +32,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
 
-
 server = ""
 
 
@@ -59,6 +58,7 @@ try:
 
     presences = Presences(Requests, log)
 
+
     menu = Menu(Requests, log, presences)
     pregame = Pregame(Requests, log)
     coregame = Coregame(Requests, log)
@@ -77,6 +77,9 @@ try:
 
 
     log(f"VALORANT rank yoinker v{version}")
+
+
+
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
