@@ -1,11 +1,17 @@
 <template>
-    <div class="" @click="$emit('openModal', PlayerLoadout)">
+    <div class="basicdiv" @click="$emit('openModal', PlayerLoadout)">
+        <img class="agent_img" :src="PlayerLoadout.Agent" :alt="PlayerLoadout.AgentArtworkName">
         <button class="btn btn--light">
             <span class="btn__inner">
                 <span class="btn__slide"></span>
                 <span class="btn__content">{{ PlayerLoadout.Name }}</span>
             </span>
         </button>
+        <!-- <div class="weapon_img_div"> -->
+            <img class="weapon_img_1" :src="PlayerLoadout.Weapons['9c82e19d-4575-0200-1a81-3eacf00cf872'].skinDisplayIcon" :alt="PlayerLoadout.Weapons['9c82e19d-4575-0200-1a81-3eacf00cf872'].skinDisplayName">
+            <img class="weapon_img_2" :src="PlayerLoadout.Weapons['ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a'].skinDisplayIcon" :alt="PlayerLoadout.Weapons['ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a'].skinDisplayName">
+            <img class="weapon_img_3" :src="PlayerLoadout.Weapons['e336c6b8-418d-9340-d77f-7a9e4cfe0702'].skinDisplayIcon" :alt="PlayerLoadout.Weapons['e336c6b8-418d-9340-d77f-7a9e4cfe0702'].skinDisplayName">
+        <!-- </div> -->
         <!-- <div class="player_name"> -->
             
         <!-- </div> -->
@@ -184,6 +190,86 @@ export default {
     --button-inner-border-color: var(--highlight-color);
     --button-text-color-hover: #ece8e1;
     --button-bits-color-hover: #ece8e1;
+    }
+
+    /* .basicdiv { */
+        /* display: inline; */
+        /* vertical-align: middle; */
+        /* height: 150px; */
+        /* display: flex; */
+        /* flex-direction: column; */
+        /* justify-content: center; */
+        /* align-items: center; */
+        /* width: 100%; */
+        /* height: 100%; */
+        /* cursor: pointer; */
+    /* } */
+
+    .agent_img {
+        /* float: left; */
+        position: absolute;
+        margin: auto;
+        height: 72px;
+        border-radius: 50px;
+        margin-left: -100px;
+        border: solid 2px black;
+        /* left: 10; */
+        /* width: 100%; */
+        /* height: auto; */
+    }
+/* 
+    .weapon_img_div {
+        padding: 0;
+        margin: 0;
+        /* left: 0; */
+        /* height: 100px; */
+        /* width: 25%; */
+        /* border: solid; */
+        /* position: relative; */
+        /* width:  */
+    /* } */
+
+    .weapon_img_1 {
+        position: absolute;
+        /* margin: auto; */
+        height: 50px;
+        /* display: block; */
+        margin-left: 20px;
+
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: var(--background-color);
+        border: solid 1px;
+
+    }
+
+    .weapon_img_2 {
+        position: absolute;
+        margin: auto;
+        height: 50px;
+        margin-left: 200px;
+
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: var(--background-color);
+        border: solid 1px;
+
+    }
+
+    .weapon_img_3 {
+        position: absolute;
+        margin: auto;
+        height: 50px;
+        margin-left: 437px;
+
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: var(--background-color);
+        border: solid 1px;
+
     }
 
 </style>

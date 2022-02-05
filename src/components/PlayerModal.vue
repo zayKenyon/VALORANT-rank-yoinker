@@ -112,7 +112,7 @@ export default {
         width: 1400px;
         height: 800px;
         padding: 20px 20px 0;
-        margin: 50px auto 10px;
+        margin: 90px auto 10px;
         background-color: var(--inventory-background);
         border-radius: 10px;
         border: 2px solid black;
