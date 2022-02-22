@@ -2,8 +2,7 @@ import traceback
 import requests
 import urllib3
 import os
-import base64
-import json
+import sys
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
@@ -37,7 +36,7 @@ server = ""
 
 def program_exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code {status}")
-    raise SystemExit(status)
+    raise sys.exit(status)
 
 
 try:
@@ -339,15 +338,17 @@ try:
                         # table.add_rows([])
                         bar()
             if (title := game_state_dict.get(game_state)) is None:
-                program_exit(1)
+                # program_exit(1)
+                time.sleep(9)
             if server != "":
                 table.title = f"Valorant status: {title} - {server}"
             else:
                 table.title = f"Valorant status: {title}"
             server = ""
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
-            print(table)
-            print(f"VALORANT rank yoinker v{version}")
+            if title is not None:
+                print(table)
+                print(f"VALORANT rank yoinker v{version}")
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:

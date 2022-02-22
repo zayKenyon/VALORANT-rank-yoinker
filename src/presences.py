@@ -16,7 +16,13 @@ class Presences:
     def get_game_state(self, presences):
         for presence in presences:
             if presence['puuid'] == self.Requests.puuid:
-                return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
+                #preventing vry from crashing when lol is open
+                # print(presence)
+                # print(presence.get("championId"))
+                if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
+                    return None
+                else:
+                    return json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
 
 
     def decode_presence(self, private):
