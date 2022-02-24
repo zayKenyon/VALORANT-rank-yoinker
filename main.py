@@ -1,8 +1,11 @@
+from tokenize import group
 import traceback
+import re
 import requests
 import urllib3
 import os
-import sys
+import base64
+import json
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
@@ -12,7 +15,7 @@ from src.requests import Requests
 from src.logs import Logging
 from src.config import Config
 from src.colors import Colors
-from src.rank import Rank
+from src.rank import Rank 
 from src.content import Content
 from src.names import Names
 from src.presences import Presences
@@ -36,14 +39,82 @@ server = ""
 
 def program_exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code {status}")
-    raise sys.exit(status)
+    raise SystemExit(status)
 
+def winRate(username):
+    #time.sleep(2.5)
+    parsed = f"{username.split('#')[0]}%23{username.split('#')[1]}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion',
+        'Accept': 'application/json, text/plain, /',
+        'Accept-Language': 'en',
+        'Connection': 'keep-alive',
+    }
+    r = requests.get(f'https://tracker.gg/valorant/profile/riot/{parsed}/overview?playlist=competitive', headers=headers)
+    WinRate = re.findall('data-v-309b1f1e>((?:\d+\.\d*)|(?:\.?\d+))', r.text)
+    #float(WinRate[3])
+    if WinRate == []: 
+        return "-"
+    else: 
+        if len(WinRate) > 0:  
+            return WinRate[3] + "%"
 
+def headShot(username):
+    parsed = f"{username.split('#')[0]}%23{username.split('#')[1]}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion',
+        'Accept': 'application/json, text/plain, /',
+        'Accept-Language': 'en',
+        'Connection': 'keep-alive',
+    }
+    r = requests.get(f'https://tracker.gg/valorant/profile/riot/{parsed}/overview?playlist=competitive', headers=headers)
+    HeadShot = re.findall('data-v-309b1f1e>((?:\d+\.\d*)|(?:\.?\d+))', r.text)
+    if HeadShot == []: 
+        return "-"
+    else: 
+        if len(HeadShot) > 0:  
+            return HeadShot[2] + "%"
+
+def getrr(username):
+    #time.sleep(2.5)
+    parsed = f"{username.split('#')[0]}%23{username.split('#')[1]}"
+    #print(parsed)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion',
+        'Accept': 'application/json, text/plain, /',
+        'Accept-Language': 'en',
+        'Connection': 'keep-alive',
+    }
+    r = requests.get(f'https://tracker.gg/valorant/profile/riot/{parsed}/overview?playlist=competitive', headers=headers)
+    rr = re.findall('              ([0-9]{2,4})', r.text)
+    #print(rr)
+    #print(r.text)
+    if rr == []: 
+        return "-"
+    else: 
+        if len(rr) > 0: 
+            return max(rr)
+
+def mostPlayed(username):
+    #time.sleep(2.5)
+    parsed = f"{username.split('#')[0]}%23{username.split('#')[1]}"
+    #print(parsed)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion',
+        'Accept': 'application/json, text/plain, /',
+        'Accept-Language': 'en',
+        'Connection': 'keep-alive',
+    }
+    r = requests.get(f'https://tracker.gg/valorant/profile/riot/{parsed}/overview?playlist=competitive', headers=headers)
+    Agents = re.findall('<span class="agent__name" data-v-c68f241e data-v-5c0ca8ee>([a-zA-Z]+[/]*[a-zA-Z]+)', r.text)
+    mystring=' '.join(map(str,Agents))
+    return mystring 
+    
 try:
     Requests = Requests(version)
     Requests.check_version()
     Requests.check_status()
-
+    
     Logging = Logging()
     log = Logging.log
 
@@ -144,14 +215,32 @@ try:
                                                         Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
-                                tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
+                                tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", "", "", "", "",""])
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         PLcolor = colors.level_to_color(player_level)
+                        
+                        #WRcolor = colors.Winrate_to_color(WinRate)
 
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
+                        
+                        #Winrate
+                        name = names[player["Subject"]]
+                        WinRate = winRate(name)
+
+                        #Headshot%
+                        name = names[player["Subject"]]
+                        HeadShot = headShot(name)
+                        
+                        # Top 3 Played Agents
+                        name = names[player["Subject"]]
+                        MostPlayed = mostPlayed(name)
+
+                        # Peak RR
+                        name = names[player["Subject"]]
+                        peakRR = getrr(name)
 
                         # NAME
                         name = Namecolor
@@ -180,13 +269,17 @@ try:
                         tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
+                                              WinRate,
+                                              HeadShot,
                                               # views,
                                               skin,
                                               rankName,
                                               rr,
                                               peakRank,
+                                              peakRR,
                                               leaderboard,
-                                              level
+                                              level,
+                                              MostPlayed,
                                               ])
                         bar()
             elif game_state == "PREGAME":
@@ -245,12 +338,30 @@ try:
                                                 fore=(128, 128, 128))
                         else:
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())), fore=(54, 53, 51))
+                        
+                        #WRcolor = colors.Winrate_to_color(WinRate)
 
                         # AGENT
                         agent = agent_color
 
                         # NAME
                         name = NameColor
+
+                        #Winrate
+                        name = names[player["Subject"]]
+                        WinRate = winRate(name)
+
+                        #Headshot%
+                        name = names[player["Subject"]]
+                        HeadShot = headShot(name)
+                        
+                        # Top 3 Played Agents
+                        name = names[player["Subject"]]
+                        MostPlayed = mostPlayed(name)
+
+                        # Peak RR
+                        name = names[player["Subject"]]
+                        peakRR = getrr(name)
 
                         # VIEWS
                         # views = get_views(names[player["Subject"]])
@@ -276,13 +387,17 @@ try:
                         tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
+                                              WinRate,
+                                              HeadShot,
                                               # views,
                                               skin,
                                               rankName,
                                               rr,
                                               peakRank,
+                                              peakRR,
                                               leaderboard,
                                               level,
+                                              MostPlayed,
                                               ])
                         bar()
             if game_state == "MENUS":
@@ -309,6 +424,13 @@ try:
 
                         # NAME
                         name = names[player["Subject"]]
+                        
+                        #Winrate
+                        WinRate = winRate(name)
+                        #WRcolor = colors.Winrate_to_color(WinRate)
+
+                        #Headshot%
+                        HeadShot = headShot(name)
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank[0]]
@@ -319,6 +441,12 @@ try:
                         # PEAK RANK
                         peakRank = NUMBERTORANKS[playerRank[3]]
 
+                        # Top 3 Played Agents
+                        MostPlayed = mostPlayed(name)
+
+                        # Peak RR
+                        peakRR = getrr(name)
+
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
@@ -328,27 +456,29 @@ try:
                         tableClass.add_row_table(table, [party_icon,
                                               agent,
                                               name,
-                                              "",
+                                              WinRate,
+                                              HeadShot,
+                                              "", #Menu only no skin
                                               rankName,
                                               rr,
                                               peakRank,
+                                              peakRR,
                                               leaderboard,
-                                              level
+                                              level,
+                                              MostPlayed
                                               ])
                         # table.add_rows([])
                         bar()
             if (title := game_state_dict.get(game_state)) is None:
-                # program_exit(1)
-                time.sleep(9)
+                program_exit(1)
             if server != "":
                 table.title = f"Valorant status: {title} - {server}"
             else:
                 table.title = f"Valorant status: {title}"
             server = ""
-            table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
-            if title is not None:
-                print(table)
-                print(f"VALORANT rank yoinker v{version}")
+            table.field_names = ["Party", "Agent", "Name", "Winrate", "HS %", "Skin", "Rank", "RR", "Peak Rank","peakRR", "pos.", "Level", "Most Played"]
+            print(table)
+            print(f"VALORANT rank yoinker v{version}")
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
