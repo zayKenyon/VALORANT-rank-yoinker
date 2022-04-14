@@ -43,6 +43,7 @@ GAMEPODS = {
     "aresriot.aws-rclusterprod-mes1-1.eu-gp-bahrain-awsedge-1": "Bahrain",
     "aresriot.aws-rclusterprod-mes1-1.ext1-gp-bahrain-awsedge-1": "Bahrain",
     "aresriot.aws-rclusterprod-mes1-1.tournament-gp-bahrain-awsedge-1": "Bahrain",
+    "aresriot.aws-rclusterprod-bog1-1.latam-gp-bogota-1": "Bogota",
     "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-1": "CMOB 1",
     "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-2": "CMOB 2",
     "aresriot.aws-rclusterprod-usw2-1.tournament-gp-cmob-3": "CMOB 3",
