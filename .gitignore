@@ -137,12 +137,11 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-#config file
-.config.json
-.idea/discord.xml
-.idea/modules.xml
-.idea/VALORANT-rank-yoinker.iml
-.idea/vcs.xml
-.idea/workspace.xml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
+# PyCharm
+.idea/
+
+# config file
+config.json
+
+# logs
+logs/
