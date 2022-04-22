@@ -18,7 +18,7 @@ class Error:
             - Check your firewall settings and whitelist the program / disable firewall
             - Try Restarting vRY and/or VALORANT, if non works try restarting your computer
             - If you have a slower internet connection, changing the value of cooldown located in config.json to 0 or any number greater than 1 may help.
-            - If that doesn't work then changing the port located within server.py (line 17) may work.
+            - If that doesn't work then changing the port number located within server.py (line 19) may work.
             - If all the above mentioned steps does not work, please join the support server!. 
             """)
             self.log("Port is being blocked by the firewall or in use by another application")
