@@ -1,4 +1,5 @@
 import base64
+from distutils import errors
 import json
 import time
 
@@ -7,7 +8,7 @@ from colr import color
 import os
 
 from src.logs import Logging
-
+from src.errors import Error
 
 class Requests:
     def __init__(self, version):
@@ -122,15 +123,14 @@ class Requests:
                     return version
 
     def get_lockfile(self):
-        try:
-            with open(os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')) as lockfile:
+        path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')
+        
+        if Error().LockfileError(path):
+            with open(path) as lockfile:
                 self.log("opened log file")
                 data = lockfile.read().split(':')
                 keys = ['name', 'PID', 'port', 'password', 'protocol']
                 return dict(zip(keys, data))
-        except FileNotFoundError:
-            self.log("lockfile not found")
-            raise Exception("Lockfile not found, you're not in a game!")
 
 
     def get_headers(self):
