@@ -25,11 +25,14 @@ class Config:
                 json_keys = [k for k in self.default.keys()] # getting the keys in the self.default
 
                 if len(json_keys) != len(keys):
+                    self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
                         missingkeys = list(filter(lambda x: x not in keys, json_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
+                        self.log("missing keys: " + missingkeys)
                         for key in missingkeys:
                             config[key] = self.default[key]
 
+                        self.log("Succesfully added missing keys")
                         json.dump(config, w, indent=4)
 
 
