@@ -9,7 +9,7 @@ from src.logs import Logging
 class Config:
     def __init__(self, log):
         self.log = log
-        self.keys = ["cooldown", "weapon", "port"]
+        self.default = {"cooldown": 1, "weapon": "", "port": 1100}
 
         if not os.path.exists("config.json"):
             self.log("config.json not found, creating new one")
@@ -21,26 +21,16 @@ class Config:
             with open("config.json", "r") as file:
                 self.log("config opened")
                 config = json.load(file)
-                keys = [k for k in config.keys()]
+                keys = [k for k in config.keys()] # getting the keys in the file
+                json_keys = [k for k in self.default.keys()] # getting the keys in the self.default
 
-            if len(self.keys) != len(keys):
-                with open("config.json", 'w') as w:
-                    if self.keys[0] not in keys and self.keys[1] not in keys and self.keys[2] not in keys:
-                        config = self.config_dialog(file)
-                
-                    if self.keys[0] not in keys:
-                        config.update({self.keys[0]: 1})
-                        self.log("cooldown has been added to the config file by default")
+                if len(json_keys) != len(keys):
+                    with open("config.json", 'w') as w:
+                        missingkeys = list(filter(lambda x: x not in keys, json_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
+                        for key in missingkeys:
+                            config[key] = self.default[key]
 
-                    if self.keys[1] not in keys:
-                        config.update({self.keys[1]: ''})
-                        self.log("weapon has been added to the config file by default")
-                    
-                    if self.keys[2] not in keys:
-                        config.update({self.keys[2]: 1100})
-                        self.log("port has been added to the config file by default")
-
-                    json.dump(config, w, indent=4)
+                        json.dump(config, w, indent=4)
 
 
                 if config.get("cooldown") is None:
@@ -77,7 +67,7 @@ class Config:
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
         self.log("color config prompt called")
-        jsonToWrite = {self.keys[0]: 1, self.keys[1]: "", self.keys[2]: 1100}
+        jsonToWrite = self.default
         
         json.dump(jsonToWrite, fileToWrite)
         return jsonToWrite
