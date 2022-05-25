@@ -9,17 +9,33 @@ from src.logs import Logging
 class Config:
     def __init__(self, log):
         self.log = log
+        self.default = {"cooldown": 1, "weapon": "", "port": 1100}
 
         if not os.path.exists("config.json"):
             self.log("config.json not found, creating new one")
             with open("config.json", "w") as file:
                 config = self.config_dialog(file)
             
-
         try:
+
             with open("config.json", "r") as file:
                 self.log("config opened")
                 config = json.load(file)
+                keys = [k for k in config.keys()] # getting the keys in the file
+                json_keys = [k for k in self.default.keys()] # getting the keys in the self.default
+
+                if len(json_keys) != len(keys):
+                    self.log("config.json is missing keys")
+                    with open("config.json", 'w') as w:
+                        missingkeys = list(filter(lambda x: x not in keys, json_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
+                        self.log("missing keys: " + missingkeys)
+                        for key in missingkeys:
+                            config[key] = self.default[key]
+
+                        self.log("Succesfully added missing keys")
+                        json.dump(config, w, indent=4)
+
+
                 if config.get("cooldown") is None:
                     self.log("some config values are None, getting new config")
                     config = self.config_dialog(file)
@@ -54,7 +70,7 @@ class Config:
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
         self.log("color config prompt called")
-        jsonToWrite = {"cooldown": 1, "weapon":"", "port":1100}
+        jsonToWrite = self.default
         
         json.dump(jsonToWrite, fileToWrite)
         return jsonToWrite
