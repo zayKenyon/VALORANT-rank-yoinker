@@ -102,6 +102,7 @@ GAMEPODS = {
     "aresriot.aws-rclusterprod-apse1-1.tournament-gp-singapore-1": "Singapore",
     "aresriot.aws-rclusterprod-apse1-1.ap-gp-singapore-1": "Singapore 1",
     "aresriot.aws-rclusterprod-apse1-1.ap-gp-singapore-awsedge-1": "Singapore 2",
+    'aresriot.aws-apse1-prod.ap-gp-singapore-1' : "Singapore 1",
     "aresriot.aws-rclusterprod-eun1-1.tournament-gp-stockholm-1": "Stockholm",
     "aresriot.aws-rclusterprod-eun1-1.eu-gp-stockholm-1": "Stockholm 1",
     "aresriot.aws-rclusterprod-eun1-1.eu-gp-stockholm-awsedge-1": "Stockholm 2",
