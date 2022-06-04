@@ -61,7 +61,6 @@ class Loadouts:
         valoApiAgents = requests.get("https://valorant-api.com/v1/agents")
         valoApiTitles = requests.get("https://valorant-api.com/v1/playertitles")
         valoApiPlayerCards = requests.get("https://valorant-api.com/v1/playercards")
-        self.log("got val apis")
         final_final_json = {"Players": {}}
 
         final_final_json.update({"time": int(time.time())})
@@ -76,12 +75,10 @@ class Loadouts:
                     }
                 )
                 #creates name field
-                self.log("created name field")
                 final_json[players[i]["Subject"]].update({"Name": names[players[i]["Subject"]]})
                 #create spray field
                 final_json[players[i]["Subject"]].update({"Sprays": {}})
                 #append sprays to field
-                self.log("append sprays to field")
 
                 final_json[players[i]["Subject"]].update({"Level": players[i]["PlayerIdentity"]["AccountLevel"]})
 
@@ -111,18 +108,15 @@ class Loadouts:
                                 })
 
                 #create weapons field
-                self.log("create weapons field")
                 final_json[players[i]["Subject"]].update({"Weapons": {}})
                 
                 for skin in PlayerInventory["Items"]:
 
                     #create skin field
-                    self.log("create skin field")
                     final_json[players[i]["Subject"]]["Weapons"].update({skin: {}})
 
                     for socket in PlayerInventory["Items"][skin]["Sockets"]:
                         #predefined sockets
-                        self.log("predefined sockets")
                         for var_socket in sockets:
                             if socket == sockets[var_socket]:
                                 final_json[players[i]["Subject"]]["Weapons"][skin].update(
@@ -136,7 +130,6 @@ class Loadouts:
                     # final_json[players[i]["Subject"]]["Weapons"].update({skin: {}})
 
                     #buddies
-                    self.log("buddies")
                     for socket in PlayerInventory["Items"][skin]["Sockets"]:
                         if sockets["skin_buddy"] == socket:
                             for buddy in valoApiBuddies.json()["data"]:
@@ -148,7 +141,6 @@ class Loadouts:
                                     )
 
                     #append names to field
-                    self.log("append names to field")
                     for weapon in valoApiWeapons.json()["data"]:
                         if skin == weapon["uuid"]:
                             final_json[players[i]["Subject"]]["Weapons"][skin].update(

@@ -40,12 +40,12 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
 
 
 try:
-    Requests = Requests(version)
-    Requests.check_version()
-    Requests.check_status()
-
     Logging = Logging()
     log = Logging.log
+    
+    Requests = Requests(version, log)
+    Requests.check_version()
+    Requests.check_status()
 
     cfg = Config(log)
 
