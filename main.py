@@ -357,7 +357,7 @@ try:
         else:
             time.sleep(cfg.cooldown)
 except:
-    traceback.print_exc()
+    log(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
         f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
