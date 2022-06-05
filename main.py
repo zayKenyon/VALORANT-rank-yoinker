@@ -105,7 +105,10 @@ try:
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
-                server = GAMEPODS[coregame_stats["GamePodID"]]
+                try:
+                    server = GAMEPODS[coregame_stats["GamePodID"]]
+                except KeyError:
+                    server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
@@ -193,7 +196,10 @@ try:
                         bar()
             elif game_state == "PREGAME":
                 pregame_stats = pregame.get_pregame_stats()
-                server = GAMEPODS[pregame_stats["GamePodID"]]
+                try:
+                    server = GAMEPODS[pregame_stats["GamePodID"]]
+                except KeyError:
+                    server = "New server"
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
@@ -356,7 +362,7 @@ try:
         else:
             time.sleep(cfg.cooldown)
 except:
-    traceback.print_exc()
+    log(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
         f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))

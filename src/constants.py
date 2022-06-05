@@ -43,7 +43,6 @@ AGENTCOLORLIST = {
 
 GAMEPODS = requests.get("https://valorant-api.com/internal/locres/en-US").json()["data"]["UI_GamePodStrings"]
 
-
 symbol = "■"
 PARTYICONLIST = [
             color(symbol, fore=(227, 67, 67)),
