@@ -22,12 +22,12 @@ class Config:
                 self.log("config opened")
                 config = json.load(file)
                 keys = [k for k in config.keys()] # getting the keys in the file
-                json_keys = [k for k in self.default.keys()] # getting the keys in the self.default
+                default_keys = [k for k in self.default.keys()] # getting the keys in the self.default
 
-                if len(json_keys) != len(keys):
+                if len(default_keys) != len(keys):
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
-                        missingkeys = list(filter(lambda x: x not in keys, json_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
+                        missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
                         self.log("missing keys: " + missingkeys)
                         for key in missingkeys:
                             config[key] = self.default[key]
@@ -40,7 +40,7 @@ class Config:
                     self.log("some config values are None, getting new config")
                     config = self.config_dialog(file)
 
-                if config.get("weapon") == "" or config.get("weapon") == None:
+                if config.get("weapon").strip() == "":
                     weapon = input("Enter the name of the weapon you use the most (This is for tracking the skins): ").capitalize().strip()
                     self.log(f"User inputted {weapon} as the weapon")
                     with open("config.json", "w") as f:
