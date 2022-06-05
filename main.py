@@ -203,8 +203,9 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
-                                              state="pregame")
+                #temporary until other regions gets fixed?
+                # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
+                                            #   state="pregame")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -263,8 +264,9 @@ try:
                         # VIEWS
                         # views = get_views(names[player["Subject"]])
 
+                        #temporary until other regions gets fixed?
                         # skin
-                        skin = loadouts[player["Subject"]]
+                        # skin = loadouts[player["Subject"]]
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank[0]]
@@ -285,7 +287,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              skin,
+                                              "",
                                               rankName,
                                               rr,
                                               peakRank,
