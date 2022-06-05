@@ -26,7 +26,6 @@ class Loadouts:
             players = players["AllyTeam"]["Players"]
             team_id = pregame_stats['Teams'][0]['TeamID']
             PlayerInventorys = self.Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
-            print(PlayerInventorys)
         for player in range(len(players)):
             if team_id == "Red":
                 invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
