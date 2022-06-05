@@ -351,6 +351,7 @@ try:
             if title is not None:
                 print(table)
                 print(f"VALORANT rank yoinker v{version}")
+                print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
