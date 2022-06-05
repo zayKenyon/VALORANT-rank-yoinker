@@ -2,15 +2,14 @@ import asyncio
 import json
 from websocket_server import WebsocketServer
 from threading import Thread
-from src.errors import Error
-from src.logs import Logging
 
 # websocket.enableTrace(True)
 
 
 
 class Server:
-    def __init__(self, log):
+    def __init__(self, log, Error):
+        self.Error = Error
         self.log = log
         self.lastMessage = ""
 
@@ -24,7 +23,7 @@ class Server:
             self.server.set_fn_new_client(self.handle_new_client)
             self.server.run_forever(threaded=True)
         except Exception as e:
-            Error().PortError(port)
+            self.Error.PortError(port)
 
     def handle_new_client(self, client, server):
         if self.lastMessage != "":

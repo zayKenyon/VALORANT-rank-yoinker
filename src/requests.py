@@ -7,10 +7,10 @@ import requests
 from colr import color
 import os
 
-from src.errors import Error
 
 class Requests:
-    def __init__(self, version, log):
+    def __init__(self, version, log, Error):
+        self.Error = Error
         self.version = version
         self.headers = {}
         self.log = log
@@ -125,7 +125,7 @@ class Requests:
     def get_lockfile(self):
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')
         
-        if Error().LockfileError(path):
+        if self.Error.LockfileError(path):
             with open(path) as lockfile:
                 self.log("opened lockfile")
                 data = lockfile.read().split(':')

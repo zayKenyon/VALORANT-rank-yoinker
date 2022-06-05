@@ -24,7 +24,7 @@ from src.states.coregame import Coregame
 
 from src.table import Table
 from src.server import Server
-
+from src.errors import Error
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -42,8 +42,10 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
 try:
     Logging = Logging()
     log = Logging.log
+
+    ErrorSRC = Error(log)
     
-    Requests = Requests(version, log)
+    Requests = Requests(version, log, Error)
     Requests.check_version()
     Requests.check_status()
 
@@ -62,7 +64,7 @@ try:
     pregame = Pregame(Requests, log)
     coregame = Coregame(Requests, log)
 
-    Server = Server(Requests)
+    Server = Server(log, ErrorSRC)
     Server.start_server()
 
 

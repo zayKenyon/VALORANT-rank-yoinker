@@ -1,12 +1,10 @@
 import socket
 import os.path
-from src.logs import Logging
 
 class Error:
     
-    def __init__(self):
-        self.Logging = Logging()
-        self.log = self.Logging.log
+    def __init__(self, log):
+        self.log = log
 
 
     def PortError(self, port):
