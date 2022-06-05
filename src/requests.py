@@ -7,15 +7,13 @@ import requests
 from colr import color
 import os
 
-from src.logs import Logging
 from src.errors import Error
 
 class Requests:
-    def __init__(self, version):
+    def __init__(self, version, log):
         self.version = version
         self.headers = {}
-        self.Logging = Logging()
-        self.log = self.Logging.log
+        self.log = log
 
         self.region = self.get_region()
         self.pd_url = f"https://pd.{self.region[0]}.a.pvp.net"
@@ -80,9 +78,10 @@ class Requests:
                 response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
                                             headers=local_headers,
                                             verify=False)
-                self.log(
-                    f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
+                if endpoint != "/chat/v4/presences":
+                    self.log(
+                        f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
+                        f" response code: {response.status_code}")
                 return response.json()
             elif url_type == "custom":
                 response = requests.request(method, f"{endpoint}", headers=self.get_headers(), verify=False)
@@ -107,6 +106,7 @@ class Requests:
                     glz_url = [(line.split('https://glz-')[1].split(".")[0]),
                                (line.split('https://glz-')[1].split(".")[1])]
                 if "pd_url" in locals().keys() and "glz_url" in locals().keys():
+                    self.log(f"got region from logs '{[pd_url, glz_url]}'")
                     return [pd_url, glz_url]
 
     def get_current_version(self):
@@ -127,7 +127,7 @@ class Requests:
         
         if Error().LockfileError(path):
             with open(path) as lockfile:
-                self.log("opened log file")
+                self.log("opened lockfile")
                 data = lockfile.read().split(':')
                 keys = ['name', 'PID', 'port', 'password', 'protocol']
                 return dict(zip(keys, data))
