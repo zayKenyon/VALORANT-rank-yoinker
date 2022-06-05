@@ -125,7 +125,7 @@ class Requests:
     def get_lockfile(self):
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')
         
-        if self.Error.LockfileError(path):
+        if self.Error.LockfileError(self.Error, path):
             with open(path) as lockfile:
                 self.log("opened lockfile")
                 data = lockfile.read().split(':')
