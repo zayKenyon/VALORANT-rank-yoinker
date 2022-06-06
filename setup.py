@@ -7,6 +7,6 @@ setup(
     name = "VALORANT rank yoinker",
     version = "1.26",
     description='vRY - Live Match Rank Viewer',
-    executables = [Executable("main.py", icon="./assets/favicon.ico")],
+    executables = [Executable("main.py", icon="./assets/Logo.ico")],
     options={"build_exe": build_exe_options}
 )
