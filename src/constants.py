@@ -57,9 +57,9 @@ PARTYICONLIST = [
 
 
 NUMBERTORANKS = [
-            color('Unrated', fore=(46, 46, 46)),
-            color('Unrated', fore=(46, 46, 46)),
-            color('Unrated', fore=(46, 46, 46)),
+            color('Unranked', fore=(46, 46, 46)),
+            color('Unranked', fore=(46, 46, 46)),
+            color('Unranked', fore=(46, 46, 46)),
             color('Iron 1', fore=(72, 69, 62)),
             color('Iron 2', fore=(72, 69, 62)),
             color('Iron 3', fore=(72, 69, 62)),
@@ -78,6 +78,9 @@ NUMBERTORANKS = [
             color('Diamond 1', fore=(216, 100, 199)),
             color('Diamond 2', fore=(216, 100, 199)),
             color('Diamond 3', fore=(216, 100, 199)),
+            color('Ascendant 1', fore=(24, 148, 82)),
+            color('Ascendant 2', fore=(24, 148, 82)),
+            color('Ascendant 3', fore=(24, 148, 82)),
             color('Immortal 1', fore=(221, 68, 68)),
             color('Immortal 2', fore=(221, 68, 68)),
             color('Immortal 3', fore=(221, 68, 68)),
