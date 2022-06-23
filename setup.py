@@ -1,7 +1,7 @@
 import sys
 from cx_Freeze import setup, Executable
 
-version = "1.261"
+version = "1.262"
 
 build_exe_options = {"path": sys.path}
 
