@@ -1,11 +1,10 @@
-
-
-
+import pyperclip
 
 class Rank:
-    def __init__(self, Requests, log):
+    def __init__(self, Requests, log, ranks_before):
         self.Requests = Requests
         self.log = log
+        self.ranks_before = ranks_before
 
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
@@ -41,6 +40,9 @@ class Rank:
             for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
                 if r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"] is not None:
                     for winByTier in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"]:
+                        if season in self.ranks_before:
+                            if int(winByTier) > 20:
+                                winByTier = int(winByTier) + 3
                         if int(winByTier) > max_rank:
                             max_rank = int(winByTier)
             rank.append(max_rank)

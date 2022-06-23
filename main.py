@@ -51,7 +51,7 @@ try:
 
     cfg = Config(log)
 
-    rank = Rank(Requests, log)
+    rank = Rank(Requests, log, before_ascendant_seasons)
 
     content = Content(Requests, log)
 
