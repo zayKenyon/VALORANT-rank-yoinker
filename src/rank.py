@@ -1,4 +1,3 @@
-import pyperclip
 
 class Rank:
     def __init__(self, Requests, log, ranks_before):
