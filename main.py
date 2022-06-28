@@ -146,8 +146,14 @@ try:
                             rankStatus = playerRank[1]
                         playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
-                        Namecolor = colors.get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
-                                                        Requests.puuid)
+                        if player["PlayerIdentity"]["Incognito"]:
+                            Namecolor = colors.get_color_from_team(coregame_stats["Players"][0]['TeamID'],
+                                                            names[player["Subject"]],
+                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"])
+                        else:
+                            Namecolor = colors.get_color_from_team(coregame_stats["Players"][0]['TeamID'],
+                                                            names[player["Subject"]],
+                                                            player["Subject"], Requests.puuid)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
