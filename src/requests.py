@@ -30,8 +30,8 @@ class Requests:
         # checking status
         rStatus = requests.get(
             "https://raw.githubusercontent.com/isaacKenyon/VALORANT-rank-yoinker/main/status.json").json()
-        if not rStatus["status_ok"] or rStatus["print_message"]:
-            status_color = (255, 0, 0) if not rStatus["status_ok"] else (0, 255, 0)
+        if not rStatus["status_good"] or rStatus["print_message"]:
+            status_color = (255, 0, 0) if not rStatus["status_good"] else (0, 255, 0)
             print(color(rStatus["message_to_display"], fore=status_color))
 
         # checking for latest release
@@ -47,8 +47,8 @@ class Requests:
         # checking status
         rStatus = requests.get(
             "https://raw.githubusercontent.com/isaacKenyon/VALORANT-rank-yoinker/main/status.json").json()
-        if not rStatus["status_ok"] or rStatus["print_message"]:
-            status_color = (255, 0, 0) if not rStatus["status_ok"] else (0, 255, 0)
+        if not rStatus["status_good"] or rStatus["print_message"]:
+            status_color = (255, 0, 0) if not rStatus["status_good"] else (0, 255, 0)
             print(color(rStatus["message_to_display"], fore=status_color))
             
     def fetch(self, url_type: str, endpoint: str, method: str):
