@@ -9,7 +9,7 @@ from src.logs import Logging
 class Config:
     def __init__(self, log):
         self.log = log
-        self.default = {"cooldown": 1, "weapon": "", "port": 1100}
+        self.default = {"cooldown": 10, "weapon": "", "port": 1100}
 
         if not os.path.exists("config.json"):
             self.log("config.json not found, creating new one")
