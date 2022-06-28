@@ -39,7 +39,7 @@
 2) Extract **all** files.
 3) Run vRY.exe.
 
-### Compiling from source:
+### Running from source:
 
 1) Download [Python 3.10](https://www.python.org/downloads/release/python-3100/), make sure it is added to the PATH. (This is an option on installation.)
    1) Any Python version post 3.8 should work.
@@ -47,6 +47,12 @@
 3) Open a terminal within the source folder.
 4) `pip install -r requirements.txt`
 5) `main.py`
+
+### Compiling from source:
+
+1) `pip install cx_Freeze`
+2) `python setup.py build`
+3)  Open the new Build folder and find vRY.exe.
 
 > `-` You can change the desired weapon by editing the gun in `config.json`, or by deleting the file for vRY re-prompt you.
 
