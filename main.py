@@ -116,7 +116,9 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
-                    log(f"retrieved names dict: {names}")
+                    partyMembers = menu.get_party_members(Requests.puuid, presence)
+                    partyMembersList = [a["Subject"] for a in partyMembers]
+                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
@@ -146,15 +148,26 @@ try:
                             rankStatus = playerRank[1]
                         playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
-                        Namecolor = colors.get_color_from_team(player["TeamID"], names[player["Subject"]], player["Subject"],
-                                                        Requests.puuid)
+                        if player["PlayerIdentity"]["Incognito"]:
+                            Namecolor = colors.get_color_from_team(coregame_stats["Players"][0]['TeamID'],
+                                                            names[player["Subject"]],
+                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"], party_members=partyMembersList)
+                        else:
+                            Namecolor = colors.get_color_from_team(coregame_stats["Players"][0]['TeamID'],
+                                                            names[player["Subject"]],
+                                                            player["Subject"], Requests.puuid, party_members=partyMembersList)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
-                        PLcolor = colors.level_to_color(player_level)
-
+                        if player["PlayerIdentity"]["HideAccountLevel"]:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList:
+                                PLcolor = colors.level_to_color(player_level)
+                            else:
+                                PLcolor = ""
+                        else:
+                            PLcolor = colors.level_to_color(player_level)
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
@@ -210,7 +223,9 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
-                    log(f"retrieved names dict: {names}")
+                    partyMembers = menu.get_party_members(Requests.puuid, presence)
+                    partyMembersList = [a["Subject"] for a in partyMembers]
+                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
                     partyIcons = {}
@@ -240,13 +255,19 @@ try:
                         if player["PlayerIdentity"]["Incognito"]:
                             NameColor = colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
                                                             names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"])
+                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"], party_members=partyMembersList)
                         else:
                             NameColor = colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
                                                             names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid)
+                                                            player["Subject"], Requests.puuid, party_members=partyMembersList)
 
-                        PLcolor = colors.level_to_color(player_level)
+                        if player["PlayerIdentity"]["HideAccountLevel"]:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList:
+                                PLcolor = colors.level_to_color(player_level)
+                            else:
+                                PLcolor = ""
+                        else:
+                            PLcolor = colors.level_to_color(player_level)
                         if player["CharacterSelectionState"] == "locked":
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())),
                                                 fore=(255, 255, 255))
@@ -300,7 +321,7 @@ try:
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    log(f"retrieved names dict: {names}")
+                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     for player in Players:
                         party_icon = PARTYICONLIST[0]
@@ -319,7 +340,7 @@ try:
                         agent = ""
 
                         # NAME
-                        name = names[player["Subject"]]
+                        name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank[0]]
@@ -334,7 +355,7 @@ try:
                         leaderboard = playerRank[2]
 
                         # LEVEL
-                        level = str(player_level)
+                        level = PLcolor
 
                         tableClass.add_row_table(table, [party_icon,
                                               agent,
@@ -352,9 +373,9 @@ try:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":
-                table.title = f"Valorant status: {title} - {server}"
+                table.title = f"VALORANT status: {title} - {server}"
             else:
-                table.title = f"Valorant status: {title}"
+                table.title = f"VALORANT status: {title}"
             server = ""
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             if title is not None:
