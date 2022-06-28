@@ -358,9 +358,9 @@ try:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":
-                table.title = f"Valorant status: {title} - {server}"
+                table.title = f"VALORANT status: {title} - {server}"
             else:
-                table.title = f"Valorant status: {title}"
+                table.title = f"VALORANT status: {title}"
             server = ""
             table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
             if title is not None:
