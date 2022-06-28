@@ -4,7 +4,7 @@
         <button class="btn btn--light">
             <span class="btn__inner">
                 <span class="btn__slide"></span>
-                <span class="btn__content">{{ PlayerLoadout.Name }}</span>
+                <span class="btn__content">{{ PlayerLoadout.AgentArtworkName.substring(0, PlayerLoadout.AgentArtworkName.length - 7) }}</span>
             </span>
         </button>
         <!-- <div class="weapon_img_div"> -->
