@@ -3,12 +3,10 @@
         <img src="assets/Logo.png" alt="Logo" width="160" height="160">
     </a>
 <h5 align="center"> VALORANT rank yoinker</h5>
-</p>
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
 [![Language][language-shield]][language-url]
-[![YouTube][youtube-shield]][youtube-url]
 [![License][license-shield]][license-url]
      
  
@@ -33,29 +31,41 @@
     
 
 ## Usage
-    
- VALORANT must be open for this to work.
- 
-**IMPORTANT: The .exe must be kept with its files, you can create a shortcut to it if you want to place it elsewhere.**
+ **VALORANT must be open**.
 
-Download and run the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
+### Bundled Release:
 
-To view a player's equipped inventory visit [this website](https://vry.netlify.app/matchLoadouts).
+1) Download the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
+2) Extract **all** files.
+3) Run vRY.exe.
 
+### Running from source:
 
-Tutorial:
-  
-  [![YouTube][youtube-shield]][youtube-url]
+1) Download [Python 3.10](https://www.python.org/downloads/release/python-3100/), make sure it is added to the PATH. (This is an option on installation.)
+   1) Any Python version post 3.8 should work.
+2) Download the [source](https://github.com/isaacKenyon/VALORANT-rank-yoinker/archive/refs/heads/main.zip).
+3) Open a terminal within the source folder.
+4) `pip install -r requirements.txt`
+5) `main.py`
 
+### Compiling from source:
+
+1) `pip install cx_Freeze`
+2) `python setup.py build`
+3)  Open the new Build folder and find vRY.exe.
+
+> `-` You can change the desired weapon by editing the gun in `config.json`, or by deleting the file for vRY re-prompt you.
+
+> `-` View all skins: <https://vry.netlify.app/matchLoadouts>.
+
+## What about that Tweet?
+
+ The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies outlines how
+ applications are not allowed to expose data hidden by the game client. As of Version 1.262, vRY respects streamer mode.
 
 ## Contributing
 
  Any contributions you make are **greatly appreciated**.
-
- 1. Fork the Project `(gh repo fork https://github.com/isaacKenyon/VALORANT-rank-yoinker)`
- 2. Commit your Changes `(git commit -am 'Add some feature')`
- 3. [Open a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
-
  
 ## Contact 
 
@@ -63,21 +73,17 @@ Tutorial:
  
 [![Discord Banner 2][discord-banner]][discord-url]
 
-
-
 ## Acknowledgements
 
  - [Valorant-API.com](https://valorant-api.com/)
- - [Hamper for all his amazing work](https://github.com/OwOHamper)
-
- 
+ - [Hamper](https://hamper.codes/)
+ - [D3CRYPT](https://d3crypt360.pages.dev/)
  
 ## Disclaimer
 
  THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
     
- Also Rito, if you send a cease-and-desist, just know that I will frame it inside my bedroom
-    
+ Whilst effort has been made to abide by Riot's API rules; you acknowledge that use of this software is done so at your own risk.
 
 
 [discord-shield]: https://img.shields.io/discord/872101595037446144?color=7289da&label=Support&logo=discord&logoColor=7289da&style=for-the-badge
@@ -89,9 +95,6 @@ Tutorial:
 
 [language-shield]: https://img.shields.io/github/languages/top/isaacKenyon/Valorant-rank-yoinker?logo=python&logoColor=yellow&style=for-the-badge
 [language-url]: https://www.python.org/
-
-[youtube-shield]: https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white
-[youtube-url]: https://youtu.be/TSLRd8Y9PiE
 
 [license-shield]: https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge
 [license-url]: https://github.com/isaacKenyon/valorant-rank-yoinker/blob/main/LICENSE
