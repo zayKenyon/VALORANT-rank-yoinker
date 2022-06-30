@@ -1,6 +1,7 @@
 import json
 from io import TextIOWrapper
 from json import JSONDecodeError
+from tkinter import Misc
 import requests
 import os
 
@@ -23,11 +24,11 @@ class Config:
                 config = json.load(file)
                 keys = [k for k in config.keys()] # getting the keys in the file
                 default_keys = [k for k in self.default.keys()] # getting the keys in the self.default
+                missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
 
-                if len(default_keys) != len(keys):
+                if len(missingkeys) > 0:
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
-                        missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
                         self.log("missing keys: " + missingkeys)
                         for key in missingkeys:
                             config[key] = self.default[key]
