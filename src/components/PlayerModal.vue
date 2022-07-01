@@ -3,7 +3,7 @@
       <div class="modal">
             <div class="flexbox flexbox-column">
                 <div class="ModalDiv">
-                    <span class="ModalText">{{ PlayerLoadout.PlayerLoadout.AgentArtworkName.substring(0, PlayerLoadout.AgentArtworkName.length - 7) }}</span>
+                    <span class="ModalText">{{ this.PlayerLoadout.AgentArtworkName.substring(0, this.PlayerLoadout.AgentArtworkName.length - 7) }}</span>
                 </div>
                 <div class="flexbox">
                     <WeaponBox :PlayerLoadout="PlayerLoadout" :flex2="false" :visible="false" weaponName="none"/>
@@ -16,7 +16,7 @@
 
 
                         <div class="nameDiv">
-                            <span class="nameText">{{ this.PlayerLoadout.PlayerLoadout.AgentArtworkName.substring(0, PlayerLoadout.AgentArtworkName.length - 7) }}</span>
+                            <span class="nameText">{{ this.PlayerLoadout.AgentArtworkName.substring(0, this.PlayerLoadout.AgentArtworkName.length - 7) }}</span>
                         </div>
 
 
