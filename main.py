@@ -139,7 +139,7 @@ try:
                     for player in Players:
 
                         if player["Subject"] in stats_data.keys():
-                            if player["Subject"] != Requests.puuid and partyMembersList != Requests.puuid:
+                            if player["Subject"] != Requests.puuid and player["Subject"] not in partyMembersList:
                                 curr_player_stat = stats_data[player["Subject"]][-1]
                                 i = 1
                                 while curr_player_stat["match_id"] == coregame.match_id and len(stats_data[player["Subject"]]) > i:
