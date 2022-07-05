@@ -26,6 +26,8 @@ from src.table import Table
 from src.server import Server
 from src.errors import Error
 
+from src.stats import Stats
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 os.system('cls')
@@ -75,7 +77,7 @@ try:
     loadoutsClass = Loadouts(Requests, log, colors, Server)
     tableClass = Table()
 
-
+    stats = Stats()
 
     log(f"VALORANT rank yoinker v{version}")
 
