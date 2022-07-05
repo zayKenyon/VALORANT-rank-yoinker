@@ -71,6 +71,7 @@ try:
 
 
     agent_dict = content.get_all_agents()
+    map_dict = content.get_maps()
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
@@ -209,6 +210,19 @@ try:
                                               leaderboard,
                                               level
                                               ])
+                        stats.save_data(
+                            {
+                                player["Subject"]: {
+                                    "name": names[player["Subject"]],
+                                    "agent": agent_dict[player["CharacterID"].lower()],
+                                    "map": map_dict[coregame_stats["MapID"].lower()],
+                                    "rank": playerRank[0],
+                                    "rr": rr,
+                                    "match_id": coregame.match_id,
+                                    "epoch": time.time(),
+                                }
+                            }
+                        )
                         bar()
             elif game_state == "PREGAME":
                 pregame_stats = pregame.get_pregame_stats()
