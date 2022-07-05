@@ -6,6 +6,7 @@ import sys
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
+import datetime
 
 from src.constants import *
 from src.requests import Requests
@@ -128,7 +129,53 @@ try:
                     partyIcons = {}
                     lastTeamBoolean = False
                     lastTeam = "Red"
+
+
+                    already_played_with = []
+                    stats_data = stats.read_data()
+
+                    for p in Players:
+                        if p["Subject"] == Requests.puuid:
+                            allyTeam = p["TeamID"]
                     for player in Players:
+
+                        if player["Subject"] in stats_data.keys():
+                            if player["Subject"] != Requests.puuid and partyMembersList != Requests.puuid:
+                                curr_player_stat = stats_data[player["Subject"]][-1]
+                                i = 1
+                                while curr_player_stat["match_id"] == coregame.match_id and len(stats_data[player["Subject"]]) > i:
+                                    i+=1
+                                # if curr_player_stat["match_id"] == coregame.match_id and len(stats_data[player["Subject"]]) > 1:
+                                    curr_player_stat = stats_data[player["Subject"]][-i]
+                                if curr_player_stat["match_id"] != coregame.match_id:
+                                    #checking for party memebers and self players
+                                    times = 0
+                                    m_set = ()
+                                    for m in stats_data[player["Subject"]]:
+                                        if m["match_id"] != coregame.match_id and m["match_id"] not in m_set:
+                                            times += 1
+                                            m_set += (m["match_id"],)
+                                    if player["PlayerIdentity"]["Incognito"] == False:
+                                        already_played_with.append(
+                                                {
+                                                    "times": times,
+                                                    "name": curr_player_stat["name"],
+                                                    "agent": curr_player_stat["agent"],
+                                                    "time_diff": time.time() - curr_player_stat["epoch"]
+                                                })
+                                    else:
+                                        if player["TeamID"] == allyTeam:
+                                            team_string = "your"
+                                        else:
+                                            team_string = "enemy"
+                                        already_played_with.append(
+                                                {
+                                                    "times": times,
+                                                    "name": agent_dict[player["CharacterID"].lower()] + " on " + team_string + " team",
+                                                    "agent": curr_player_stat["agent"],
+                                                    "time_diff": time.time() - curr_player_stat["epoch"]
+                                                })
+
                         party_icon = ''
 
                         # set party premade icon
@@ -225,6 +272,7 @@ try:
                         )
                         bar()
             elif game_state == "PREGAME":
+                already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
                 try:
                     server = GAMEPODS[pregame_stats["GamePodID"]]
@@ -334,6 +382,7 @@ try:
                                               ])
                         bar()
             if game_state == "MENUS":
+                already_played_with = []
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
@@ -397,6 +446,15 @@ try:
             if title is not None:
                 print(table)
                 print(f"VALORANT rank yoinker v{version}")
+                                        #                 {
+                                        #     "times": sum(stats_data[player["Subject"]]),
+                                        #     "name": curr_player_stat["name"],
+                                        #     "agent": curr_player_stat["agent"],
+                                        #     "time_diff": time.time() - curr_player_stat["time"]
+                                        # })
+                for played in already_played_with:
+                    print(f"\nAlready played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
