@@ -22,4 +22,5 @@ class Coregame:
             return 0
 
     def get_coregame_stats(self):
-        return self.Requests.fetch(url_type="glz", endpoint=f"/core-game/v1/matches/{self.get_coregame_match_id()}", method="get")
+        self.match_id = self.get_coregame_match_id()
+        return self.Requests.fetch(url_type="glz", endpoint=f"/core-game/v1/matches/{self.match_id}", method="get")
