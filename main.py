@@ -6,7 +6,6 @@ import sys
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
-import datetime
 
 from src.constants import *
 from src.requests import Requests
