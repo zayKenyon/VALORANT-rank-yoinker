@@ -123,6 +123,7 @@ try:
                     game_state = presences.get_game_state(presence)
                     if game_state != None:
                         run = False
+                    time.sleep(2)
             else:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
