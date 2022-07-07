@@ -1,4 +1,3 @@
-import asyncio
 import json
 from websocket_server import WebsocketServer
 from threading import Thread

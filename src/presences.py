@@ -2,7 +2,6 @@ import base64
 import json
 import time
 
-
 class Presences:
     def __init__(self, Requests, log):
         self.Requests = Requests

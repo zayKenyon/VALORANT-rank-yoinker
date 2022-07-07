@@ -19,6 +19,7 @@ class Content():
         rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
         agent_dict = {}
         agent_dict.update({None: None})
+        agent_dict.update({"": ""})
         for agent in rAgents["data"]:
             agent_dict.update({agent['uuid'].lower(): agent['displayName']})
         self.log(f"retrieved agent dict: {agent_dict}")

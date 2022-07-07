@@ -6,6 +6,7 @@ import sys
 import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
+import asyncio
 
 from src.constants import *
 from src.requests import Requests
@@ -81,7 +82,10 @@ try:
 
     stats = Stats()
 
-    Wss = Ws(Requests.lockfile)
+    Wss = Ws(Requests.lockfile, Requests)
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # loop.run_forever()
 
     log(f"VALORANT rank yoinker v{version}")
 
@@ -94,14 +98,40 @@ try:
     lastGameState = ""
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
+
+
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # loop.run_until_complete(Wss.conntect_to_websocket(game_state))
+    # loop.close()
+    firstTime = True
     while True:
         table.clear()
         try:
-            presence = presences.get_presence()
-            game_state = presences.get_game_state(presence)
+
+
+            # loop = asyncio.get_event_loop()
+            # loop.run_until_complete(Wss.conntect_to_websocket())
+            # if firstTime:
+            #     loop = asyncio.new_event_loop()
+            #     asyncio.set_event_loop(loop)
+            #     game_state = loop.run_until_complete(Wss.conntect_to_websocket(game_state))
+            if firstTime:
+                presence = presences.get_presence()
+                game_state = presences.get_game_state(presence)
+            else:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                game_state = loop.run_until_complete(Wss.recconect_to_websocket(game_state))
+                loop.close()
+            firstTime = False
+            # loop = asyncio.new_event_loop()
+            # asyncio.set_event_loop(loop)
+            # loop.run_until_complete()
         except TypeError:
             raise Exception("Game has not started yet!")
-        if cfg.cooldown == 0 or game_state != lastGameState:
+        # if cfg.cooldown == 0 or game_state != lastGameState:
+        if True:
             log(f"getting new {game_state} scoreboard")
             lastGameState = game_state
             game_state_dict = {
@@ -460,7 +490,8 @@ try:
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
-            time.sleep(cfg.cooldown)
+            # time.sleep(cfg.cooldown)
+            pass
 except:
     log(traceback.format_exc())
     print(color(
