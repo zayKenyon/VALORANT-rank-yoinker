@@ -9,7 +9,7 @@ from src.logs import Logging
 class Config:
     def __init__(self, log):
         self.log = log
-        self.default = {"cooldown": 10, "weapon": "", "port": 1100}
+        self.default = {"cooldown": 10, "weapon": "", "port": 1100, "table": {"skin": True, "rr": True, "peakrank": True, "leaderboard": True}}
 
         if not os.path.exists("config.json"):
             self.log("config.json not found, creating new one")
@@ -23,12 +23,12 @@ class Config:
                 config = json.load(file)
                 keys = [k for k in config.keys()] # getting the keys in the file
                 default_keys = [k for k in self.default.keys()] # getting the keys in the self.default
+                missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
 
-                if len(default_keys) != len(keys):
+                if len(missingkeys) > 0:
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
-                        missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
-                        self.log("missing keys: " + missingkeys)
+                        self.log(f"missing keys: " + {missingkeys})
                         for key in missingkeys:
                             config[key] = self.default[key]
 
@@ -53,6 +53,8 @@ class Config:
                             config["weapon"] = weapon
                             json.dump(config, f, indent=4)
                             self.log(f"{weapon} weapon has been added to the config file by user")
+                
+                self.table = config.get("table", {})
                 
         except (JSONDecodeError):
             self.log("invalid file")

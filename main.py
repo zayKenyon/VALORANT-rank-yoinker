@@ -76,7 +76,7 @@ try:
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server)
-    tableClass = Table()
+    table = Table(cfg)
 
     stats = Stats()
 
@@ -92,7 +92,7 @@ try:
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
     while True:
-        table = PrettyTable()
+        table.clear()
         try:
             presence = presences.get_presence()
             game_state = presences.get_game_state(presence)
@@ -207,7 +207,7 @@ try:
                                                             player["Subject"], Requests.puuid, party_members=partyMembersList)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
-                                tableClass.add_row_table(table, ["", "", "", "", "", "", "", "", ""])
+                                table.add_empty_row()
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         if player["PlayerIdentity"]["HideAccountLevel"]:
@@ -245,7 +245,7 @@ try:
 
                         # LEVEL
                         level = PLcolor
-                        tableClass.add_row_table(table, [party_icon,
+                        table.add_row_table([party_icon,
                                               agent,
                                               name,
                                               # views,
@@ -368,7 +368,7 @@ try:
                         # LEVEL
                         level = PLcolor
 
-                        tableClass.add_row_table(table, [party_icon,
+                        table.add_row_table([party_icon,
                                               agent,
                                               name,
                                               # views,
@@ -421,7 +421,7 @@ try:
                         # LEVEL
                         level = PLcolor
 
-                        tableClass.add_row_table(table, [party_icon,
+                        table.add_row_table([party_icon,
                                               agent,
                                               name,
                                               "",
@@ -437,13 +437,13 @@ try:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":
-                table.title = f"VALORANT status: {title} - {server}"
+                table.set_title(f"VALORANT status: {title} - {server}")
             else:
-                table.title = f"VALORANT status: {title}"
+                table.set_title(f"VALORANT status: {title}")
             server = ""
-            table.field_names = ["Party", "Agent", "Name", "Skin", "Rank", "RR", "Peak Rank", "pos.", "Level"]
+            table.set_default_field_names()
             if title is not None:
-                print(table)
+                table.display()
                 print(f"VALORANT rank yoinker v{version}")
                                         #                 {
                                         #     "times": sum(stats_data[player["Subject"]]),
