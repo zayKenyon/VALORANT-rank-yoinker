@@ -117,8 +117,12 @@ try:
             #     asyncio.set_event_loop(loop)
             #     game_state = loop.run_until_complete(Wss.conntect_to_websocket(game_state))
             if firstTime:
-                presence = presences.get_presence()
-                game_state = presences.get_game_state(presence)
+                run = True
+                while run:
+                    presence = presences.get_presence()
+                    game_state = presences.get_game_state(presence)
+                    if game_state != None:
+                        run = False
             else:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
