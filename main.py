@@ -17,6 +17,7 @@ from src.content import Content
 from src.names import Names
 from src.presences import Presences
 from src.Loadouts import Loadouts
+from src.websocket import Ws
 
 from src.states.menu import Menu
 from src.states.pregame import Pregame
@@ -79,6 +80,8 @@ try:
     table = Table(cfg)
 
     stats = Stats()
+
+    Wss = Ws(Requests.lockfile)
 
     log(f"VALORANT rank yoinker v{version}")
 
