@@ -28,7 +28,7 @@ class Config:
                 if len(missingkeys) > 0:
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
-                        self.log(f"missing keys: " + {missingkeys})
+                        self.log(f"missing keys: " + {str(missingkeys)})
                         for key in missingkeys:
                             config[key] = self.default[key]
 
@@ -53,13 +53,13 @@ class Config:
                             config["weapon"] = weapon
                             json.dump(config, f, indent=4)
                             self.log(f"{weapon} weapon has been added to the config file by user")
-                
                 self.table = config.get("table", {})
                 
         except (JSONDecodeError):
             self.log("invalid file")
             with open("config.json", "w") as file:
                 config = self.config_dialog(file)
+            self.table = self.default.get("table", {})
         finally:
             self.cooldown = config["cooldown"]
             self.log(f"got cooldown with value '{self.cooldown}'")
@@ -68,6 +68,7 @@ class Config:
                 self.weapon = "vandal" # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
             else:   
                 self.weapon = config["weapon"]
+            
                 
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
