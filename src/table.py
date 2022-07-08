@@ -15,6 +15,7 @@ class Table:
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             True,  # Level
         ]
+        self.runtime_col_flags = self.col_flags[:] # making a copy
         self.field_names_candidates = [
             "Party",
             "Agent",
@@ -47,8 +48,20 @@ class Table:
         empty_row = [""] * sum(self.col_flags)
         self.pretty_table.add_rows([empty_row])
 
+    def reset_runtime_col_flags(self):
+        self.runtime_col_flags = self.col_flags
+
+    def set_runtime_col_flag(self,field_name,flag):
+        index = self.field_names_candidates.index(field_name)
+        self.runtime_col_flags[index] = flag
+
     def display(self):
-        print(self.pretty_table)
+        overall_col_flags = [f1 & f2 for f1, f2 in zip(self.col_flags,self.runtime_col_flags)]
+        fields_to_display = [c for c, flag in zip(self.field_names_candidates,overall_col_flags) if flag]
+
+        # extracting specific columns at runtime can sometimes lead to very minor padding issues
+        # this can be problematic for OCD people, others might not notice
+        print(self.pretty_table.get_string(fields=fields_to_display))
 
     def clear(self):
         self.pretty_table.clear()
