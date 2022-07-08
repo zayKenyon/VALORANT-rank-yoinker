@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 class Table:
     def __init__(self,config):
         self.pretty_table = PrettyTable()
-        self.row_flags = [
+        self.col_flags = [
             True,  # Party
             True,  # Agent
             True,  # Name
@@ -27,7 +27,7 @@ class Table:
             "Level",
         ]
         self.field_names = [
-            c for c, i in zip(self.field_names_candidates, self.row_flags) if i
+            c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
 
     def set_title(self, title):
@@ -40,11 +40,11 @@ class Table:
         self.pretty_table.field_names = field_names
 
     def add_row_table(self, args: list):
-        row = [c for c, i in zip(args, self.row_flags) if i]
+        row = [c for c, i in zip(args, self.col_flags) if i]
         self.pretty_table.add_rows([row])
 
     def add_empty_row(self):
-        empty_row = [""] * sum(self.row_flags)
+        empty_row = [""] * sum(self.col_flags)
         self.pretty_table.add_rows([empty_row])
 
     def display(self):
