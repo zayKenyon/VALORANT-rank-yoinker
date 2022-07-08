@@ -35,7 +35,7 @@ class Table:
         self.pretty_table.title = title
 
     def set_default_field_names(self):
-        self.pretty_table.field_names = self.field_names
+        self.pretty_table.field_names = self.field_names[:]
 
     def set_field_names(self, field_names):
         self.pretty_table.field_names = field_names
@@ -49,7 +49,7 @@ class Table:
         self.pretty_table.add_rows([empty_row])
 
     def reset_runtime_col_flags(self):
-        self.runtime_col_flags = self.col_flags
+        self.runtime_col_flags = self.col_flags[:]
 
     def set_runtime_col_flag(self,field_name,flag):
         index = self.field_names_candidates.index(field_name)
