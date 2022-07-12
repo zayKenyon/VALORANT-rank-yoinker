@@ -29,6 +29,7 @@ from src.server import Server
 from src.errors import Error
 
 from src.stats import Stats
+from src.configurator import configure
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -42,6 +43,13 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     log(f"exited program with error code {status}")
     raise sys.exit(status)
 
+try:
+    if sys.argv[1] == "--configure":
+        configure()
+        input("press enter to exit...\n")
+        os._exit(1)
+except:
+    pass
 
 try:
     Logging = Logging()
