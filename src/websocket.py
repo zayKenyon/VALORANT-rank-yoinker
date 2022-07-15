@@ -1,7 +1,6 @@
 import websockets
+import websockets.client
 import ssl
-import os
-import asyncio
 import base64
 import json
 
@@ -84,4 +83,3 @@ class Ws:
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
-    
