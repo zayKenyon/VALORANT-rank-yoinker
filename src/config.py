@@ -28,7 +28,7 @@ class Config:
                 if len(missingkeys) > 0:
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
-                        self.log(f"missing keys: " + {str(missingkeys)})
+                        self.log(f"missing keys: " + str(missingkeys))
                         for key in missingkeys:
                             config[key] = self.default[key]
 
