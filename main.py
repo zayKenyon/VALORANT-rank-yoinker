@@ -43,19 +43,22 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     log(f"exited program with error code {status}")
     raise sys.exit(status)
 
-try:
-    if len(sys.argv) > 1 and sys.argv[1] == "--configure":
-        configure()
-        input("press enter to exit...\n")
-        os._exit(1)
-except:
-    print("Something went wrong while running configurator!")
-    input("press enter to exit...\n")
-    os._exit(1)
+
 
 try:
     Logging = Logging()
     log = Logging.log
+
+    try:
+        if len(sys.argv) > 1 and sys.argv[1] == "--configure":
+            configure()
+            input("press enter to exit...\n")
+            os._exit(1)
+    except Exception as e:
+        print("Something went wrong while running configurator!")
+        log("configurator encountered an error:", str(e))
+        input("press enter to exit...\n")
+        os._exit(1)
 
     ErrorSRC = Error(log)
     
