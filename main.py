@@ -49,7 +49,7 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 except:
-    pass
+    print("Something went wrong while running configurator!")
 
 try:
     Logging = Logging()
