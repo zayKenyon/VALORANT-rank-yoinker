@@ -53,5 +53,7 @@ def configure():
         config = default_config | user_config | changed_config
         with open("config.json", "w") as outfile:
             json.dump(config, outfile, indent=4)
+    else:
+        config = default_config | user_config
 
     return config

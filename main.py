@@ -56,7 +56,7 @@ try:
             os._exit(1)
     except Exception as e:
         print("Something went wrong while running configurator!")
-        log("configurator encountered an error:", str(e))
+        log(f"configurator encountered an error: {str(e)}")
         input("press enter to exit...\n")
         os._exit(1)
 
