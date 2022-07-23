@@ -50,7 +50,7 @@ try:
     log = Logging.log
 
     try:
-        if len(sys.argv) > 1 and sys.argv[1] == "--configure":
+        if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
             input("press enter to exit...\n")
             os._exit(1)
