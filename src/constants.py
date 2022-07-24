@@ -113,3 +113,24 @@ tierDict = {
             "411e4a55-4e59-7757-41f0-86a53f101bb5": (239, 235, 101),
             None: None
         }
+
+WEAPONS = [
+    "Classic",
+    "Shorty",
+    "Frenzy",
+    "Ghost",
+    "Sheriff",
+    "Stinger",
+    "Spectre",
+    "Bucky",
+    "Judge",
+    "Bulldog",
+    "Guardian",
+    "Phantom",
+    "Vandal",
+    "Marshal",
+    "Operator",
+    "Ares",
+    "Odin",
+    "Melee",
+]

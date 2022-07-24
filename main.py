@@ -29,6 +29,7 @@ from src.server import Server
 from src.errors import Error
 
 from src.stats import Stats
+from src.configurator import configure
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -43,9 +44,21 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     raise sys.exit(status)
 
 
+
 try:
     Logging = Logging()
     log = Logging.log
+
+    try:
+        if len(sys.argv) > 1 and sys.argv[1] == "--config":
+            configure()
+            input("press enter to exit...\n")
+            os._exit(1)
+    except Exception as e:
+        print("Something went wrong while running configurator!")
+        log(f"configurator encountered an error: {str(e)}")
+        input("press enter to exit...\n")
+        os._exit(1)
 
     ErrorSRC = Error(log)
     
