@@ -58,6 +58,20 @@
 
 > `-` View all skins: <https://vry.netlify.app/matchLoadouts>.
 
+### Letting Github Build It:
+
+The latest commits to the `main` branch will be built by a [Github Actions](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions) workflow 
+and a successful build should result in a compiled artifact that you can download and try out.
+See the [Actions tab](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions), click on the `Build` workflow, 
+select a particular workflow run, and it should have an artifact available for download. 
+
+If you want to make a small change to the application, you can:
+1) [Fork](https://github.com/isaacKenyon/VALORANT-rank-yoinker/fork) this project.
+2) Change the code in your forked repository.
+3) Let the Github Actions workflow build vRY.exe for you.
+4) Download it and test it.
+5) Submit a Pull Request if you would like your change included in future releases.
+
 ## What about that Tweet?
 
  The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies outlines how
