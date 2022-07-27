@@ -3,7 +3,10 @@ from cx_Freeze import setup, Executable
 from src.constants import version
 
 
-build_exe_options = {"path": sys.path}
+build_exe_options = {
+    "path": sys.path,
+    "include_files":['configurator.bat']
+}
 
 setup(
     name = "VALORANT rank yoinker",
