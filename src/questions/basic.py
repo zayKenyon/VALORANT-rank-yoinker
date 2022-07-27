@@ -20,9 +20,10 @@ basic_questions = lambda config: [
         "name": "table",
         "message": "Please select table columns to display:",
         "choices": [
-            Choice(k, name=v, enabled=config.get("table").get(k, True))
+            Choice(k, name=v, enabled=config.get("table",{}).get(k, True))
             for k, v in TABLE_OPTS.items()
         ],
         "filter": lambda table: {k: k in table for k in TABLE_OPTS.keys()},
+        "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
     },
 ]

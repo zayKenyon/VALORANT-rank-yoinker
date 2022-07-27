@@ -21,7 +21,7 @@ def configure():
 
     try:
         with open("config.json", "r") as openfile:
-            user_config = json.load(openfile)
+            user_config = default_config | json.load(openfile)
     except FileNotFoundError:
         print("Generating default configuration")
         user_config = default_config
