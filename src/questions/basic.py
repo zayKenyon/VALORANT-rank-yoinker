@@ -24,5 +24,6 @@ basic_questions = lambda config: [
             for k, v in TABLE_OPTS.items()
         ],
         "filter": lambda table: {k: k in table for k in TABLE_OPTS.keys()},
+        "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
     },
 ]
