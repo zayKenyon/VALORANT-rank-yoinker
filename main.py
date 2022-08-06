@@ -9,7 +9,7 @@ from alive_progress import alive_bar
 import asyncio
 
 from src.constants import *
-from src.requests import Requests
+from src.requestsV import Requests
 from src.logs import Logging
 from src.config import Config
 from src.colors import Colors

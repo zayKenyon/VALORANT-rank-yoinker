@@ -145,5 +145,3 @@ class Requests:
                 "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
             }
         return headers
-
-
