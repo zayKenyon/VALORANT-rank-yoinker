@@ -248,11 +248,12 @@ try:
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         rankStatus = playerRank[1]
-                        while not rankStatus:
-                            print("You have been rate limited, 😞 waiting 10 seconds!")
-                            time.sleep(10)
-                            playerRank = rank.get_rank(player["Subject"], seasonID)
-                            rankStatus = playerRank[1]
+                        #useless code since rate limit is handled in the requestsV
+                        # while not rankStatus:
+                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
+                        #     time.sleep(10)
+                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
+                        #     rankStatus = playerRank[1]
                         playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
@@ -369,11 +370,12 @@ try:
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         rankStatus = playerRank[1]
-                        while not rankStatus:
-                            print("You have been rate limited, 😞 waiting 10 seconds!")
-                            time.sleep(10)
-                            playerRank = rank.get_rank(player["Subject"], seasonID)
-                            rankStatus = playerRank[1]
+                        #useless code since rate limit is handled in the requestsV
+                        # while not rankStatus:
+                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
+                        #     time.sleep(10)
+                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
+                        #     rankStatus = playerRank[1]
                         playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
@@ -455,11 +457,12 @@ try:
                         party_icon = PARTYICONLIST[0]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         rankStatus = playerRank[1]
-                        while not rankStatus:
-                            print("You have been rate limited, 😞 waiting 10 seconds!")
-                            time.sleep(10)
-                            playerRank = rank.get_rank(player["Subject"], seasonID)
-                            rankStatus = playerRank[1]
+                        #useless code since rate limit is handled in the requestsV
+                        # while not rankStatus:
+                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
+                        #     time.sleep(10)
+                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
+                        #     rankStatus = playerRank[1]
                         playerRank = playerRank[0]
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         PLcolor = colors.level_to_color(player_level)
