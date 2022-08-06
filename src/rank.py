@@ -8,7 +8,7 @@ class Rank:
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
-        pyperclip.copy(str(response.json()))
+        # pyperclip.copy(str(response.json()))
         try:
             if response.ok:
                 # self.log("retrieved rank successfully")
