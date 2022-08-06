@@ -18,7 +18,7 @@ class Rank:
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
-                elif int(rankTIER) not in (0, 1, 2, 3):
+                elif int(rankTIER) not in (0, 1, 2):
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                             0]
