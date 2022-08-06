@@ -251,7 +251,7 @@ try:
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         if player["PlayerIdentity"]["HideAccountLevel"]:
-                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
                                 PLcolor = colors.level_to_color(player_level)
                             else:
                                 PLcolor = ""
