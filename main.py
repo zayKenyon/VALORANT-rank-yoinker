@@ -29,6 +29,7 @@ from src.server import Server
 from src.errors import Error
 
 from src.stats import Stats
+from src.configurator import configure
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -43,9 +44,21 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     raise sys.exit(status)
 
 
+
 try:
     Logging = Logging()
     log = Logging.log
+
+    try:
+        if len(sys.argv) > 1 and sys.argv[1] == "--config":
+            configure()
+            input("press enter to exit...\n")
+            os._exit(0)
+    except Exception as e:
+        print("Something went wrong while running configurator!")
+        log(f"configurator encountered an error: {str(e)}")
+        input("press enter to exit...\n")
+        os._exit(1)
 
     ErrorSRC = Error(log)
     
@@ -107,6 +120,8 @@ try:
     firstTime = True
     while True:
         table.clear()
+        table.set_default_field_names()
+        table.reset_runtime_col_flags()
         try:
 
 
@@ -146,6 +161,9 @@ try:
                 "PREGAME": color('Agent Select', fore=(103, 237, 76)),
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
             }
+
+            is_leaderboard_needed = False
+
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
@@ -283,6 +301,9 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        if(int(leaderboard)>0):
+                            is_leaderboard_needed = True
+
                         # LEVEL
                         level = PLcolor
                         table.add_row_table([party_icon,
@@ -405,6 +426,9 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        if(int(leaderboard)>0):
+                            is_leaderboard_needed = True
+
                         # LEVEL
                         level = PLcolor
 
@@ -458,6 +482,9 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        if(int(leaderboard)>0):
+                            is_leaderboard_needed = True
+
                         # LEVEL
                         level = PLcolor
 
@@ -481,8 +508,10 @@ try:
             else:
                 table.set_title(f"VALORANT status: {title}")
             server = ""
-            table.set_default_field_names()
             if title is not None:
+                if(not is_leaderboard_needed):
+                    table.set_runtime_col_flag('Pos.', False)
+
                 table.display()
                 print(f"VALORANT rank yoinker v{version}")
                                         #                 {
