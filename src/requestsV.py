@@ -48,20 +48,22 @@ class Requests:
     def fetch(self, url_type: str, endpoint: str, method: str):
         try:
             if url_type == "glz":
-                response = requests.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
+                response = requests.request(method, self.glz_url + endpoint, headers=self.headers, verify=False)
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
                 if not response.ok:
+                    self.log("response not ok glz endpoint")
                     time.sleep(5)
                     self.headers = {}
                     self.fetch(url_type, endpoint, method)
                 return response.json()
             elif url_type == "pd":
-                response = requests.request(method, self.pd_url + endpoint, headers=self.get_headers(), verify=False)
+                response = requests.request(method, self.pd_url + endpoint, headers=self.headers, verify=False)
                 self.log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
                 if not response.ok:
+                    self.log("response not ok pd endpoint")
                     time.sleep(5)
                     self.headers = {}
                     self.fetch(url_type, endpoint, method)
