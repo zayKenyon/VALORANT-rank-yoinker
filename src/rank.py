@@ -8,32 +8,32 @@ class Rank:
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+        pyperclip.copy(str(response.json()))
         try:
             if response.ok:
-                self.log("retrieved rank successfully")
+                # self.log("retrieved rank successfully")
                 r = response.json()
                 rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
                 if int(rankTIER) >= 21:
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"], ]
+                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
                 elif int(rankTIER) not in (0, 1, 2, 3):
                     rank = [rankTIER,
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            0,
-                            ]
+                            0]
                 else:
-                    rank = [0, 0, 0]
+                    rank = [0, 0, 0, 0]
 
             else:
                 self.log("failed getting rank")
                 self.log(response.text)
                 rank = [0, 0, 0]
         except TypeError:
-            rank = [0, 0, 0]
+            rank = [0, 0, 0, 0]
         except KeyError:
-            rank = [0, 0, 0]
-        max_rank = 0
+            rank = [0, 0, 0, 0]
+        max_rank = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
             for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
@@ -48,3 +48,31 @@ class Rank:
         else:
             rank.append(max_rank)
         return [rank, response.ok]
+
+
+if __name__ == "__main__":
+    from constants import before_ascendant_seasons, version, NUMBERTORANKS
+    from requestsV import Requests
+    from logs import Logging
+    from errors import Error
+    import urllib3
+    import pyperclip
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    Logging = Logging()
+    log = Logging.log
+
+    ErrorSRC = Error(log)
+
+    Requests = Requests(version, log, ErrorSRC)
+    #custom region
+    Requests.pd_url = "https://pd.ap.a.pvp.net"
+
+    #season id
+    s_id = "67e373c7-48f7-b422-641b-079ace30b427" 
+
+    r = Rank(Requests, log, before_ascendant_seasons)
+
+    res = r.get_rank("puuid", s_id)
+    print(res)
+    print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}")
