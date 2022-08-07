@@ -23,19 +23,19 @@ class Rank:
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                             0]
                 else:
-                    rank = [0, 0, 0, 0]
+                    rank = [0, 0, 0, 0, 0]
 
             else:
                 self.log("failed getting rank")
                 self.log(response.text)
-                rank = [0, 0, 0]
+                rank = [0, 0, 0, 0, 0]
                 rankTIER = 0
         except TypeError:
             rankTIER = 0
-            rank = [0, 0, 0, 0]
+            rank = [0, 0, 0, 0, 0]
         except KeyError:
             rankTIER = 0
-            rank = [0, 0, 0, 0]
+            rank = [0, 0, 0, 0, 0]
         max_rank = rankTIER
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
