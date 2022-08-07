@@ -1,23 +1,13 @@
 import json
 
 from InquirerPy import inquirer, prompt
+from src.constants import DEFAULT_CONFIG
 
-from src.questions.advance import advance_questions
-from src.questions.basic import basic_questions
+from src.questions import basic_questions, advance_questions, flags_question 
 
 
 def configure():
-    default_config = {
-        "cooldown": 10,
-        "weapon": "Vandal",
-        "port": 1100,
-        "table": {
-            "skin": True,
-            "rr": True,
-            "peakrank": True,
-            "leaderboard": True,
-        },
-    }
+    default_config = DEFAULT_CONFIG
 
     try:
         with open("config.json", "r") as openfile:
@@ -32,6 +22,7 @@ def configure():
     menu_choices = [
         "Basic Config (Suitable for most users)",
         "Advance Config (I know what i am doing!)",
+        "Optional Feature Flags"
     ]
 
     choice = inquirer.select(
@@ -42,6 +33,8 @@ def configure():
 
     if choice is menu_choices[0]:
         changed_config = prompt(basic_questions(config=user_config))
+    elif choice is menu_choices[2]:
+        changed_config = prompt([flags_question(config=user_config)])
     else:
         changed_config = prompt(advance_questions(config=user_config))
 
