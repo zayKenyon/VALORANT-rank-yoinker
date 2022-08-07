@@ -1,23 +1,14 @@
 import json
 
 from InquirerPy import inquirer, prompt
+from src.constants import DEFAULT_CONFIG
 
-from src.questions.advance import advance_questions
-from src.questions.basic import basic_questions
+from src.questions import advance_questions
+from src.questions import basic_questions
 
 
 def configure():
-    default_config = {
-        "cooldown": 10,
-        "weapon": "Vandal",
-        "port": 1100,
-        "table": {
-            "skin": True,
-            "rr": True,
-            "peakrank": True,
-            "leaderboard": True,
-        },
-    }
+    default_config = DEFAULT_CONFIG
 
     try:
         with open("config.json", "r") as openfile:

@@ -135,3 +135,15 @@ WEAPONS = [
     "Odin",
     "Melee",
 ]
+
+DEFAULT_CONFIG = {
+        "cooldown": 10,
+        "weapon": "Vandal",
+        "port": 1100,
+        "table": {
+            "skin": True,
+            "rr": True,
+            "peakrank": True,
+            "leaderboard": True,
+        },
+    }
