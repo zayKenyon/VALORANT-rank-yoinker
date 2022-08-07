@@ -64,7 +64,7 @@ class Colors:
         except ValueError:
             return "N/a"
         dark_red = (64, 15, 10)
-        yellow = (245, 232, 51)
+        yellow = (140, 119, 11)
         green = (18, 204, 25)
         white = (255, 255, 255)
         gradients = {
@@ -96,7 +96,7 @@ class Colors:
         except ValueError:
             return "N/a"
         dark_red = (64, 15, 10)
-        yellow = (245, 232, 51)
+        yellow = (140, 119, 11)
         green = (18, 204, 25)
         white = (255, 255, 255)
         gradients = {
