@@ -76,7 +76,7 @@ try:
     cfg = Config(log)
 
     rank = Rank(Requests, log, before_ascendant_seasons)
-    pstats = PlayerStats(Requests, log)
+    pstats = PlayerStats(Requests, log, cfg)
 
     content = Content(Requests, log)
 
@@ -547,7 +547,7 @@ try:
                 table.set_title(f"VALORANT status: {title}")
             server = ""
             if title is not None:
-                if cfg.get_flag("auto_hide_leaderboard") and (not is_leaderboard_needed):
+                if cfg.get_feature_flag("auto_hide_leaderboard") and (not is_leaderboard_needed):
                     table.set_runtime_col_flag('Pos.', False)
 
                 table.display()
@@ -558,7 +558,7 @@ try:
                                         #     "agent": curr_player_stat["agent"],
                                         #     "time_diff": time.time() - curr_player_stat["time"]
                                         # })
-                if cfg.get_flag("last_played"):
+                if cfg.get_feature_flag("last_played"):
                     for played in already_played_with:
                         print("\n") 
                         print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
