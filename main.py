@@ -525,7 +525,7 @@ try:
                                         # })
                 if cfg.get_flag("last_played"):
                     for played in already_played_with:
-                        print("\n")
+                        print("\n") 
                         print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
