@@ -47,6 +47,7 @@ class Loadouts:
                             # else:
                             #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
+        # self.log(f"json for website: {final_json}")
         self.Server.send_message(json.dumps(final_json))
         return weaponLists
 
