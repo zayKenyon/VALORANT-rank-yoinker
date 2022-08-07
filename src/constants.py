@@ -137,9 +137,8 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
-        "cooldown": 10,
-        "weapon": "Vandal",
         "port": 1100,
+        "weapon": "Vandal",
         "table": {
             "skin": True,
             "rr": True,
