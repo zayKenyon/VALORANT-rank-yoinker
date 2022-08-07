@@ -1,10 +1,11 @@
 <template>
     <div class="basicdiv" @click="$emit('openModal', PlayerLoadout)">
         <img class="agent_img" :src="PlayerLoadout.Agent" :alt="PlayerLoadout.AgentArtworkName">
-        <button class="btn btn--light">
-            <span class="btn__inner">
+
+        <button class="btn btn--light" :class="{ btn_blue: blue }">
+            <span class="btn__inner" :class="{ btn_blue: blue }">
                 <span class="btn__slide"></span>
-                <span class="btn__content">{{ PlayerLoadout.AgentArtworkName.substring(0, PlayerLoadout.AgentArtworkName.length - 7) }}</span>
+                <span class="btn__content">{{ PlayerLoadout.Name }}</span>
             </span>
         </button>
         <!-- <div class="weapon_img_div"> -->
@@ -23,13 +24,12 @@ export default {
     props: ["PlayerLoadout"],
     data() {
         return {
-
+            blue: this.PlayerLoadout.Team == "Blue"
         }
     },
     mounted() {
         console.log("test")
     }
-
 }
 </script>
 
@@ -135,6 +135,12 @@ export default {
     background-color: var(--button-background-color);
     overflow: hidden;
     box-shadow: inset 0px 0px 0px 1px var(--button-inner-border-color);
+    }
+
+    .btn_blue {
+        color: #1971ff;
+        box-shadow: inset 0px 0px 0px 1px #1971ff;
+        /* background-color: ; */
     }
 
     .btn__inner::before {
