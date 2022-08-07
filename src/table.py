@@ -13,7 +13,8 @@ class Table:
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
-            True, #wr need to be changed to be optional in future default true
+            bool(config.table.get("headshot_percent", True)), #hs need to be changed to be optional in future default true
+            bool(config.table.get("winrate", True)), #wr need to be changed to be optional in future default true
             True,  # Level
         ]
         self.runtime_col_flags = self.col_flags[:] # making a copy
@@ -26,6 +27,7 @@ class Table:
             "RR",
             "Peak Rank",
             "Pos.",
+            "HS",
             "WR",
             "Level",
         ]

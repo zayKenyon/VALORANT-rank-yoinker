@@ -50,13 +50,17 @@ class Rank:
             rank.append(max_rank)
         else:
             rank.append(max_rank)
-
-        wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
-        total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
         try:
-            wr = int(wins / total_games * 100)
-        except ZeroDivisionError:
-            wr = 100
+            wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
+            total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
+            try:
+                wr = int(wins / total_games * 100)
+            except ZeroDivisionError: #no loses
+                wr = 100
+        except (KeyError, TypeError): #haven't played this season, #no data?
+            wr = "N/a"
+
+
         rank.append(wr)
         return [rank, response.ok]
 

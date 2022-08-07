@@ -57,3 +57,67 @@ class Colors:
             return color(agent, fore=agent_color)
         else:
             return agent
+
+    def get_hs_gradient(self, number):
+        try:
+            number = int(number)
+        except ValueError:
+            return "N/a"
+        dark_red = (64, 15, 10)
+        yellow = (245, 232, 51)
+        green = (18, 204, 25)
+        white = (255, 255, 255)
+        gradients = {
+            (0, 25): (dark_red, yellow),
+            (25, 50): (yellow, green),
+            (50, 100): (green, white)
+        }
+        f = []
+        for gradient in gradients:
+            if gradient[0] <= number <= gradient[1]:
+                for rgb in range(3):
+                    if gradients[gradient][0][rgb] > gradients[gradient][1][rgb]:
+                        firstHigher = True
+                    else:
+                        firstHigher = False
+                    if firstHigher:
+                        offset = gradients[gradient][0][rgb] - gradients[gradient][1][rgb]
+                    else:
+                        offset = gradients[gradient][1][rgb] - gradients[gradient][0][rgb]
+                    if firstHigher:
+                        f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
+                    else:
+                        f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
+                return color(number, fore=f)
+
+    def get_wr_gradient(self, number):
+        try:
+            number = int(number)
+        except ValueError:
+            return "N/a"
+        dark_red = (64, 15, 10)
+        yellow = (245, 232, 51)
+        green = (18, 204, 25)
+        white = (255, 255, 255)
+        gradients = {
+            (0, 45): (dark_red, yellow),
+            (45, 55): (yellow, green),
+            (55, 100): (green, white)
+        }
+        f = []
+        for gradient in gradients:
+            if gradient[0] <= number <= gradient[1]:
+                for rgb in range(3):
+                    if gradients[gradient][0][rgb] > gradients[gradient][1][rgb]:
+                        firstHigher = True
+                    else:
+                        firstHigher = False
+                    if firstHigher:
+                        offset = gradients[gradient][0][rgb] - gradients[gradient][1][rgb]
+                    else:
+                        offset = gradients[gradient][1][rgb] - gradients[gradient][0][rgb]
+                    if firstHigher:
+                        f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
+                    else:
+                        f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
+                return color(number, fore=f)
