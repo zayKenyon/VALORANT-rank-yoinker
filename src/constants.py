@@ -1,5 +1,5 @@
-from colr import color
 import requests
+from colr import color
 
 version = "2.1"
 enablePrivateLogging = False
@@ -137,6 +137,7 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
+        "cooldown": 10,
         "port": 1100,
         "weapon": "Vandal",
         "table": {
