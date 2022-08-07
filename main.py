@@ -524,7 +524,8 @@ try:
                                         #     "time_diff": time.time() - curr_player_stat["time"]
                                         # })
                 for played in already_played_with:
-                    print(f"\nAlready played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                    print("\n")
+                    print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
