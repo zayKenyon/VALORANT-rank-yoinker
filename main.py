@@ -7,6 +7,7 @@ import time
 from prettytable import PrettyTable
 from alive_progress import alive_bar
 import asyncio
+from InquirerPy import inquirer
 
 from src.constants import *
 from src.requestsV import Requests
@@ -53,8 +54,13 @@ try:
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
-            input("press enter to exit...\n")
-            os._exit(0)
+            run_app = inquirer.confirm(
+                message="Do you want to run vRY now?", default=True
+            ).execute()
+            if run_app:
+                os.system('cls')
+            else:
+                os._exit(0)
     except Exception as e:
         print("Something went wrong while running configurator!")
         log(f"configurator encountered an error: {str(e)}")

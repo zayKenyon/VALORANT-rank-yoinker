@@ -1,5 +1,5 @@
-from colr import color
 import requests
+from colr import color
 
 version = "2.1"
 enablePrivateLogging = False
@@ -138,13 +138,15 @@ WEAPONS = [
 
 DEFAULT_CONFIG = {
         "cooldown": 10,
-        "weapon": "Vandal",
         "port": 1100,
+        "weapon": "Vandal",
         "table": {
             "skin": True,
             "rr": True,
             "peakrank": True,
             "leaderboard": True,
+            "headshot_percent": True,
+            "winrate": True
         },
         "flags": {
             "last_played": True,
