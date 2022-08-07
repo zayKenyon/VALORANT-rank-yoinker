@@ -8,6 +8,11 @@ TABLE_OPTS = {
     "peakrank": "Peak Rank",
 }
 
+FLAGS_OPTS = {
+	"last_played": "Last Played Stats",
+	"auto_hide_leaderboard": "Auto Hide Leaderboard Column"
+}
+
 weapon_question = {
         "type": "fuzzy",
         "name": "weapon",
@@ -43,6 +48,18 @@ cooldown_question = lambda config: {
         "message": "Please enter cooldown time in seconds:",
         "default": config.get("cooldown", 10),
         "filter": lambda ans: int(ans)
+    }
+
+flags_question = lambda config: {
+        "type": "checkbox",
+        "name": "flags",
+        "message": "Please select optional features:",
+        "choices": [
+            Choice(k, name=v, enabled=config.get("flags",{}).get(k, True))
+            for k, v in FLAGS_OPTS.items()
+        ],
+        "filter": lambda flags: {k: k in flags for k in FLAGS_OPTS.keys()},
+        "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
     }
 
 basic_questions = lambda config: [

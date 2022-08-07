@@ -58,7 +58,8 @@ class Config:
             else:   
                 self.weapon = config["weapon"]
             
-                
+    def get_flag(self,key):
+        return self.__dict__.get("flags",{}).get(key,True)            
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
         self.log("color config prompt called")

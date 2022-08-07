@@ -512,7 +512,7 @@ try:
                 table.set_title(f"VALORANT status: {title}")
             server = ""
             if title is not None:
-                if(not is_leaderboard_needed):
+                if cfg.get_flag("auto_hide_leaderboard") and (not is_leaderboard_needed):
                     table.set_runtime_col_flag('Pos.', False)
 
                 table.display()
@@ -523,8 +523,9 @@ try:
                                         #     "agent": curr_player_stat["agent"],
                                         #     "time_diff": time.time() - curr_player_stat["time"]
                                         # })
-                for played in already_played_with:
-                    print(f"\nAlready played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                if cfg.get_flag("last_played"):
+                    for played in already_played_with:
+                        print(f"\nAlready played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")

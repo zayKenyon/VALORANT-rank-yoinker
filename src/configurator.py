@@ -3,8 +3,7 @@ import json
 from InquirerPy import inquirer, prompt
 from src.constants import DEFAULT_CONFIG
 
-from src.questions import advance_questions
-from src.questions import basic_questions
+from src.questions import basic_questions, advance_questions, flags_question 
 
 
 def configure():
@@ -23,6 +22,7 @@ def configure():
     menu_choices = [
         "Basic Config (Suitable for most users)",
         "Advance Config (I know what i am doing!)",
+        "Optional Feature Flags"
     ]
 
     choice = inquirer.select(
@@ -33,6 +33,8 @@ def configure():
 
     if choice is menu_choices[0]:
         changed_config = prompt(basic_questions(config=user_config))
+    elif choice is menu_choices[2]:
+        changed_config = prompt([flags_question(config=user_config)])
     else:
         changed_config = prompt(advance_questions(config=user_config))
 

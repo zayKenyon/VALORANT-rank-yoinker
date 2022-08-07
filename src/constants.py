@@ -146,4 +146,8 @@ DEFAULT_CONFIG = {
             "peakrank": True,
             "leaderboard": True,
         },
+        "flags": {
+            "last_played": True,
+            "auto_hide_leaderboard": True
+        }
     }
