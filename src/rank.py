@@ -50,6 +50,14 @@ class Rank:
             rank.append(max_rank)
         else:
             rank.append(max_rank)
+
+        wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
+        total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
+        try:
+            wr = int(wins / total_games * 100)
+        except ZeroDivisionError:
+            wr = 100
+        rank.append(wr)
         return [rank, response.ok]
 
 
@@ -69,13 +77,13 @@ if __name__ == "__main__":
 
     Requests = Requests(version, log, ErrorSRC)
     #custom region
-    Requests.pd_url = "https://pd.ap.a.pvp.net"
+    # Requests.pd_url = "https://pd.ap.a.pvp.net"
 
     #season id
     s_id = "67e373c7-48f7-b422-641b-079ace30b427" 
 
     r = Rank(Requests, log, before_ascendant_seasons)
 
-    res = r.get_rank("puuid", s_id)
+    res = r.get_rank("", s_id)
     print(res)
-    print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}")
+    print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")

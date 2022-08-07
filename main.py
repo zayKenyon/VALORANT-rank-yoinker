@@ -302,6 +302,8 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        wr = playerRank[4]
+
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
 
@@ -316,6 +318,7 @@ try:
                                               rr,
                                               peakRank,
                                               leaderboard,
+                                              wr,
                                               level
                                               ])
                         stats.save_data(
@@ -428,6 +431,8 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        wr = playerRank[4]
+
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
 
@@ -443,6 +448,7 @@ try:
                                               rr,
                                               peakRank,
                                               leaderboard,
+                                              wr,
                                               level,
                                               ])
                         bar()
@@ -485,6 +491,8 @@ try:
                         # LEADERBOARD
                         leaderboard = playerRank[2]
 
+                        wr = playerRank[4]
+
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
 
@@ -499,6 +507,7 @@ try:
                                               rr,
                                               peakRank,
                                               leaderboard,
+                                              wr,
                                               level
                                               ])
                         # table.add_rows([])
