@@ -6,6 +6,8 @@ TABLE_OPTS = {
     "rr": "Ranked Rating",
     "leaderboard": "Leaderboard Position",
     "peakrank": "Peak Rank",
+    "headshot_percent": "Headshot Percentage",
+    "winrate": "WinRate"
 }
 
 FLAGS_OPTS = {

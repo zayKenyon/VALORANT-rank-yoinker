@@ -145,6 +145,8 @@ DEFAULT_CONFIG = {
             "rr": True,
             "peakrank": True,
             "leaderboard": True,
+            "headshot_percent": True,
+            "winrate": True
         },
         "flags": {
             "last_played": True,
