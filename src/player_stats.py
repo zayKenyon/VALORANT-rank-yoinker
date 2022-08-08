@@ -28,7 +28,8 @@ class PlayerStats:
                             total_headshots += hits["headshots"]
 
             # print(f"Total hits: {total_hits}\nTotal headshots: {total_headshots}\nHS%: {round((total_headshots/total_hits)*100, 1)}")
-
+            if total_hits == 0: # No hits
+                return "N/a"
             hs = int((total_headshots/total_hits)*100)
             return hs
         except IndexError: #no matches
