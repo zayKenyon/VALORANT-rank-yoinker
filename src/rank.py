@@ -8,7 +8,7 @@ class Rank:
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
-        # pyperclip.copy(str(response.json()))
+        pyperclip.copy(str(response.json()))
         try:
             if response.ok:
                 # self.log("retrieved rank successfully")
@@ -23,19 +23,19 @@ class Rank:
                             r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
                             0]
                 else:
-                    rank = [0, 0, 0, 0, 0]
+                    rank = [0, 0, 0]
 
             else:
                 self.log("failed getting rank")
                 self.log(response.text)
-                rank = [0, 0, 0, 0, 0]
+                rank = [0, 0, 0]
                 rankTIER = 0
         except TypeError:
             rankTIER = 0
-            rank = [0, 0, 0, 0, 0]
+            rank = [0, 0, 0]
         except KeyError:
             rankTIER = 0
-            rank = [0, 0, 0, 0, 0]
+            rank = [0, 0, 0]
         max_rank = rankTIER
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
@@ -58,6 +58,7 @@ class Rank:
             except ZeroDivisionError: #no loses
                 wr = 100
         except (KeyError, TypeError): #haven't played this season, #no data?
+            # print("test")
             wr = "N/a"
 
 
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 
     Requests = Requests(version, log, ErrorSRC)
     #custom region
-    # Requests.pd_url = "https://pd.ap.a.pvp.net"
+    # Requests.pd_url = "https://pd.na.a.pvp.net"
 
     #season id
     s_id = "67e373c7-48f7-b422-641b-079ace30b427" 
@@ -90,4 +91,5 @@ if __name__ == "__main__":
 
     res = r.get_rank("", s_id)
     print(res)
+    #[[rank, rr, leadeboard, peak rank, wr,] status]
     print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")
