@@ -1,5 +1,19 @@
+from typing import Literal, get_args
 from prettytable import PrettyTable
 
+TABLE_COLUMN_NAMES = Literal[
+            "Party",
+            "Agent",
+            "Name",
+            "Skin",
+            "Rank",
+            "RR",
+            "Peak Rank",
+            "Pos.",
+            "HS",
+            "WR",
+            "Level",
+        ]
 
 class Table:
     def __init__(self,config):
@@ -18,19 +32,7 @@ class Table:
             True,  # Level
         ]
         self.runtime_col_flags = self.col_flags[:] # making a copy
-        self.field_names_candidates = [
-            "Party",
-            "Agent",
-            "Name",
-            "Skin",
-            "Rank",
-            "RR",
-            "Peak Rank",
-            "Pos.",
-            "HS",
-            "WR",
-            "Level",
-        ]
+        self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
@@ -55,7 +57,7 @@ class Table:
     def reset_runtime_col_flags(self):
         self.runtime_col_flags = self.col_flags[:]
 
-    def set_runtime_col_flag(self,field_name,flag):
+    def set_runtime_col_flag(self,field_name: TABLE_COLUMN_NAMES,flag: bool):
         index = self.field_names_candidates.index(field_name)
         self.runtime_col_flags[index] = flag
 

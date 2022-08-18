@@ -62,7 +62,7 @@ class Colors:
         try:
             number = int(number)
         except ValueError:
-            return "N/a"
+            return color("N/a",fore=(46, 46, 46))
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)
@@ -94,7 +94,7 @@ class Colors:
         try:
             number = int(number)
         except ValueError:
-            return "N/a"
+            return color("N/a",fore=(46, 46, 46))
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)

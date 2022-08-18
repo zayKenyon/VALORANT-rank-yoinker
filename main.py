@@ -4,7 +4,6 @@ import urllib3
 import os
 import sys
 import time
-from prettytable import PrettyTable
 from alive_progress import alive_bar
 import asyncio
 from InquirerPy import inquirer
@@ -550,6 +549,10 @@ try:
                 if cfg.get_feature_flag("auto_hide_leaderboard") and (not is_leaderboard_needed):
                     table.set_runtime_col_flag('Pos.', False)
 
+                if game_state == "MENUS":
+                    table.set_runtime_col_flag('Agent',False)
+                    table.set_runtime_col_flag('Skin',False)
+
                 table.display()
                 print(f"VALORANT rank yoinker v{version}")
                                         #                 {
@@ -568,11 +571,10 @@ try:
         else:
             # time.sleep(cfg.cooldown)
             pass
-except:
+except KeyboardInterrupt:
     #lame implementation of fast ctrl+c exit
-    if str(traceback.format_exc()[-18:-1]) == "KeyboardInterrupt":
-        os._exit(1)
-
+    os._exit(0)
+except:
     log(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
