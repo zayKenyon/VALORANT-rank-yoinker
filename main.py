@@ -4,7 +4,6 @@ import urllib3
 import os
 import sys
 import time
-from prettytable import PrettyTable
 from alive_progress import alive_bar
 import asyncio
 from InquirerPy import inquirer
