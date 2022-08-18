@@ -568,11 +568,10 @@ try:
         else:
             # time.sleep(cfg.cooldown)
             pass
-except:
+except KeyboardInterrupt:
     #lame implementation of fast ctrl+c exit
-    if str(traceback.format_exc()[-18:-1]) == "KeyboardInterrupt":
-        os._exit(1)
-
+    os._exit(0)
+except:
     log(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
