@@ -4,10 +4,9 @@ import ssl
 import base64
 import json
 
-print_messages = False
 
 class Ws:
-    def __init__(self, lockfile, Requests):
+    def __init__(self, lockfile, Requests, cfg):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -16,6 +15,7 @@ class Ws:
         self.ssl_context.check_hostname = False
         self.ssl_context.verify_mode = ssl.CERT_NONE
         self.id_seen = []
+        self.cfg = cfg
 
     # async def conntect_to_websocket(self, initial_game_state):
 
@@ -67,7 +67,7 @@ class Ws:
             if resp_json[2].get("uri") == "/chat/v6/messages":
                 message = resp_json[2]["data"]["messages"][0]
                 if message["id"] not in self.id_seen:
-                    if print_messages:
+                    if self.cfg.get_feature_flag("game_chat"):
                         print(f"{message['game_name']}#{message['game_tag']}: {message['body']}")
                     self.id_seen.append(message['id'])
 
