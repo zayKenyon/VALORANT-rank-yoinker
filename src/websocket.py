@@ -4,6 +4,8 @@ import ssl
 import base64
 import json
 
+print_messages = False
+
 class Ws:
     def __init__(self, lockfile, Requests):
 
@@ -13,22 +15,23 @@ class Ws:
         self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.ssl_context.check_hostname = False
         self.ssl_context.verify_mode = ssl.CERT_NONE
+        self.id_seen = []
 
-    async def conntect_to_websocket(self, initial_game_state):
+    # async def conntect_to_websocket(self, initial_game_state):
 
 
-        local_headers = {}
-        local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
-        url = f"wss://127.0.0.1:{self.lockfile['port']}"
-        self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
-        async with self.websocket_client as websocket:
-            await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
-            return None
-            # while True:
-            #     response = await websocket.recv()
-            #     h = self.handle(response, initial_game_state)
-            #     if h is not None:
-            #         return h
+    #     local_headers = {}
+    #     local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
+    #     url = f"wss://127.0.0.1:{self.lockfile['port']}"
+    #     self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
+    #     async with self.websocket_client as websocket:
+    #         await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
+    #         return None
+    #         # while True:
+    #         #     response = await websocket.recv()
+    #         #     h = self.handle(response, initial_game_state)
+    #         #     if h is not None:
+    #         #         return h
 
 
     async def recconect_to_websocket(self, initial_game_state):
@@ -39,6 +42,7 @@ class Ws:
         self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
         async with self.websocket_client as websocket:
             await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
+            await websocket.send('[5, "OnJsonApiEvent_chat_v6_messages"]')
             while True:
                 response = await websocket.recv()
                 h = self.handle(response, initial_game_state)
@@ -48,23 +52,24 @@ class Ws:
 
     def handle(self, m, initial_game_state):
         if len(m) > 10:
-            presence = json.loads(m[38:-1])
-            n_presence = presence["data"]["presences"][0]
-            # print(n_presence)
-            # print(type(n_presence))
-            if n_presence['puuid'] == self.Requests.puuid:
-            # if n_presence['puuid'] == "963ad672-61e1-537e-8449-06ece1a5ceb7":
-            # #preventing vry from crashing when lol is open
-            # print(presence)
-            # print(presence.get("championId"))
-                if n_presence.get("championId") is not None or n_presence.get("product") == "league_of_legends":
-                    state = None
-                else:
-                    state = json.loads(base64.b64decode(n_presence['private']))["sessionLoopState"]
-                
-                if state is not None:
-                    if state != initial_game_state:
-                        return state
+            resp_json = json.loads(m)
+            if resp_json[2].get("uri") == "/chat/v4/presences":
+                presence = resp_json[2]["data"]["presences"][0]
+                if presence['puuid'] == self.Requests.puuid:
+                    if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
+                        state = None
+                    else:
+                        state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
+                    
+                    if state is not None:
+                        if state != initial_game_state:
+                            return state
+            if resp_json[2].get("uri") == "/chat/v6/messages":
+                message = resp_json[2]["data"]["messages"][0]
+                if message["id"] not in self.id_seen:
+                    if print_messages:
+                        print(f"{message['game_name']}#{message['game_tag']}: {message['body']}")
+                    self.id_seen.append(message['id'])
 
 # if __name__ == "__main__":
 #     try:
