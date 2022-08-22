@@ -12,7 +12,8 @@ TABLE_OPTS = {
 
 FLAGS_OPTS = {
 	"last_played": "Last Played Stats",
-	"auto_hide_leaderboard": "Auto Hide Leaderboard Column"
+	"auto_hide_leaderboard": "Auto Hide Leaderboard Column",
+    "pre_cls": "Pre-Clear Screen"
 }
 
 weapon_question = lambda config: {
