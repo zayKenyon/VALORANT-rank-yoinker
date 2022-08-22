@@ -62,7 +62,8 @@ try:
                 os._exit(0)
     except Exception as e:
         print("Something went wrong while running configurator!")
-        log(f"configurator encountered an error: {str(e)}")
+        log(f"configurator encountered an error")
+        log(str(traceback.format_exc()))
         input("press enter to exit...\n")
         os._exit(1)
 
@@ -102,7 +103,7 @@ try:
 
     stats = Stats()
 
-    Wss = Ws(Requests.lockfile, Requests)
+    Wss = Ws(Requests.lockfile, Requests, cfg)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
