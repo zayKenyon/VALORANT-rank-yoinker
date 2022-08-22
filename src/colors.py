@@ -40,11 +40,11 @@ class Colors:
 
     def level_to_color(self, level):
         if level >= 400:
-            return color(level, fore=(0, 255, 255))
+            return color(level, fore=(102, 212, 212))
         elif level >= 300:
-            return color(level, fore=(255, 255, 0))
+            return color(level, fore=(207, 207, 76))
         elif level >= 200:
-            return color(level, fore=(0, 0, 255))
+            return color(level, fore=(71, 71, 204))
         elif level >= 100:
             return color(level, fore=(241, 144, 54))
         elif level < 100:
