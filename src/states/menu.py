@@ -20,6 +20,10 @@ class Menu:
                             party_json[decodedPresence["partyId"]].append(presence["puuid"])
                         except KeyError:
                             party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
+        for party in party_json:
+            if len(party_json[party]) == 1:
+                del party_json[party]
+
         self.log(f"retrieved party json: {party_json}")
         return party_json
 
