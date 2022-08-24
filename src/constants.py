@@ -3,8 +3,8 @@ from colr import color
 
 version = "2.21"
 enablePrivateLogging = True
-hide_names = False
-hide_levels = False
+hide_names = True
+hide_levels = True
 
 
 before_ascendant_seasons = [
