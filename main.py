@@ -570,9 +570,10 @@ try:
                                         #     "time_diff": time.time() - curr_player_stat["time"]
                                         # })
                 if cfg.get_feature_flag("last_played"):
-                    for played in already_played_with:
-                        print("\n") 
-                        print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                    if len(already_played_with) > 0:
+                        print("\n")
+                        for played in already_played_with:
+                            print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
