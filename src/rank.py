@@ -16,7 +16,7 @@ class Rank:
             "leaderboard": None,
             "peakrank": None,
             "wr": None,
-            "numberofgames": None,
+            "numberofgames": 0,
             "peakrankact": None,
             "peakrankep": None,
             "statusgood": None,
