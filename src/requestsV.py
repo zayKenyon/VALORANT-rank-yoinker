@@ -51,7 +51,7 @@ class Requests:
                 response = requests.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
-                if response["errorCode"] == "BAD_CLAIMS":
+                if response.json().get("errorCode") == "BAD_CLAIMS":
                     self.headers = {}
                     return self.fetch(url_type, endpoint, method)
                 if not response.ok:
@@ -67,8 +67,8 @@ class Requests:
                     f" response code: {response.status_code}")
                 if response.status_code == 404:
                     return response
-                    
-                if response["errorCode"] == "BAD_CLAIMS":
+
+                if response.json().get("errorCode") == "BAD_CLAIMS":
                     self.headers = {}
                     return self.fetch(url_type, endpoint, method)
 
