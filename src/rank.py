@@ -9,34 +9,59 @@ class Rank:
     def get_rank(self, puuid, seasonID):
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
         # pyperclip.copy(str(response.json()))
+        final = {
+            "rank": None,
+            "rr": None,
+            "leaderboard": None,
+            "peakrank": None,
+            "wr": None,
+            "numberofgames": None,
+            "peakrankact": None,
+            "peakrankep": None,
+            "statusgood": None,
+            "statuscode": None,
+            }
         try:
             if response.ok:
                 # self.log("retrieved rank successfully")
                 r = response.json()
                 rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
                 if int(rankTIER) >= 21:
-                    rank = [rankTIER,
-                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
+                    # rank = [rankTIER,
+                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
+
+                    final["rank"] = rankTIER
+                    final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
+                    final["leaderboard"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]
                 elif int(rankTIER) not in (0, 1, 2):
-                    rank = [rankTIER,
-                            r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            0]
+                    final["rank"] = rankTIER
+                    final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
+                    final["leaderboard"] = 0
+
+                    # rank = [rankTIER,
+                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
+                            # 0]
                 else:
-                    rank = [0, 0, 0]
+                    final["rank"] = 0
+                    final["rr"] = 0
+                    final["leaderboard"] = 0
 
             else:
                 self.log("failed getting rank")
                 self.log(response.text)
-                rank = [0, 0, 0]
-                rankTIER = 0
+                final["rank"] = 0
+                final["rr"] = 0
+                final["leaderboard"] = 0
         except TypeError:
-            rankTIER = 0
-            rank = [0, 0, 0]
+            final["rank"] = 0
+            final["rr"] = 0
+            final["leaderboard"] = 0
         except KeyError:
-            rankTIER = 0
-            rank = [0, 0, 0]
-        max_rank = rankTIER
+            final["rank"] = 0
+            final["rr"] = 0
+            final["leaderboard"] = 0
+        max_rank = final["rank"]
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
             for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
@@ -47,12 +72,15 @@ class Rank:
                                 winByTier = int(winByTier) + 3
                         if int(winByTier) > max_rank:
                             max_rank = int(winByTier)
-            rank.append(max_rank)
+            # rank.append(max_rank)
+            final["peakrank"] = max_rank
         else:
-            rank.append(max_rank)
+            # rank.append(max_rank)
+            final["peakrank"] = max_rank
         try:
             wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
             total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
+            final["numberofgames"] = total_games
             try:
                 wr = int(wins / total_games * 100)
             except ZeroDivisionError: #no loses
@@ -62,8 +90,11 @@ class Rank:
             wr = "N/a"
 
 
-        rank.append(wr)
-        return [rank, response.ok]
+        # rank.append(wr)
+        final["wr"] = wr
+        final["statusgood"] = response.ok
+        final["statuscode"] = response.status_code
+        return final
 
 
 if __name__ == "__main__":
@@ -92,4 +123,4 @@ if __name__ == "__main__":
     res = r.get_rank("", s_id)
     print(res)
     #[[rank, rr, leadeboard, peak rank, wr,] status]
-    print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")
+    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")

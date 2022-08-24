@@ -260,14 +260,13 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
-                        rankStatus = playerRank[1]
+                        # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
                         #     print("You have been rate limited, 😞 waiting 10 seconds!")
                         #     time.sleep(10)
                         #     playerRank = rank.get_rank(player["Subject"], seasonID)
                         #     rankStatus = playerRank[1]
-                        playerRank = playerRank[0]
 
                         hs = pstats.get_stats(player["Subject"])
 
@@ -309,20 +308,20 @@ try:
                         skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank[0]]
+                        rankName = NUMBERTORANKS[playerRank["rank"]]
 
                         # RANK RATING
-                        rr = playerRank[1]
+                        rr = playerRank["rr"]
 
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank[3]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
 
                         # LEADERBOARD
-                        leaderboard = playerRank[2]
+                        leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank[4])
+                        wr = colors.get_wr_gradient(playerRank["wr"])
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -348,7 +347,7 @@ try:
                                     "name": names[player["Subject"]],
                                     "agent": agent_dict[player["CharacterID"].lower()],
                                     "map": map_dict[coregame_stats["MapID"].lower()],
-                                    "rank": playerRank[0],
+                                    "rank": playerRank["rank"],
                                     "rr": rr,
                                     "match_id": coregame.match_id,
                                     "epoch": time.time(),
@@ -393,14 +392,14 @@ try:
                                     party_icon = partyIcons[party]
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
-                        rankStatus = playerRank[1]
+                        # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
                         #     print("You have been rate limited, 😞 waiting 10 seconds!")
                         #     time.sleep(10)
                         #     playerRank = rank.get_rank(player["Subject"], seasonID)
                         #     rankStatus = playerRank[1]
-                        playerRank = playerRank[0]
+                        # playerRank = playerRank[0]
 
                         hs = pstats.get_stats(player["Subject"])
 
@@ -444,19 +443,19 @@ try:
                         # skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank[0]]
+                        rankName = NUMBERTORANKS[playerRank["rank"]]
 
                         # RANK RATING
-                        rr = playerRank[1]
+                        rr = playerRank["rr"]
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank[3]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
 
                         # LEADERBOARD
-                        leaderboard = playerRank[2]
+                        leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank[4])
+                        wr = colors.get_wr_gradient(playerRank["wr"])
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -488,14 +487,14 @@ try:
                     for player in Players:
                         party_icon = PARTYICONLIST[0]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
-                        rankStatus = playerRank[1]
+                        # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
                         #     print("You have been rate limited, 😞 waiting 10 seconds!")
                         #     time.sleep(10)
                         #     playerRank = rank.get_rank(player["Subject"], seasonID)
                         #     rankStatus = playerRank[1]
-                        playerRank = playerRank[0]
+                        # playerRank = playerRank["rank"]
 
                         hs = pstats.get_stats(player["Subject"])
 
@@ -509,19 +508,19 @@ try:
                         name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank[0]]
+                        rankName = NUMBERTORANKS[playerRank["rank"]]
 
                         # RANK RATING
-                        rr = playerRank[1]
+                        rr = playerRank["rr"]
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank[3]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
 
                         # LEADERBOARD
-                        leaderboard = playerRank[2]
+                        leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank[4])
+                        wr = colors.get_wr_gradient(playerRank["wr"])
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
