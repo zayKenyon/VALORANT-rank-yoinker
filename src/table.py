@@ -16,7 +16,7 @@ TABLE_COLUMN_NAMES = Literal[
         ]
 
 class Table:
-    def __init__(self,config):
+    def __init__(self,config,chatlog):
         self.pretty_table = PrettyTable()
         self.col_flags = [
             True,  # Party
@@ -36,6 +36,7 @@ class Table:
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
+        self.chatlog = chatlog
 
     def set_title(self, title):
         self.pretty_table.title = title
@@ -68,6 +69,7 @@ class Table:
         # extracting specific columns at runtime can sometimes lead to very minor padding issues
         # this can be problematic for OCD people, others might not notice
         print(self.pretty_table.get_string(fields=fields_to_display))
+        self.chatlog(self.pretty_table.get_string(fields=fields_to_display))
 
     def clear(self):
         self.pretty_table.clear()

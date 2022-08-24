@@ -6,7 +6,7 @@ import json
 from colr import color
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -23,6 +23,7 @@ class Ws:
         self.message_history = []
         self.up = "\033[A"
         self.chat_limit = 5
+        self.chatlog = chatlog
 
     def set_player_data(self, player_data):
         self.player_data = player_data
@@ -97,6 +98,7 @@ class Ws:
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
+        self.chatlog(message)
         self.messages += 1
         if self.messages > self.chat_limit:
             print(self.up * self.chat_limit, end="")
@@ -107,6 +109,7 @@ class Ws:
             print(message)
 
         self.message_history.append(message)
+
 
 # if __name__ == "__main__":
 #     try:

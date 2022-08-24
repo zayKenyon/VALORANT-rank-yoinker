@@ -32,6 +32,8 @@ from src.stats import Stats
 from src.configurator import configure
 from src.player_stats import PlayerStats
 
+from src.chatlogs import ChatLogging
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 os.system('cls')
@@ -50,6 +52,9 @@ try:
     Logging = Logging()
     log = Logging.log
 
+    ChatLogging = ChatLogging()
+    chatlog = ChatLogging.chatLog
+
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
@@ -66,6 +71,7 @@ try:
         log(str(traceback.format_exc()))
         input("press enter to exit...\n")
         os._exit(1)
+
 
     ErrorSRC = Error(log)
     
@@ -99,11 +105,11 @@ try:
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server)
-    table = Table(cfg)
+    table = Table(cfg, chatlog)
 
     stats = Stats()
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
@@ -119,6 +125,7 @@ try:
     lastGameState = ""
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
+    chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
 
 
     # loop = asyncio.new_event_loop()
@@ -592,6 +599,7 @@ try:
                 firstPrint = False
 
                 print(f"VALORANT rank yoinker v{version}")
+                chatlog(f"VALORANT rank yoinker v{version}")
                                         #                 {
                                         #     "times": sum(stats_data[player["Subject"]]),
                                         #     "name": curr_player_stat["name"],
@@ -603,6 +611,7 @@ try:
                         print("\n")
                         for played in already_played_with:
                             print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                            chatlog(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
@@ -615,6 +624,9 @@ except KeyboardInterrupt:
 except:
     log(traceback.format_exc())
     print(color(
+        "The program has encountered an error. If the problem persists, please reach support"
+        f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
+    chatlog(color(
         "The program has encountered an error. If the problem persists, please reach support"
         f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
     input("press enter to exit...\n")
