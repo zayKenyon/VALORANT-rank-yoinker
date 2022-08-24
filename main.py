@@ -103,7 +103,7 @@ try:
 
     stats = Stats()
 
-    Wss = Ws(Requests.lockfile, Requests, cfg)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
@@ -180,6 +180,16 @@ try:
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
+                #data for chat to function
+                presence = presences.get_presence()
+                partyMembers = menu.get_party_members(Requests.puuid, presence)
+                partyMembersList = [a["Subject"] for a in partyMembers]
+
+                players_data = {}
+                players_data.update({"ignore": partyMembersList})
+                for player in Players:
+                    players_data.update({player["Subject"]: {"team": player["TeamID"], "agent": player["CharacterID"], "streamer_mode": player["PlayerIdentity"]["Incognito"]}})
+                Wss.set_player_data(players_data)
                 try:
                     server = GAMEPODS[coregame_stats["GamePodID"]]
                 except KeyError:
@@ -188,10 +198,7 @@ try:
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
-                    partyMembers = menu.get_party_members(Requests.puuid, presence)
-                    partyMembersList = [a["Subject"] for a in partyMembers]
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)

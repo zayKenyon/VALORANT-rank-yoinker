@@ -3,10 +3,10 @@ import websockets.client
 import ssl
 import base64
 import json
-
+from colr import color
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -16,6 +16,13 @@ class Ws:
         self.ssl_context.verify_mode = ssl.CERT_NONE
         self.id_seen = []
         self.cfg = cfg
+        self.player_data = {}
+        self.messages = 0
+        self.colors = colors
+        self.hide_names = hide_names
+
+    def set_player_data(self, player_data):
+        self.player_data = player_data
 
     # async def conntect_to_websocket(self, initial_game_state):
 
@@ -42,7 +49,8 @@ class Ws:
         self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
         async with self.websocket_client as websocket:
             await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
-            await websocket.send('[5, "OnJsonApiEvent_chat_v6_messages"]')
+            if self.cfg.get_feature_flag("game_chat"):
+                await websocket.send('[5, "OnJsonApiEvent_chat_v6_messages"]')
             while True:
                 response = await websocket.recv()
                 h = self.handle(response, initial_game_state)
@@ -66,10 +74,25 @@ class Ws:
                             return state
             if resp_json[2].get("uri") == "/chat/v6/messages":
                 message = resp_json[2]["data"]["messages"][0]
-                if message["id"] not in self.id_seen:
-                    if self.cfg.get_feature_flag("game_chat"):
-                        print(f"{message['game_name']}#{message['game_tag']}: {message['body']}")
-                    self.id_seen.append(message['id'])
+                #currently only game chat no pregame or menu
+                if "ares-coregame" in message["cid"]:
+                    if message["id"] not in self.id_seen:
+                        if self.player_data[message["puuid"]]["team"] == "Red":
+                            clr = (238, 77, 77)
+                        else:
+                            clr = (76, 151, 237)
+                        agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
+                        self.messages += 1
+                        name = f"{message['game_name']}#{message['game_tag']}"
+                        if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
+                            print(f"{color(agent, clr)}: {message['body']}")
+                        else:
+                            if agent == "":
+                                agent_str = ""
+                            else:
+                                agent_str = f" ({agent})"
+                            print(f"{color(name, clr)}{agent_str}: {message['body']}")
+                        self.id_seen.append(message['id'])
 
 # if __name__ == "__main__":
 #     try:
