@@ -122,6 +122,8 @@ class Requests:
                                (line.split('https://glz-')[1].split(".")[1])]
                 if "pd_url" in locals().keys() and "glz_url" in locals().keys():
                     self.log(f"got region from logs '{[pd_url, glz_url]}'")
+                    if pd_url == "pbe":
+                        return ["na", "na-1", "na"]
                     return [pd_url, glz_url]
 
     def get_current_version(self):
