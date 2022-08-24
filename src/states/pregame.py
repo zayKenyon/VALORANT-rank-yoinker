@@ -20,8 +20,8 @@ class Pregame:
             self.log(f"retrieved pregame match id: '{match_id}'")
             return match_id
         except (KeyError, TypeError):
-            self.log(f"cannot find pregame match id: ")
-            print(f"No match id found. {self.response}")
+            self.log(f"cannot find pregame match id: {response}")
+            print(f"No match id found. {response}")
             return 0
 
     def get_pregame_stats(self):
