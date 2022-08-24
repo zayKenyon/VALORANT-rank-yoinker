@@ -275,7 +275,9 @@ try:
                         #     playerRank = rank.get_rank(player["Subject"], seasonID)
                         #     rankStatus = playerRank[1]
 
-                        hs = pstats.get_stats(player["Subject"])
+                        ppstats = pstats.get_stats(player["Subject"])
+                        hs = ppstats["hs"]
+                        kd = ppstats["kd"]
 
                         player_level = player["PlayerIdentity"].get("AccountLevel")
 
@@ -413,7 +415,9 @@ try:
                         #     rankStatus = playerRank[1]
                         # playerRank = playerRank[0]
 
-                        hs = pstats.get_stats(player["Subject"])
+                        ppstats = pstats.get_stats(player["Subject"])
+                        hs = ppstats["hs"]
+                        kd = ppstats["kd"]
 
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
@@ -500,69 +504,74 @@ try:
                 with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
+                    seen = []
                     for player in Players:
-                        party_icon = PARTYICONLIST[0]
-                        playerRank = rank.get_rank(player["Subject"], seasonID)
-                        # rankStatus = playerRank[1]
-                        #useless code since rate limit is handled in the requestsV
-                        # while not rankStatus:
-                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                        #     time.sleep(10)
-                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                        #     rankStatus = playerRank[1]
-                        # playerRank = playerRank["rank"]
+                        if player not in seen:
+                            party_icon = PARTYICONLIST[0]
+                            playerRank = rank.get_rank(player["Subject"], seasonID)
+                            # rankStatus = playerRank[1]
+                            #useless code since rate limit is handled in the requestsV
+                            # while not rankStatus:
+                            #     print("You have been rate limited, 😞 waiting 10 seconds!")
+                            #     time.sleep(10)
+                            #     playerRank = rank.get_rank(player["Subject"], seasonID)
+                            #     rankStatus = playerRank[1]
+                            # playerRank = playerRank["rank"]
 
-                        hs = pstats.get_stats(player["Subject"])
+                            ppstats = pstats.get_stats(player["Subject"])
+                            hs = ppstats["hs"]
+                            kd = ppstats["kd"]
 
-                        player_level = player["PlayerIdentity"].get("AccountLevel")
-                        PLcolor = colors.level_to_color(player_level)
+                            player_level = player["PlayerIdentity"].get("AccountLevel")
+                            PLcolor = colors.level_to_color(player_level)
 
-                        # AGENT
-                        agent = ""
+                            # AGENT
+                            agent = ""
 
-                        # NAME
-                        name = color(names[player["Subject"]], fore=(76, 151, 237))
+                            # NAME
+                            name = color(names[player["Subject"]], fore=(76, 151, 237))
 
-                        # RANK
-                        rankName = NUMBERTORANKS[playerRank["rank"]]
+                            # RANK
+                            rankName = NUMBERTORANKS[playerRank["rank"]]
 
-                        # RANK RATING
-                        rr = playerRank["rr"]
+                            # RANK RATING
+                            rr = playerRank["rr"]
 
-                        #short peak rank string
-                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
-                        if not cfg.get_feature_flag("peak_rank_act"):
-                            peakRankAct = ""
+                            #short peak rank string
+                            peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                            if not cfg.get_feature_flag("peak_rank_act"):
+                                peakRankAct = ""
 
-                        # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                            # PEAK RANK
+                            peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
-                        # LEADERBOARD
-                        leaderboard = playerRank["leaderboard"]
+                            # LEADERBOARD
+                            leaderboard = playerRank["leaderboard"]
 
-                        hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
+                            hs = colors.get_hs_gradient(hs)
+                            wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
 
-                        if(int(leaderboard)>0):
-                            is_leaderboard_needed = True
+                            if(int(leaderboard)>0):
+                                is_leaderboard_needed = True
 
-                        # LEVEL
-                        level = PLcolor
+                            # LEVEL
+                            level = PLcolor
 
-                        table.add_row_table([party_icon,
-                                              agent,
-                                              name,
-                                              "",
-                                              rankName,
-                                              rr,
-                                              peakRank,
-                                              leaderboard,
-                                              hs,
-                                              wr,
-                                              level
-                                              ])
-                        # table.add_rows([])
-                        bar()
+                            table.add_row_table([party_icon,
+                                                agent,
+                                                name,
+                                                "",
+                                                rankName,
+                                                rr,
+                                                peakRank,
+                                                leaderboard,
+                                                hs,
+                                                wr,
+                                                level
+                                                ])
+                            # table.add_rows([])
+                            bar()
+                    seen.append(player["Subject"])
             if (title := game_state_dict.get(game_state)) is None:
                 # program_exit(1)
                 time.sleep(9)
