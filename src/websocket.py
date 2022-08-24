@@ -20,6 +20,9 @@ class Ws:
         self.messages = 0
         self.colors = colors
         self.hide_names = hide_names
+        self.message_history = []
+        self.up = "\033[A"
+        self.chat_limit = 5
 
     def set_player_data(self, player_data):
         self.player_data = player_data
@@ -82,17 +85,28 @@ class Ws:
                         else:
                             clr = (76, 151, 237)
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
-                        self.messages += 1
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
-                            print(f"{color(agent, clr)}: {message['body']}")
+                            self.print_message(f"{color(agent, clr)}: {message['body']}")
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
-                            print(f"{color(name, clr)}{agent_str}: {message['body']}")
+                            self.print_message(f"{color(name, clr)}{agent_str}: {message['body']}")
                         self.id_seen.append(message['id'])
+
+    def print_message(self, message):
+        self.messages += 1
+        if self.messages > self.chat_limit:
+            print(self.up * self.chat_limit, end="")
+            for i in range(len(self.message_history) - self.chat_limit + 1, len(self.message_history)):
+                print(self.message_history[i] + " " * max([0, len(self.message_history[i-1]) - len(self.message_history[i])]))
+            print(message + " " * max([0, len(self.message_history[-1]) - len(message)]))
+        else:
+            print(message)
+
+        self.message_history.append(message)
 
 # if __name__ == "__main__":
 #     try:
