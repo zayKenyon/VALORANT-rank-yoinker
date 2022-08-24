@@ -14,7 +14,8 @@ FLAGS_OPTS = {
 	"last_played": "Last Played Stats",
 	"auto_hide_leaderboard": "Auto Hide Leaderboard Column",
     "pre_cls": "Pre-Clear Screen",
-    "game_chat": "Print Game Chat"
+    "game_chat": "Print Game Chat",
+    "peak_rank_act": "Peak Rank Act"
 }
 
 weapon_question = lambda config: {

@@ -1,9 +1,10 @@
 
 class Rank:
-    def __init__(self, Requests, log, ranks_before):
+    def __init__(self, Requests, log, content, ranks_before):
         self.Requests = Requests
         self.log = log
         self.ranks_before = ranks_before
+        self.content = content
 
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
@@ -62,6 +63,7 @@ class Rank:
             final["rr"] = 0
             final["leaderboard"] = 0
         max_rank = final["rank"]
+        max_rank_season = seasonID
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
             for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
@@ -72,6 +74,7 @@ class Rank:
                                 winByTier = int(winByTier) + 3
                         if int(winByTier) > max_rank:
                             max_rank = int(winByTier)
+                            max_rank_season = season
             # rank.append(max_rank)
             final["peakrank"] = max_rank
         else:
@@ -94,6 +97,12 @@ class Rank:
         final["wr"] = wr
         final["statusgood"] = response.ok
         final["statuscode"] = response.status_code
+        
+
+        #peak rank act and ep
+        peak_rank_act_ep = self.content.get_act_episode_from_act_id(max_rank_season)
+        final["peakrankact"] = peak_rank_act_ep["act"]
+        final["peakrankep"] = peak_rank_act_ep["episode"]
         return final
 
 

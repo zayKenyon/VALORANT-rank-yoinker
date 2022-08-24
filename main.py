@@ -75,10 +75,10 @@ try:
 
     cfg = Config(log)
 
-    rank = Rank(Requests, log, before_ascendant_seasons)
-    pstats = PlayerStats(Requests, log, cfg)
-
     content = Content(Requests, log)
+
+    rank = Rank(Requests, log, content, before_ascendant_seasons)
+    pstats = PlayerStats(Requests, log, cfg)
 
     namesClass = Names(Requests, log)
 
@@ -313,15 +313,20 @@ try:
                         # RANK RATING
                         rr = playerRank["rr"]
 
+                        #short peak rank string
+                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        if not cfg.get_feature_flag("peak_rank_act"):
+                            peakRankAct = ""
+
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"])
+                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -448,14 +453,18 @@ try:
                         # RANK RATING
                         rr = playerRank["rr"]
 
+                        #short peak rank string
+                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        if not cfg.get_feature_flag("peak_rank_act"):
+                            peakRankAct = ""
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"])
+                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -513,14 +522,19 @@ try:
                         # RANK RATING
                         rr = playerRank["rr"]
 
+                        #short peak rank string
+                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        if not cfg.get_feature_flag("peak_rank_act"):
+                            peakRankAct = ""
+
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"])
+                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
