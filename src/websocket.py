@@ -8,7 +8,7 @@ import re
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc=None):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -26,7 +26,8 @@ class Ws:
         self.up = "\033[A"
         self.chat_limit = 5
         self.chatlog = chatlog
-        self.rpc = rpc
+        if self.cfg.get_feature_flag("discord_rpc"):
+            self.rpc = rpc
 
     def set_player_data(self, player_data):
         self.player_data = player_data
@@ -77,7 +78,8 @@ class Ws:
                         state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
                     
                     if state is not None:
-                        self.rpc.set_rpc(json.loads(base64.b64decode(presence['private'])))
+                        if self.cfg.get_feature_flag("discord_rpc"):
+                            self.rpc.set_rpc(json.loads(base64.b64decode(presence['private'])))
                         if state != initial_game_state:
                             self.messages = 0
                             self.message_history = []

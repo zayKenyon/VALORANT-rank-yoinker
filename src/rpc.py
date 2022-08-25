@@ -1,7 +1,6 @@
 from pypresence import Presence
 from pypresence.exceptions import DiscordNotFound, InvalidID
 import nest_asyncio
-import time
 
 class Rpc():
     def __init__(self, map_dict, gamemodes, colors):

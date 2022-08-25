@@ -111,7 +111,10 @@ try:
 
     stats = Stats()
 
-    rpc = Rpc(map_dict, gamemodes, colors)
+    if cfg.get_feature_flag("discord_rpc"):
+        rpc = Rpc(map_dict, gamemodes, colors)
+    else:
+        rpc = None
 
     Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
     # loop = asyncio.new_event_loop()
@@ -161,7 +164,8 @@ try:
                         if presences.get_private_presence(presence) != None:
                             break
                         time.sleep(2)
-                    rpc.set_rpc(presences.get_private_presence(presence))
+                    if cfg.get_feature_flag("discord_rpc"):
+                        rpc.set_rpc(presences.get_private_presence(presence))
                     game_state = presences.get_game_state(presence)
                     if game_state != None:
                         run = False
@@ -206,7 +210,8 @@ try:
                 players_data.update({"ignore": partyMembersList})
                 for player in Players:
                     if player["Subject"] == Requests.puuid:
-                        rpc.set_data({"agent": player["CharacterID"]})
+                        if cfg.get_feature_flag("discord_rpc"):
+                            rpc.set_data({"agent": player["CharacterID"]})
                     players_data.update({player["Subject"]: {"team": player["TeamID"], "agent": player["CharacterID"], "streamer_mode": player["PlayerIdentity"]["Incognito"]}})
                 Wss.set_player_data(players_data)
 
@@ -429,7 +434,8 @@ try:
                         playerRank = rank.get_rank(player["Subject"], seasonID)
 
                         if player["Subject"] == Requests.puuid:
-                            rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                            if cfg.get_feature_flag("discord_rpc"):
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -537,7 +543,8 @@ try:
                             playerRank = rank.get_rank(player["Subject"], seasonID)
 
                             if player["Subject"] == Requests.puuid:
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                if cfg.get_feature_flag("discord_rpc"):
+                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
 
                             # rankStatus = playerRank[1]
                             #useless code since rate limit is handled in the requestsV
@@ -619,6 +626,7 @@ try:
                     table.set_runtime_col_flag('Agent',False)
                     table.set_runtime_col_flag('Skin',False)
 
+                print("\n")
                 table.display()
                 firstPrint = False
 

@@ -16,7 +16,8 @@ FLAGS_OPTS = {
 	"auto_hide_leaderboard": "Auto Hide Leaderboard Column",
     "pre_cls": "Pre-Clear Screen",
     "game_chat": "Print Game Chat",
-    "peak_rank_act": "Peak Rank Act"
+    "peak_rank_act": "Peak Rank Act",
+    "discord_rpc": "Discord Rich Presence"
 }
 
 weapon_question = lambda config: {
