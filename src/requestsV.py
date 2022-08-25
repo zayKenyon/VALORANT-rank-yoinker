@@ -40,16 +40,17 @@ class Requests:
                     break
         if float(release_version) > float(self.version):
             print(f"New version available! {link}")
-            while True:
-                udpate_now = input("Do you want to update now? (Y/n): ")
-                if udpate_now.lower() == "n" or udpate_now.lower() == "no":
-                    return
-                elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
-                    self.copy_run_update_script(link)
-                    os._exit(1)
-                else:
-                    print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
-                    return
+            if sys.argv[0][-3:] == "exe":
+                while True:
+                    udpate_now = input("Do you want to update now? (Y/n): ")
+                    if udpate_now.lower() == "n" or udpate_now.lower() == "no":
+                        return
+                    elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
+                        self.copy_run_update_script(link)
+                        os._exit(1)
+                    else:
+                        print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
+                        return
 
     def copy_run_update_script(self, link):
         try:
@@ -57,11 +58,10 @@ class Requests:
         except FileExistsError:
             pass
         shutil.copyfile("updatescript.bat", os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"))
-        if sys.argv[0][-3:] == "exe":
-            r_zip = requests.get(link, stream=True)
-            z = zipfile.ZipFile(io.BytesIO(r_zip.content))
-            z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
-            subprocess.Popen([os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"), '"' + os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])) + '"', '"' + os.getcwd() + '"', '"' + os.path.join(os.getenv('APPDATA'), "vry") + '"'])
+        r_zip = requests.get(link, stream=True)
+        z = zipfile.ZipFile(io.BytesIO(r_zip.content))
+        z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
+        # subprocess.Popen([os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"), os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])), os.getcwd(), os.path.join(os.getenv('APPDATA'), "vry")])
 
     def check_status(self):
         # checking status
