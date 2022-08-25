@@ -1,5 +1,6 @@
 from colr import color
 from src.constants import tierDict
+import re
 
 class Colors:
     def __init__(self, hide_names, agent_dict, AGENTCOLORLIST):
@@ -121,3 +122,7 @@ class Colors:
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
                 return color(number, fore=f)
+
+    def escape_ansi(self, line):
+        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return ansi_escape.sub('', line)

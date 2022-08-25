@@ -1,11 +1,24 @@
 import requests
 from colr import color
 
-version = "2.32"
+version = "2.33"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
 
+
+gamemodes = {
+    "newmap": "New Map",
+    "competitive": "Competitive",
+    "unrated": "Unrated",
+    "spikerush": "Spike Rush",
+    "deathmatch": "Deathmatch",
+    "ggteam": "Escalation",
+    "onefa": "Replication",
+    "custom": "Custom",
+    "snowball": "Snowball Fight",
+    "": "Custom",
+}
 
 before_ascendant_seasons = [
     "0df5adb9-4dcb-6899-1306-3e9860661dd3",
