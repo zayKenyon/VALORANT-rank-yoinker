@@ -49,7 +49,7 @@ class Loadouts:
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         # self.log(f"json for website: {final_json}")
         self.Server.send_payload("matchLoadout",final_json)
-        return weaponLists
+        return [weaponLists,final_json]
 
     #this will convert valorant loadouts to json with player names
     def convertLoadoutToJsonArray(self, PlayerInventorys, players, state, names):
