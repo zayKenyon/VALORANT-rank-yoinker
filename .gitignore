@@ -144,8 +144,8 @@ cython_debug/
 config.json
 
 # logs
-logs/
-chat_logs/
+/logs/
+/chat_logs/
 
 env/
 tempCodeRunnerFile.py
