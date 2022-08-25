@@ -1,23 +1,25 @@
 from typing import Literal, get_args
+
 from prettytable import PrettyTable
 
 TABLE_COLUMN_NAMES = Literal[
-            "Party",
-            "Agent",
-            "Name",
-            "Skin",
-            "Rank",
-            "RR",
-            "Peak Rank",
-            "Pos.",
-            "HS",
-            "WR",
-            "KD"
-            "Level",
-        ]
+    "Party",
+    "Agent",
+    "Name",
+    "Skin",
+    "Rank",
+    "RR",
+    "Peak Rank",
+    "Pos.",
+    "HS",
+    "WR",
+    "KD",
+    "Level"
+]
+
 
 class Table:
-    def __init__(self,config,chatlog):
+    def __init__(self, config, chatlog):
         self.pretty_table = PrettyTable()
         self.col_flags = [
             True,  # Party
@@ -28,12 +30,16 @@ class Table:
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
-            bool(config.table.get("headshot_percent", True)), #hs need to be changed to be optional in future default true
-            bool(config.table.get("winrate", True)), #wr need to be changed to be optional in future default true
-            bool(config.table.get("kd", False)), #KD
+            bool(
+                config.table.get("headshot_percent", True)
+            ),  # hs need to be changed to be optional in future default true
+            bool(
+                config.table.get("winrate", True)
+            ),  # wr need to be changed to be optional in future default true
+            bool(config.table.get("kd", True)),  # KD
             True,  # Level
         ]
-        self.runtime_col_flags = self.col_flags[:] # making a copy
+        self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
@@ -60,13 +66,17 @@ class Table:
     def reset_runtime_col_flags(self):
         self.runtime_col_flags = self.col_flags[:]
 
-    def set_runtime_col_flag(self,field_name: TABLE_COLUMN_NAMES,flag: bool):
+    def set_runtime_col_flag(self, field_name: TABLE_COLUMN_NAMES, flag: bool):
         index = self.field_names_candidates.index(field_name)
         self.runtime_col_flags[index] = flag
 
     def display(self):
-        overall_col_flags = [f1 & f2 for f1, f2 in zip(self.col_flags,self.runtime_col_flags)]
-        fields_to_display = [c for c, flag in zip(self.field_names_candidates,overall_col_flags) if flag]
+        overall_col_flags = [
+            f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
+        ]
+        fields_to_display = [
+            c for c, flag in zip(self.field_names_candidates, overall_col_flags) if flag
+        ]
 
         # extracting specific columns at runtime can sometimes lead to very minor padding issues
         # this can be problematic for OCD people, others might not notice
