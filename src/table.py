@@ -12,6 +12,7 @@ TABLE_COLUMN_NAMES = Literal[
             "Pos.",
             "HS",
             "WR",
+            "KD"
             "Level",
         ]
 
@@ -29,6 +30,7 @@ class Table:
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             bool(config.table.get("headshot_percent", True)), #hs need to be changed to be optional in future default true
             bool(config.table.get("winrate", True)), #wr need to be changed to be optional in future default true
+            bool(config.table.get("kd", False)), #KD
             True,  # Level
         ]
         self.runtime_col_flags = self.col_flags[:] # making a copy
