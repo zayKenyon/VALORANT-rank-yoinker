@@ -5,7 +5,7 @@ from src.constants import version
 
 build_exe_options = {
     "path": sys.path,
-    "include_files":['configurator.bat']
+    "include_files":['configurator.bat', 'updatescript.bat']
 }
 
 setup(
