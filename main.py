@@ -626,7 +626,6 @@ try:
                     table.set_runtime_col_flag('Agent',False)
                     table.set_runtime_col_flag('Skin',False)
 
-                print("\n")
                 table.display()
                 firstPrint = False
 
