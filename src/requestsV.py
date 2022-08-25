@@ -86,7 +86,10 @@ class Requests:
                 except JSONDecodeError:
                     pass
                 if not response.ok:
-                    self.log("response not ok glz endpoint: " + response.text)
+                    if response.status_code == 429:
+                        self.log("response not ok glz endpoint: rate limit 429")
+                    else:
+                        self.log("response not ok glz endpoint: " + response.text)
                     time.sleep(rate_limit_seconds+5)
                     self.headers = {}
                     self.fetch(url_type, endpoint, method)
@@ -108,7 +111,10 @@ class Requests:
                     pass
 
                 if not response.ok:
-                    self.log(f"response not ok pd endpoint, {response.text}")
+                    if response.status_code == 429:
+                        self.log(f"response not ok pd endpoint, rate limit 429")
+                    else:
+                        self.log(f"response not ok pd endpoint, {response.text}")
                     time.sleep(rate_limit_seconds+5)
                     self.headers = {}
                     return self.fetch(url_type, endpoint, method, rate_limit_seconds=rate_limit_seconds+5)
