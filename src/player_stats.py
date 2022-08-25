@@ -55,7 +55,10 @@ class PlayerStats:
             final["hs"] = hs
             return final
         except IndexError: #no matches
-            return final
+            return {
+                "kd": "N/a",
+                "hs": "N/a"
+            }
 
 
 if __name__ == "__main__":
