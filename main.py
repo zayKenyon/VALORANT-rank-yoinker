@@ -633,7 +633,7 @@ try:
                     table.set_runtime_col_flag('Agent',False)
                     table.set_runtime_col_flag('Skin',False)
 
-                Server.send_payload("hearbeat",heartbeat_data)
+                Server.send_payload("heartbeat",heartbeat_data)
                 table.display()
                 firstPrint = False
 
