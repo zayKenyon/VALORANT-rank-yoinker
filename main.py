@@ -184,6 +184,12 @@ try:
 
             is_leaderboard_needed = False
 
+            heartbeat_data = {
+                "time": int(time.time()),
+                "state": game_state,
+                "players": {}
+            }
+
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 Players = coregame_stats["Players"]
@@ -377,6 +383,20 @@ try:
                                 }
                             }
                         )
+
+                        heartbeat_data["players"][player["Subject"]] = {
+                            "name": names[player["Subject"]],
+                            "agent": agent_dict[player["CharacterID"].lower()],
+                            "map": map_dict[coregame_stats["MapID"].lower()],
+                            "rank": playerRank["rank"],
+                            "peakRank": playerRank["peakrank"],
+                            "rr": rr,
+                            "agentImgLink": loadouts_data["Players"][player["Subject"]]["Agent"],
+                            "team": loadouts_data["Players"][player["Subject"]]["Team"],
+                            "sprays": loadouts_data["Players"][player["Subject"]]["Sprays"],
+                            "weapons": loadouts_data["Players"][player["Subject"]]["Weapons"],
+                            "level": loadouts_data["Players"][player["Subject"]]["Level"]
+                        }
                         bar()
             elif game_state == "PREGAME":
                 already_played_with = []
@@ -505,6 +525,15 @@ try:
                                               wr,
                                               level,
                                               ])
+
+                        heartbeat_data["players"][player["Subject"]] = {
+                            "name": names[player["Subject"]],
+                            "agent": agent_dict[player["CharacterID"].lower()],
+                            "rank": playerRank["rank"],
+                            "peakRank": playerRank["peakrank"],
+                            "rr": rr,
+                        }
+
                         bar()
             if game_state == "MENUS":
                 already_played_with = []
@@ -578,7 +607,14 @@ try:
                                                 wr,
                                                 level
                                                 ])
-                            # table.add_rows([])
+                            
+                            heartbeat_data["players"][player["Subject"]] = {
+                                "name": names[player["Subject"]],
+                                "rank": playerRank["rank"],
+                                "peakRank": playerRank["peakrank"],
+                                "rr": rr,
+                            }
+
                             bar()
                     seen.append(player["Subject"])
             if (title := game_state_dict.get(game_state)) is None:
@@ -597,6 +633,7 @@ try:
                     table.set_runtime_col_flag('Agent',False)
                     table.set_runtime_col_flag('Skin',False)
 
+                Server.send_payload("hearbeat",heartbeat_data)
                 table.display()
                 firstPrint = False
 
