@@ -33,6 +33,6 @@ class Server:
 
     def send_payload(self, type, payload):
         payload["type"] = type
-        msg_str = json.dump(payload)
+        msg_str = json.dumps(payload)
         self.lastMessages[type] = msg_str
         self.server.send_message_to_all(msg_str)
