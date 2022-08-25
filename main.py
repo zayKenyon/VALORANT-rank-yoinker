@@ -360,6 +360,7 @@ try:
                                               leaderboard,
                                               hs,
                                               wr,
+                                              kd,
                                               level
                                               ])
                         stats.save_data(
@@ -501,6 +502,7 @@ try:
                                               leaderboard,
                                               hs,
                                               wr,
+                                              kd,
                                               level,
                                               ])
                         bar()
@@ -574,6 +576,7 @@ try:
                                                 leaderboard,
                                                 hs,
                                                 wr,
+                                                kd,
                                                 level
                                                 ])
                             # table.add_rows([])
