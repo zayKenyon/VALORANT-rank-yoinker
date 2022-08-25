@@ -9,6 +9,7 @@ import shutil
 import sys
 import zipfile
 import io
+import subprocess
 
 class Requests:
     def __init__(self, version, log, Error):
@@ -60,7 +61,7 @@ class Requests:
             r_zip = requests.get(link, stream=True)
             z = zipfile.ZipFile(io.BytesIO(r_zip.content))
             z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
-            os.system(os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat") + ' "'  + os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])) + '" "' + os.getcwd() + '" "' + os.path.join(os.getenv('APPDATA'), "vry") + '"')
+            subprocess.call(os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat") + ' "'  + os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])) + '" "' + os.getcwd() + '" "' + os.path.join(os.getenv('APPDATA'), "vry") + '"')
 
     def check_status(self):
         # checking status
