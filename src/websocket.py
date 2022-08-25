@@ -75,6 +75,8 @@ class Ws:
                     
                     if state is not None:
                         if state != initial_game_state:
+                            self.messages = 0
+                            self.message_history = []
                             return state
             if resp_json[2].get("uri") == "/chat/v6/messages":
                 message = resp_json[2]["data"]["messages"][0]
