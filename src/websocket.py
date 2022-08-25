@@ -4,6 +4,7 @@ import ssl
 import base64
 import json
 from colr import color
+import re
 
 class Ws:
     def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog):
@@ -105,12 +106,17 @@ class Ws:
         if self.messages > self.chat_limit:
             print(self.up * self.chat_limit, end="")
             for i in range(len(self.message_history) - self.chat_limit + 1, len(self.message_history)):
-                print(self.message_history[i] + " " * max([0, len(self.message_history[i-1]) - len(self.message_history[i])]))
-            print(message + " " * max([0, len(self.message_history[-1]) - len(message)]))
+                print(self.message_history[i] + " " * max([0, len(self.escape_ansi(self.message_history[i-1])) - len(self.escape_ansi(self.message_history[i]))]))
+            print(message + " " * max([0, len(self.escape_ansi(self.message_history[-1])) - len(self.escape_ansi(message))]))
         else:
             print(message)
 
         self.message_history.append(message)
+
+    
+    def escape_ansi(self, line):
+        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return ansi_escape.sub('', line)
 
 
 # if __name__ == "__main__":
