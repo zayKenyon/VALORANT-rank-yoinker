@@ -1,3 +1,4 @@
+import socket
 import traceback
 import requests
 import urllib3
@@ -46,7 +47,18 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     log(f"exited program with error code {status}")
     raise sys.exit(status)
 
-
+def get_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 try:
     Logging = Logging()
@@ -123,6 +135,8 @@ try:
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)
     lastGameState = ""
+
+    print(color(f"\nWs Server - {get_ip()}:{cfg.port}", fore=(255, 127, 80)))
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
     chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
