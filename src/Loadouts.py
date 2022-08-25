@@ -48,7 +48,7 @@ class Loadouts:
                             #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         # self.log(f"json for website: {final_json}")
-        self.Server.send_message(json.dumps(final_json))
+        self.Server.send_payload("matchLoadout",final_json)
         return weaponLists
 
     #this will convert valorant loadouts to json with player names

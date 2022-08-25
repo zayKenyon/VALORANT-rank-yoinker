@@ -10,7 +10,7 @@ class Server:
     def __init__(self, log, Error):
         self.Error = Error
         self.log = log
-        self.lastMessage = ""
+        self.lastMessages = {}
 
     def start_server(self):
         try:
@@ -25,9 +25,14 @@ class Server:
             self.Error.PortError(port)
 
     def handle_new_client(self, client, server):
-        if self.lastMessage != "":
-            self.send_message(self.lastMessage)
+        for key in self.lastMessages:
+            self.send_message(self.lastMessages[key])
 
     def send_message(self, message):
-        self.lastMessage = message
         self.server.send_message_to_all(message)
+
+    def send_payload(self, type, payload):
+        payload["type"] = type
+        msg_str = json.dump(payload)
+        self.lastMessages[type] = msg_str
+        self.server.send_message_to_all(msg_str)
