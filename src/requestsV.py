@@ -1,12 +1,14 @@
 import base64
-from distutils import errors
 import json
 import time
 from json.decoder import JSONDecodeError
 import requests
 from colr import color
 import os
-
+import shutil
+import sys
+import zipfile
+import io
 
 class Requests:
     def __init__(self, version, log, Error):
@@ -31,11 +33,34 @@ class Requests:
         r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
         json_data = r.json()
         release_version = json_data[0]["tag_name"]  # get release version
-        link = json_data[0]["assets"][0]["browser_download_url"]  # link for the latest release
-
+        for asset in json_data[0]["assets"]:
+            if "zip" in asset["content_type"]:
+                    link = asset["browser_download_url"]  # link for the latest release
+                    break
         if float(release_version) > float(self.version):
             print(f"New version available! {link}")
+            while True:
+                udpate_now = input("Do you want to update now? (Y/n): ")
+                if udpate_now.lower() == "n" or udpate_now.lower() == "no":
+                    return
+                elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
+                    self.copy_run_update_script(link)
+                    os._exit(1)
+                else:
+                    print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
+                    return
 
+    def copy_run_update_script(self, link):
+        try:
+            os.mkdir(os.path.join(os.getenv('APPDATA'), "vry"))
+        except FileExistsError:
+            pass
+        shutil.copyfile("updatescript.bat", os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"))
+        if sys.argv[0][-3:] == "exe":
+            r_zip = requests.get(link, stream=True)
+            z = zipfile.ZipFile(io.BytesIO(r_zip.content))
+            z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
+            os.system(os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat") + ' "'  + os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])) + '" "' + os.getcwd() + '" "' + os.path.join(os.getenv('APPDATA'), "vry") + '"')
 
     def check_status(self):
         # checking status
