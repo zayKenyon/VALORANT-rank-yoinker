@@ -30,7 +30,7 @@ class Error:
             return True
         else:
             # self.log("Lockfile does not exist, VALORANT is not open")
-            print("VALORANT is not open. Please open valorant\n")
+            print("\nVALORANT is not open. Please open valorant\n")
             while not os.path.exists(path):
                 time.sleep(1)
             os.system('cls')
