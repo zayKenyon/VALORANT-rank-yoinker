@@ -155,7 +155,12 @@ try:
             if firstTime:
                 run = True
                 while run:
-                    presence = presences.get_presence()
+                    while True:
+                        presence = presences.get_presence()
+                        #wait until your own valorant presence is initialized
+                        if presences.get_private_presence(presence) != None:
+                            break
+                        time.sleep(2)
                     rpc.set_rpc(presences.get_private_presence(presence))
                     game_state = presences.get_game_state(presence)
                     if game_state != None:
