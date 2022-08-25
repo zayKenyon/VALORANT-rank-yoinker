@@ -531,6 +531,7 @@ try:
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
+                            "level": player_level,
                             "rr": rr,
                         }
 
@@ -612,6 +613,7 @@ try:
                                 "name": names[player["Subject"]],
                                 "rank": playerRank["rank"],
                                 "peakRank": playerRank["peakrank"],
+                                "level": player_level,
                                 "rr": rr,
                             }
 
