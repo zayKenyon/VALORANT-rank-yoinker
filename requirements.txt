@@ -6,3 +6,4 @@ Colr~=0.9.1
 websocket-server==0.6.0
 websockets==10.3
 inquirerpy==0.3.4
+pypresence==4.2.1
