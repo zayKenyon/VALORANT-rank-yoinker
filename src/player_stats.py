@@ -15,7 +15,10 @@ class PlayerStats:
             r = self.Requests.fetch('pd', f"/match-details/v1/matches/{response.json()['Matches'][0]['MatchID']}", "get")
             # pyperclip.copy(str(r.json()))
             if r.status_code == 404: # too old match
-                return "N/a"
+                return {
+                "kd": "N/a",
+                "hs": "N/a"
+            }
 
             total_hits = 0
             total_headshots = 0
@@ -52,7 +55,10 @@ class PlayerStats:
             final["hs"] = hs
             return final
         except IndexError: #no matches
-            return final
+            return {
+                "kd": "N/a",
+                "hs": "N/a"
+            }
 
 
 if __name__ == "__main__":

@@ -1,12 +1,16 @@
 import base64
-from distutils import errors
 import json
 import time
 from json.decoder import JSONDecodeError
 import requests
 from colr import color
 import os
-
+import shutil
+import sys
+import zipfile
+import io
+import subprocess
+from requests.exceptions import ConnectionError
 
 class Requests:
     def __init__(self, version, log, Error):
@@ -31,11 +35,34 @@ class Requests:
         r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
         json_data = r.json()
         release_version = json_data[0]["tag_name"]  # get release version
-        link = json_data[0]["assets"][0]["browser_download_url"]  # link for the latest release
-
+        for asset in json_data[0]["assets"]:
+            if "zip" in asset["content_type"]:
+                    link = asset["browser_download_url"]  # link for the latest release
+                    break
         if float(release_version) > float(self.version):
             print(f"New version available! {link}")
+            if sys.argv[0][-3:] == "exe":
+                while True:
+                    udpate_now = input("Do you want to update now? (Y/n): ")
+                    if udpate_now.lower() == "n" or udpate_now.lower() == "no":
+                        return
+                    elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
+                        self.copy_run_update_script(link)
+                        os._exit(1)
+                    else:
+                        print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
+                        return
 
+    def copy_run_update_script(self, link):
+        try:
+            os.mkdir(os.path.join(os.getenv('APPDATA'), "vry"))
+        except FileExistsError:
+            pass
+        shutil.copyfile("updatescript.bat", os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"))
+        r_zip = requests.get(link, stream=True)
+        z = zipfile.ZipFile(io.BytesIO(r_zip.content))
+        z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
+        subprocess.Popen([os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"), os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])), os.getcwd(), os.path.join(os.getenv('APPDATA'), "vry")])
 
     def check_status(self):
         # checking status
@@ -60,7 +87,10 @@ class Requests:
                 except JSONDecodeError:
                     pass
                 if not response.ok:
-                    self.log("response not ok glz endpoint: " + response.text)
+                    if response.status_code == 429:
+                        self.log("response not ok glz endpoint: rate limit 429")
+                    else:
+                        self.log("response not ok glz endpoint: " + response.text)
                     time.sleep(rate_limit_seconds+5)
                     self.headers = {}
                     self.fetch(url_type, endpoint, method)
@@ -82,7 +112,10 @@ class Requests:
                     pass
 
                 if not response.ok:
-                    self.log(f"response not ok pd endpoint, {response.text}")
+                    if response.status_code == 429:
+                        self.log(f"response not ok pd endpoint, rate limit 429")
+                    else:
+                        self.log(f"response not ok pd endpoint, {response.text}")
                     time.sleep(rate_limit_seconds+5)
                     self.headers = {}
                     return self.fetch(url_type, endpoint, method, rate_limit_seconds=rate_limit_seconds+5)
@@ -90,9 +123,20 @@ class Requests:
             elif url_type == "local":
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                     ('riot:' + self.lockfile['password']).encode()).decode()}
-                response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
-                                            headers=local_headers,
-                                            verify=False)
+                
+                while True:
+                    try:
+                        response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
+                                                    headers=local_headers,
+                                                    verify=False)
+                        if response.json().get("errorCode") == "RPC_ERROR":
+                            self.log("RPC_ERROR waiting 5 seconds")
+                            time.sleep(5)
+                        else:
+                            break
+                    except ConnectionError:
+                        print("Connection error, retrying in 5 seconds")
+                        time.sleep(5)
                 if endpoint != "/chat/v4/presences":
                     self.log(
                         f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"

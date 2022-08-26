@@ -1,5 +1,7 @@
 import socket
 import os.path
+import time
+import os
 
 class Error:
     
@@ -27,5 +29,9 @@ class Error:
         if os.path.exists(path):
             return True
         else:
-            self.log("Lockfile does not exist, VALORANT is not open")
-            print("\nVALORANT is not open! Try again with VALORANT open.\n")
+            # self.log("Lockfile does not exist, VALORANT is not open")
+            print("\nVALORANT is not open. Please open valorant\n")
+            while not os.path.exists(path):
+                time.sleep(1)
+            os.system('cls')
+            return True
