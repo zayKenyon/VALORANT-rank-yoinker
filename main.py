@@ -412,10 +412,10 @@ try:
                             "peakRank": playerRank["peakrank"],
                             "rr": rr,
                             "level": player_level,
-                            "agentImgLink": loadouts_data["Players"][player["Subject"]]["Agent"],
-                            "team": loadouts_data["Players"][player["Subject"]]["Team"],
-                            "sprays": loadouts_data["Players"][player["Subject"]]["Sprays"],
-                            "weapons": loadouts_data["Players"][player["Subject"]]["Weapons"]
+                            "agentImgLink": loadouts_data["Players"][player["Subject"]].get("Agent",None),
+                            "team": loadouts_data["Players"][player["Subject"]].get("Team",None),
+                            "sprays": loadouts_data["Players"][player["Subject"]].get("Sprays",None),
+                            "weapons": loadouts_data["Players"][player["Subject"]].get("Weapons",None)
                         }                     
 
                         stats.save_data(
