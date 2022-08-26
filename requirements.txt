@@ -7,3 +7,4 @@ websocket-server==0.6.0
 websockets==10.3
 inquirerpy==0.3.4
 pypresence==4.2.1
+nest_asyncio==1.5.5
