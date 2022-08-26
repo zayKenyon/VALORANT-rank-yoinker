@@ -3,7 +3,6 @@ from typing import Literal, get_args
 # from prettytable import PrettyTable
 from rich.table import Table as RichTable
 from rich.console import Console as RichConsole
-import re
 
 TABLE_COLUMN_NAMES = Literal[
     "Party",
@@ -48,7 +47,7 @@ class Table:
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
         self.chatlog = chatlog
-        self.console = RichConsole()
+        self.console = RichConsole(color_system="standard", force_terminal=True)
 
 
 
@@ -73,7 +72,7 @@ class Table:
 
     def add_row_table(self, args: list):
         row = [c for c, i in zip(args, self.col_flags) if i]
-        row = [self.escape_ansi(str(i)) for i in row]
+        row = [self.ansi_to_console(str(i)) for i in row]
         
         self.pretty_table.add_row(*row)
 
@@ -109,6 +108,13 @@ class Table:
         # self.pretty_table.clear()
         pass
 
-    def escape_ansi(self, line):
-        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-        return ansi_escape.sub('', line)
+    def ansi_to_console(self, line):
+        string_to_return = ""
+        strings = line.split("\x1b[38;2;")
+        del strings[0]
+        for string in strings:
+            splits = string.split("m", 1)
+            rgb = [int(i) for i in splits[0].split(";")]
+            original_strings = splits[1].split("\x1b[0m")
+            string_to_return += f"[rgb({rgb[0]},{rgb[1]},{rgb[2]})]{'[/]'.join(original_strings)}"
+        return string_to_return
