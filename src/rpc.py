@@ -2,6 +2,7 @@ from pypresence import Presence
 from pypresence.exceptions import DiscordNotFound, InvalidID
 import nest_asyncio
 import time
+import requests
 
 class Rpc():
     def __init__(self, map_dict, gamemodes, colors):
@@ -26,12 +27,18 @@ class Rpc():
         self.data = self.data | data
         self.set_rpc(self.last_presence_data)
 
+    @staticmethod
+    def get_latest_url():
+        r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
+        return r.json()[0]["assets"][0]["browser_download_url"]
+
     def set_rpc(self, presence):
         if self.discord_running:
             try:
+                url = Rpc.get_latest_url()
                 if presence["isValid"]:
                     if presence["sessionLoopState"] == "INGAME":
-                        if self.data.get("agent") is None or self.data.get("agent") is "":
+                        if self.data.get("agent") is None or self.data.get("agent") == "":
                             agent_img = None
                             agent = None
                         else:
@@ -53,7 +60,7 @@ class Rpc():
                             agent = self.data.get("rank_name")
                         else:
                             mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
-                        if mapText is None or mapText is "":
+                        if mapText is None or mapText == "":
                             mapText = None
                             mapImage = None
                         self.rpc.update(
@@ -64,7 +71,7 @@ class Rpc():
                             small_image=agent_img,
                             small_text=agent,
                             start=time.time(),
-                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
+                            buttons=[{"label": "Download VALORANT Rank Yoinker", "url": url}]
                         )
                     elif presence["sessionLoopState"] == "MENUS":
                         if presence["isIdle"]:
@@ -86,7 +93,7 @@ class Rpc():
                             large_text=image_text,
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name"),
-                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
+                            buttons=[{"label": "Download VALORANT Rank Yoinker", "url": url}]
                         )
                     elif presence["sessionLoopState"] == "PREGAME":
                         if presence["provisioningFlow"] == "CustomGame":
@@ -96,7 +103,7 @@ class Rpc():
 
                         mapText = self.map_dict.get(presence["matchMap"].lower())
                         mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
-                        if mapText is None or mapText is "":
+                        if mapText is None or mapText == "":
                             mapText = None
                             mapImage = None
 
@@ -108,7 +115,7 @@ class Rpc():
                             large_text=mapText,
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name"),
-                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
+                            buttons=[{"label": "Download VALORANT Rank Yoinker", "url": url}]
                         )
             except InvalidID:
                 self.discord_running = False
@@ -121,3 +128,7 @@ class Rpc():
             except DiscordNotFound:
                 self.discord_running = False
         self.last_presence_data = presence
+
+
+if __name__ == "__main__":
+    Rpc.get_latest_url()
