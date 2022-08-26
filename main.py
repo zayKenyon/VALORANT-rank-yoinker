@@ -78,7 +78,6 @@ try:
     ErrorSRC = Error(log)
     
     Requests = Requests(version, log, ErrorSRC)
-    print(Requests.check_version())
     Requests.check_status()
 
     cfg = Config(log)
