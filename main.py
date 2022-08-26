@@ -111,7 +111,7 @@ try:
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server)
-    table = Table(cfg, chatlog)
+    table = Table(cfg, chatlog, log)
 
     stats = Stats()
 
@@ -632,8 +632,6 @@ try:
                                                 kd,
                                                 level
                                                 ])
-                            # table.add_rows([])
-                            # bar()
                     seen.append(player["Subject"])
             if (title := game_state_dict.get(game_state)) is None:
                 # program_exit(1)

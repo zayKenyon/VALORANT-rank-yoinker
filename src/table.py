@@ -21,7 +21,8 @@ TABLE_COLUMN_NAMES = Literal[
 
 
 class Table:
-    def __init__(self, config, chatlog):
+    def __init__(self, config, chatlog, log):
+        self.log = log
         self.rich_table = RichTable()
         self.col_flags = [
             True,  # Party
@@ -83,12 +84,12 @@ class Table:
         # self.rich_table.add_row(*row)
 
     def add_empty_row(self):
-        empty_row = [""] * sum(self.col_flags)
-        self.rich_table.add_row(*empty_row)
+        # empty_row = [""] * sum(self.col_flags)
+        # self.rich_table.add_row(*empty_row)
+        self.rows.append(zip(self.field_names_candidates, ""*len(self.field_names_candidates)))
 
     def apply_rows(self):
         for row in self.rows:
-            print(row)
             row = [self.ansi_to_console(str(v)) for i, v in row if i in self.fields_to_display]
             self.rich_table.add_row(*row)
 
@@ -100,24 +101,24 @@ class Table:
         self.runtime_col_flags[index] = flag
 
     def display(self):
-        # print(self.rows)
+        self.log("rows: " + str(self.rows))
         self.set_collumns()
         self.apply_rows()
 
-        # self.clear()
-        # self.set_collumns()
         self.console.print(self.rich_table)
 
     def clear(self):
         self.rich_table = RichTable()
 
         self.rich_table.title_style = "bold"
-        self.rich_table.caption_style = "italic rgb(5,5,5)"
+        self.rich_table.caption_style = "italic rgb(50,505,50)"
         self.rich_table.caption_justify = "left"
         
         pass
 
     def ansi_to_console(self, line):
+        if "\x1b[38;2;" not in line:
+            return line
         string_to_return = ""
         strings = line.split("\x1b[38;2;")
         del strings[0]
