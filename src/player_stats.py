@@ -7,8 +7,8 @@ class PlayerStats:
 
     #in future rewrite this code
     def get_stats(self, puuid):
-        # if not self.config.get_table_flag("headshot_percent"):
-            # return "N/a"
+        if not self.config.get_table_flag("headshot_percent"):
+            return "N/a"
 
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=1&queue=competitive", "get")
         try:
