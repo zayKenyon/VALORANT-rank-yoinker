@@ -16,6 +16,8 @@ class Pregame:
         global response
         try:
             response = self.Requests.fetch(url_type="glz", endpoint=f"/pregame/v1/players/{self.Requests.puuid}", method="get")
+            if response.get("errorCode") == "RESOURCE_NOT_FOUND":
+                return 0
             match_id = response['MatchID']
             self.log(f"retrieved pregame match id: '{match_id}'")
             return match_id

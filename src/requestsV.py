@@ -79,6 +79,9 @@ class Requests:
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
 
+                if response.status_code == 404:
+                    return response
+
                 try:
                     if response.json().get("errorCode") == "BAD_CLAIMS":
                         self.log("detected bad claims")
