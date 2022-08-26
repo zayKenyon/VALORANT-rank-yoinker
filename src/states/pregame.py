@@ -36,3 +36,5 @@ class Pregame:
         match_id = self.get_pregame_match_id()
         if match_id != 0:
             return self.Requests.fetch("glz", f"/pregame/v1/matches/{match_id}", "get")
+        else:
+            return None

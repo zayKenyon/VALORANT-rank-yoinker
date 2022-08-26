@@ -200,6 +200,8 @@ try:
 
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
+                if coregame_stats == None:
+                    continue
                 Players = coregame_stats["Players"]
                 #data for chat to function
                 presence = presences.get_presence()
@@ -401,6 +403,8 @@ try:
             elif game_state == "PREGAME":
                 already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
+                if pregame_stats == None:
+                    continue
                 try:
                     server = GAMEPODS[pregame_stats["GamePodID"]]
                 except KeyError:
