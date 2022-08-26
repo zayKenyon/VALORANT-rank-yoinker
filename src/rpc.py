@@ -4,10 +4,9 @@ import nest_asyncio
 import time
 
 class Rpc():
-    def __init__(self, map_dict, gamemodes, colors, log, url):
+    def __init__(self, map_dict, gamemodes, colors, log):
         nest_asyncio.apply()
         self.log = log
-        self.url = url
         self.discord_running = True
         try:
             self.rpc = Presence("1012402211134910546")
@@ -70,7 +69,7 @@ class Rpc():
                             small_image=agent_img,
                             small_text=agent,
                             start=time.time(),
-                            buttons=[{"label": "Download VALORANT rank yoinker", "url": self.url}]
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC in-game data update")
                     elif presence["sessionLoopState"] == "MENUS":
@@ -93,7 +92,7 @@ class Rpc():
                             large_text=image_text,
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name"),
-                            buttons=[{"label": "Download VALORANT rank yoinker", "url": self.url}]
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC menu data update")
                     elif presence["sessionLoopState"] == "PREGAME":
@@ -116,7 +115,7 @@ class Rpc():
                             large_text=mapText,
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name"),
-                            buttons=[{"label": "Download VALORANT rank yoinker", "url": self.url}]
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC agent-select data update")
             except InvalidID:
