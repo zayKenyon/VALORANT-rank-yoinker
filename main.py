@@ -36,6 +36,10 @@ from src.chatlogs import ChatLogging
 
 from src.rpc import Rpc
 
+from colr import color as colr
+
+from rich.console import Console as RichConsole
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 os.system('cls')
@@ -135,6 +139,8 @@ try:
     chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
 
 
+    richConsole = RichConsole()
+
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_until_complete(Wss.conntect_to_websocket(game_state))
@@ -224,7 +230,10 @@ try:
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
-                with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
+                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
+                playersLoaded = 0
+                with richConsole.status("Loading Players...") as status: 
+                    playersLoaded += 1
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -399,7 +408,8 @@ try:
                                 }
                             }
                         )
-                        bar()
+                        # bar()
+                        status.update(f"Loading player info... [{playersLoaded}/{len(Players)}]")
             elif game_state == "PREGAME":
                 already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
@@ -621,7 +631,7 @@ try:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":
-                table.set_title(f"VALORANT status: {title} - {server}")
+                table.set_title(f"VALORANT status: {title} {colr('- ' + server, fore=(200, 200, 200))}")
             else:
                 table.set_title(f"VALORANT status: {title}")
             server = ""
@@ -636,8 +646,8 @@ try:
                 table.display()
                 firstPrint = False
 
-                print(f"VALORANT rank yoinker v{version}")
-                chatlog(f"VALORANT rank yoinker v{version}")
+                # print(f"VALORANT rank yoinker v{version}")
+                # chatlog(f"VALORANT rank yoinker v{version}")
                                         #                 {
                                         #     "times": sum(stats_data[player["Subject"]]),
                                         #     "name": curr_player_stat["name"],

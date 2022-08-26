@@ -22,7 +22,7 @@ TABLE_COLUMN_NAMES = Literal[
 
 class Table:
     def __init__(self, config, chatlog):
-        self.pretty_table = RichTable()
+        self.rich_table = RichTable()
         self.col_flags = [
             True,  # Party
             True,  # Agent
@@ -47,8 +47,12 @@ class Table:
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
         self.chatlog = chatlog
-        self.console = RichConsole(color_system="standard", force_terminal=True)
+        self.console = RichConsole()
 
+        self.rich_table.title_style = "bold"
+        self.rich_table.caption_style = "italic rgb(5,5,5)"
+        self.rich_table.caption = "VALORANT rank yoinker v2.5"
+        self.rich_table.caption_justify = "left"
 
 
         overall_col_flags = [
@@ -59,26 +63,26 @@ class Table:
         ]
 
         for field in fields_to_display:
-            self.pretty_table.add_column(field)
+            self.rich_table.add_column(field, justify="center")
 
     def set_title(self, title):
-        self.pretty_table.title = title
+        self.rich_table.title = self.ansi_to_console(title)
 
     def set_default_field_names(self):
-        self.pretty_table.field_names = self.field_names[:]
+        self.rich_table.field_names = self.field_names[:]
 
     def set_field_names(self, field_names):
-        self.pretty_table.field_names = field_names
+        self.rich_table.field_names = field_names
 
     def add_row_table(self, args: list):
         row = [c for c, i in zip(args, self.col_flags) if i]
         row = [self.ansi_to_console(str(i)) for i in row]
         
-        self.pretty_table.add_row(*row)
+        self.rich_table.add_row(*row)
 
     def add_empty_row(self):
         empty_row = [""] * sum(self.col_flags)
-        self.pretty_table.add_row(*empty_row)
+        self.rich_table.add_row(*empty_row)
 
     def reset_runtime_col_flags(self):
         self.runtime_col_flags = self.col_flags[:]
@@ -102,7 +106,7 @@ class Table:
         # print(self.pretty_table.get_string(fields=fields_to_display))
         # RichConsole.print(self.pretty_table.get_string(fields=fields_to_display))
         # self.chatlog(self.pretty_table.get_string(fields=fields_to_display))
-        self.console.print(self.pretty_table)
+        self.console.print(self.rich_table)
 
     def clear(self):
         # self.pretty_table.clear()
