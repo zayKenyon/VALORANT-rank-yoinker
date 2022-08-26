@@ -50,7 +50,6 @@ class Requests:
                         self.copy_run_update_script(link)
                         os._exit(1)
                     
-        return link
 
     def copy_run_update_script(self, link):
         try:
