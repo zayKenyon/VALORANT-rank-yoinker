@@ -49,9 +49,8 @@ class Requests:
                     elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
                         self.copy_run_update_script(link)
                         os._exit(1)
-                    else:
-                        print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
-                        return
+                    
+        return link
 
     def copy_run_update_script(self, link):
         try:
