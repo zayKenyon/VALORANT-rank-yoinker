@@ -102,7 +102,7 @@ class Table:
 
     def display(self):
         self.log("rows: " + str(self.rows))
-        self.set_collumns()
+        self.set_columns()
         self.apply_rows()
 
         self.console.print(self.rich_table)
@@ -129,7 +129,7 @@ class Table:
             string_to_return += f"[rgb({rgb[0]},{rgb[1]},{rgb[2]})]{'[/]'.join(original_strings)}"
         return string_to_return
 
-    def set_collumns(self):
+    def set_columns(self):
         self.overall_col_flags = [
             f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
         ]
