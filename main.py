@@ -163,7 +163,7 @@ try:
                         #wait until your own valorant presence is initialized
                         if presences.get_private_presence(presence) != None:
                             break
-                        time.sleep(2)
+                        time.sleep(5)
                     if cfg.get_feature_flag("discord_rpc"):
                         rpc.set_rpc(presences.get_private_presence(presence))
                     game_state = presences.get_game_state(presence)
@@ -348,7 +348,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
@@ -495,7 +495,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
@@ -575,7 +575,7 @@ try:
                             rr = playerRank["rr"]
 
                             #short peak rank string
-                            peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                            peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
                             if not cfg.get_feature_flag("peak_rank_act"):
                                 peakRankAct = ""
 
