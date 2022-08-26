@@ -104,7 +104,7 @@ class Requests:
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
                 if response.status_code == 404:
-                    return response.json()
+                    return response
 
                 try:
                     if response.json().get("errorCode") == "BAD_CLAIMS":

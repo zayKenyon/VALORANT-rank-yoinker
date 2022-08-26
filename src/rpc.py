@@ -1,6 +1,7 @@
 from pypresence import Presence
 from pypresence.exceptions import DiscordNotFound, InvalidID
 import nest_asyncio
+import time
 
 class Rpc():
     def __init__(self, map_dict, gamemodes, colors):
@@ -61,7 +62,8 @@ class Rpc():
                             large_image=mapImage,
                             large_text=mapText,
                             small_image=agent_img,
-                            small_text=agent
+                            small_text=agent,
+                            start=time.time()
                         )
                     elif presence["sessionLoopState"] == "MENUS":
                         if presence["isIdle"]:
