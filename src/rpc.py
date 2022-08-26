@@ -55,7 +55,6 @@ class Rpc():
                         if mapText is None or mapText is "":
                             mapText = None
                             mapImage = None
-                        print(mapImage)
                         self.rpc.update(
                             state=f"In a Party ({presence['partySize']} of {presence['maxPartySize']})",
                             details=details,
