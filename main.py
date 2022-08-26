@@ -36,6 +36,9 @@ from src.chatlogs import ChatLogging
 
 from src.rpc import Rpc
 
+from src.account_manager import AccountManager
+
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 os.system('cls')
@@ -74,8 +77,10 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 
+    acc_manager = AccountManager(log)
 
     ErrorSRC = Error(log)
+
     
     Requests = Requests(version, log, ErrorSRC)
     Requests.check_version()
@@ -112,7 +117,7 @@ try:
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors)
+        rpc = Rpc(map_dict, gamemodes, colors, log)
     else:
         rpc = None
 

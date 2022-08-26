@@ -4,13 +4,16 @@ import nest_asyncio
 import time
 
 class Rpc():
-    def __init__(self, map_dict, gamemodes, colors):
+    def __init__(self, map_dict, gamemodes, colors, log):
         nest_asyncio.apply()
+        self.log = log
         self.discord_running = True
         try:
             self.rpc = Presence("1012402211134910546")
             self.rpc.connect()
+            self.log("Connected to discord")
         except DiscordNotFound:
+            self.log("Failed connecting to discord")
             self.discord_running = False
         self.gamemodes = gamemodes
         self.map_dict = map_dict
@@ -24,6 +27,7 @@ class Rpc():
 
     def set_data(self, data):
         self.data = self.data | data
+        self.log("New data set in RPC")
         self.set_rpc(self.last_presence_data)
 
     def set_rpc(self, presence):
@@ -65,6 +69,7 @@ class Rpc():
                             small_text=agent,
                             start=time.time()
                         )
+                        self.log("RPC in-game data update")
                     elif presence["sessionLoopState"] == "MENUS":
                         if presence["isIdle"]:
                             image = "game_icon_yellow"
@@ -86,6 +91,7 @@ class Rpc():
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name")
                         )
+                        self.log("RPC menu data update")
                     elif presence["sessionLoopState"] == "PREGAME":
                         if presence["provisioningFlow"] == "CustomGame":
                             gamemode = "Custom Game"
@@ -107,6 +113,7 @@ class Rpc():
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name")
                         )
+                        self.log("RPC agent-select data update")
             except InvalidID:
                 self.discord_running = False
         else:
@@ -114,6 +121,7 @@ class Rpc():
                 self.rpc = Presence("1012402211134910546")
                 self.rpc.connect()
                 self.discord_running = True
+                self.log("Reconnected to discord")
                 self.set_rpc(presence)
             except DiscordNotFound:
                 self.discord_running = False
