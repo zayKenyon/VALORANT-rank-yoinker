@@ -403,6 +403,21 @@ try:
                                               kd,
                                               level
                                               ])
+
+                        heartbeat_data["players"][player["Subject"]] = {
+                            "name": names[player["Subject"]],
+                            "agent": agent_dict[player["CharacterID"].lower()],
+                            "map": map_dict[coregame_stats["MapID"].lower()],
+                            "rank": playerRank["rank"],
+                            "peakRank": playerRank["peakrank"],
+                            "rr": rr,
+                            "level": player_level,
+                            "agentImgLink": loadouts_data["Players"][player["Subject"]]["Agent"],
+                            "team": loadouts_data["Players"][player["Subject"]]["Team"],
+                            "sprays": loadouts_data["Players"][player["Subject"]]["Sprays"],
+                            "weapons": loadouts_data["Players"][player["Subject"]]["Weapons"]
+                        }                     
+
                         stats.save_data(
                             {
                                 player["Subject"]: {
@@ -417,19 +432,6 @@ try:
                             }
                         )
 
-                        heartbeat_data["players"][player["Subject"]] = {
-                            "name": names[player["Subject"]],
-                            "agent": agent_dict[player["CharacterID"].lower()],
-                            "map": map_dict[coregame_stats["MapID"].lower()],
-                            "rank": playerRank["rank"],
-                            "peakRank": playerRank["peakrank"],
-                            "rr": rr,
-                            "agentImgLink": loadouts_data["Players"][player["Subject"]]["Agent"],
-                            "team": loadouts_data["Players"][player["Subject"]]["Team"],
-                            "sprays": loadouts_data["Players"][player["Subject"]]["Sprays"],
-                            "weapons": loadouts_data["Players"][player["Subject"]]["Weapons"],
-                            "level": loadouts_data["Players"][player["Subject"]]["Level"]
-                        }
                         bar()
             elif game_state == "PREGAME":
                 already_played_with = []
