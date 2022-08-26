@@ -51,10 +51,11 @@ class Rpc():
                             agent_img = str(self.data.get("rank"))
                             agent = self.data.get("rank_name")
                         else:
-                            mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square"
+                            mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
                         if mapText is None or mapText is "":
                             mapText = None
                             mapImage = None
+                        print(mapImage)
                         self.rpc.update(
                             state=f"In a Party ({presence['partySize']} of {presence['maxPartySize']})",
                             details=details,
@@ -91,7 +92,7 @@ class Rpc():
                             gamemode = self.gamemodes.get(presence['queueId'])
 
                         mapText = self.map_dict.get(presence["matchMap"].lower())
-                        mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square"
+                        mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
                         if mapText is None or mapText is "":
                             mapText = None
                             mapImage = None
