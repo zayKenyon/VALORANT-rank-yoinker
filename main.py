@@ -112,7 +112,7 @@ try:
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log, Requests.check_version())
+        rpc = Rpc(map_dict, gamemodes, colors, log)
     else:
         rpc = None
 
