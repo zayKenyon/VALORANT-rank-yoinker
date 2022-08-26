@@ -44,7 +44,7 @@ class Rpc():
                         self.rpc.update(
                             state=f"In a Party ({presence['partySize']} of {presence['maxPartySize']})",
                             details=f"{gamemode} // {presence['partyOwnerMatchScoreAllyTeam']} - {presence['partyOwnerMatchScoreEnemyTeam']}",
-                            large_image=f"splash_{self.map_dict.get(presence['matchMap'].lower()).lower()}_square",
+                            large_image=f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square",
                             large_text=self.map_dict.get(presence["matchMap"].lower()),
                             small_image=agent_img,
                             small_text=agent
@@ -75,10 +75,12 @@ class Rpc():
                             gamemode = "Custom Game"
                         else:
                             gamemode = self.gamemodes.get(presence['queueId'])
+
+                        
                         self.rpc.update(
                             state=f"In a Party ({presence['partySize']} of {presence['maxPartySize']})",
                             details=f"Agent Select - {gamemode}",
-                            large_image=f"splash_{self.map_dict.get(presence['matchMap'].lower()).lower()}_square",
+                            large_image=f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square",
                             large_text=self.map_dict.get(presence["matchMap"].lower()),
                             small_image=str(self.data.get("rank")),
                             small_text=self.data.get("rank_name")
