@@ -63,7 +63,8 @@ class Rpc():
                             large_text=mapText,
                             small_image=agent_img,
                             small_text=agent,
-                            start=time.time()
+                            start=time.time(),
+                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                     elif presence["sessionLoopState"] == "MENUS":
                         if presence["isIdle"]:
@@ -84,7 +85,8 @@ class Rpc():
                             large_image=image,
                             large_text=image_text,
                             small_image=str(self.data.get("rank")),
-                            small_text=self.data.get("rank_name")
+                            small_text=self.data.get("rank_name"),
+                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                     elif presence["sessionLoopState"] == "PREGAME":
                         if presence["provisioningFlow"] == "CustomGame":
@@ -105,7 +107,8 @@ class Rpc():
                             large_image=mapImage,
                             large_text=mapText,
                             small_image=str(self.data.get("rank")),
-                            small_text=self.data.get("rank_name")
+                            small_text=self.data.get("rank_name"),
+                            buttons=[{"label": "Download VALORANT-Rank-Yoinker", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
             except InvalidID:
                 self.discord_running = False
