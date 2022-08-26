@@ -34,10 +34,10 @@ class Table:
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             bool(
                 config.table.get("headshot_percent", True)
-            ),  # hs need to be changed to be optional in future default true
+            ),  # hs
             bool(
                 config.table.get("winrate", True)
-            ),  # wr need to be changed to be optional in future default true
+            ),  # wr
             bool(config.table.get("kd", True)),  # KD
             True,  # Level
         ]
@@ -49,24 +49,25 @@ class Table:
         self.chatlog = chatlog
         self.console = RichConsole()
 
-        self.rich_table.title_style = "bold"
-        self.rich_table.caption_style = "italic rgb(5,5,5)"
-        self.rich_table.caption = "VALORANT rank yoinker v2.5"
-        self.rich_table.caption_justify = "left"
 
-
-        overall_col_flags = [
+        #only to get init value not used
+        self.overall_col_flags = [
             f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
         ]
-        fields_to_display = [
-            c for c, flag in zip(self.field_names_candidates, overall_col_flags) if flag
+        self.fields_to_display = [
+            c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
         ]
 
-        for field in fields_to_display:
-            self.rich_table.add_column(field, justify="center")
+        # for field in fields_to_display:
+        #     self.rich_table.add_column(field, justify="center")
+        # self.set_collumns()
+        self.rows = []
 
     def set_title(self, title):
         self.rich_table.title = self.ansi_to_console(title)
+    
+    def set_caption(self, caption):
+        self.rich_table.caption = self.ansi_to_console(caption)
 
     def set_default_field_names(self):
         self.rich_table.field_names = self.field_names[:]
@@ -75,14 +76,21 @@ class Table:
         self.rich_table.field_names = field_names
 
     def add_row_table(self, args: list):
-        row = [c for c, i in zip(args, self.col_flags) if i]
-        row = [self.ansi_to_console(str(i)) for i in row]
+        # row = [c for c, i in zip(args, self.col_flags) if i]
+        # row = [self.ansi_to_console(str(i)) for i in row]
+        self.rows.append(zip(self.field_names_candidates, args))
         
-        self.rich_table.add_row(*row)
+        # self.rich_table.add_row(*row)
 
     def add_empty_row(self):
         empty_row = [""] * sum(self.col_flags)
         self.rich_table.add_row(*empty_row)
+
+    def apply_rows(self):
+        for row in self.rows:
+            print(row)
+            row = [self.ansi_to_console(str(v)) for i, v in row if i in self.fields_to_display]
+            self.rich_table.add_row(*row)
 
     def reset_runtime_col_flags(self):
         self.runtime_col_flags = self.col_flags[:]
@@ -92,24 +100,21 @@ class Table:
         self.runtime_col_flags[index] = flag
 
     def display(self):
-        # overall_col_flags = [
-        #     f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
-        # ]
-        # fields_to_display = [
-        #     c for c, flag in zip(self.field_names_candidates, overall_col_flags) if flag
-        # ]
+        # print(self.rows)
+        self.set_collumns()
+        self.apply_rows()
 
-        # all_fields = [c for c, flag in zip(self.field_names_candidates, overall_col_flags)]
-        
-        # extracting specific columns at runtime can sometimes lead to very minor padding issues
-        # this can be problematic for OCD people, others might not notice
-        # print(self.pretty_table.get_string(fields=fields_to_display))
-        # RichConsole.print(self.pretty_table.get_string(fields=fields_to_display))
-        # self.chatlog(self.pretty_table.get_string(fields=fields_to_display))
+        # self.clear()
+        # self.set_collumns()
         self.console.print(self.rich_table)
 
     def clear(self):
-        # self.pretty_table.clear()
+        self.rich_table = RichTable()
+
+        self.rich_table.title_style = "bold"
+        self.rich_table.caption_style = "italic rgb(5,5,5)"
+        self.rich_table.caption_justify = "left"
+        
         pass
 
     def ansi_to_console(self, line):
@@ -122,3 +127,14 @@ class Table:
             original_strings = splits[1].split("\x1b[0m")
             string_to_return += f"[rgb({rgb[0]},{rgb[1]},{rgb[2]})]{'[/]'.join(original_strings)}"
         return string_to_return
+
+    def set_collumns(self):
+        self.overall_col_flags = [
+            f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
+        ]
+        self.fields_to_display = [
+            c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
+        ]
+
+        for field in self.fields_to_display:
+            self.rich_table.add_column(field, justify="center")
