@@ -109,7 +109,7 @@ class Table:
 
     def clear(self):
         self.rich_table = RichTable()
-
+        self.rows = []
         self.rich_table.title_style = "bold"
         self.rich_table.caption_style = "italic rgb(50,505,50)"
         self.rich_table.caption_justify = "left"
