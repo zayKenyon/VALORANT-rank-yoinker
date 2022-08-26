@@ -292,6 +292,9 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        if player["Subject"] == Requests.puuid:
+                            if cfg.get_feature_flag("discord_rpc"):
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -348,7 +351,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
@@ -495,7 +498,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
@@ -575,7 +578,7 @@ try:
                             rr = playerRank["rr"]
 
                             #short peak rank string
-                            peakRankAct = f" e({playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                            peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                             if not cfg.get_feature_flag("peak_rank_act"):
                                 peakRankAct = ""
 
