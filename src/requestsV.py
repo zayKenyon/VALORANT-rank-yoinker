@@ -43,10 +43,10 @@ class Requests:
             print(f"New version available! {link}")
             if sys.argv[0][-3:] == "exe":
                 while True:
-                    udpate_now = input("Do you want to update now? (Y/n): ")
-                    if udpate_now.lower() == "n" or udpate_now.lower() == "no":
+                    update_now = input("Do you want to update now? (Y/n): ")
+                    if update_now.lower() == "n" or update_now.lower() == "no":
                         return
-                    elif udpate_now.lower() == "y" or udpate_now.lower() == "yes" or udpate_now == "":
+                    elif update_now.lower() == "y" or update_now.lower() == "yes" or update_now == "":
                         self.copy_run_update_script(link)
                         os._exit(1)
                     
