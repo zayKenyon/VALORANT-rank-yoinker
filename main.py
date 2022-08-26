@@ -78,7 +78,7 @@ try:
     ErrorSRC = Error(log)
     
     Requests = Requests(version, log, ErrorSRC)
-    Requests.check_version()
+    print(Requests.check_version())
     Requests.check_status()
 
     cfg = Config(log)
@@ -112,7 +112,7 @@ try:
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log)
+        rpc = Rpc(map_dict, gamemodes, colors, log, Requests.check_version())
     else:
         rpc = None
 
