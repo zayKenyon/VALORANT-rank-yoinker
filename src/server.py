@@ -27,7 +27,7 @@ class Server:
 
     def handle_new_client(self, client, server):
         self.send_payload("version",{
-            "version": version
+            "core": version
         })
         for key in self.lastMessages:
             self.send_message(self.lastMessages[key])
