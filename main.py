@@ -422,7 +422,7 @@ try:
 
                         heartbeat_data["players"][player["Subject"]] = {
                             "name": names[player["Subject"]],
-                            "partyNumber": partyCount,
+                            "partyIcon": party_icon,
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "map": map_dict[coregame_stats["MapID"].lower()],
                             "rank": playerRank["rank"],
@@ -593,7 +593,7 @@ try:
 
                         heartbeat_data["players"][player["Subject"]] = {
                             "name": names[player["Subject"]],
-                            "partyNumber": partyCount,
+                            "partyIcon": party_icon,
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
