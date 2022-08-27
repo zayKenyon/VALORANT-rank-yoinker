@@ -39,7 +39,7 @@ from colr import color as colr
 
 from rich.console import Console as RichConsole
 
-from src.account_manager import AccountManager
+# from src.account_manager import AccountManager
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -83,7 +83,7 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 
-    acc_manager = AccountManager(log)
+    # acc_manager = AccountManager(log)
 
     ErrorSRC = Error(log)
 
