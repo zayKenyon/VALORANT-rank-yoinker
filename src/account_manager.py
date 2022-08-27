@@ -8,7 +8,7 @@ import yaml
 import re
 import json
 import subprocess
-
+import time
 
 #temporary
 import urllib3
@@ -63,19 +63,111 @@ class AccountManager:
         self.region = ""
         self.content = None
         self.pritvate_settings = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Data\RiotGamesPrivateSettings.yaml')
+        self.riot_client_path = ""
+        # yaml.add_representer(str, lambda dumper, data: dumper.represent_scalar('tag:yaml.org,2002:str', data, style='"'))
 
 
-    def switch_to_account(self, account_cookies):
+
+    def switch_to_account(self, account_data):
+        subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         with open(self.pritvate_settings, 'r') as f:
             yaml_data = yaml.safe_load(f)
-            for i, cookie in enumerate(yaml_data["riot-login"]["persist"]["session"]["cookies"]):
-                yaml_data["riot-login"]["persist"]["session"]["cookies"][i]["value"] = account_cookies.get(cookie["name"])
+            try:
+                if len(yaml_data["riot-login"]["persist"]["session"]["cookies"]) == 5:
+                    for i, cookie in enumerate(yaml_data["riot-login"]["persist"]["session"]["cookies"]):
+                        yaml_data["riot-login"]["persist"]["session"]["cookies"][i]["value"] = account_data["cookies"].get(cookie["name"])
+            except TypeError:
+                yaml_data = self.create_yaml_config_file(account_data)
+            else:
+                # self.log.error(f"Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}")
+                yaml_data = self.create_yaml_config_file(account_data)
+                #need to create riotgamesprivatesettings.yaml file with content in it generated
         with open(self.pritvate_settings, "w") as f:
             yaml.dump(yaml_data, f)
+
+    def create_yaml_config_file(self, account_data):
+        return {
+            "riot-login": {
+                "persist": {
+                    "region": f"""{account_data['lol_region'].upper()}""",
+                    "session": {
+                        "cookies": [
+                            {
+                                "domain": "riotgames.com",
+                                "hostOnly": False,
+                                "httpOnly": True,
+                                "name": "tdid",
+                                "path": "/",
+                                "persistent": True,
+                                "secureOnly": True,
+                                "value": account_data["cookies"]["tdid"]
+                            },
+                            {
+                                "domain": "auth.riotgames.com",
+                                "hostOnly": True,
+                                "httpOnly": True,
+                                "name": "ssid",
+                                "path": "/",
+                                "persistent": True,
+                                "secureOnly": True,
+                                "value": account_data["cookies"]["ssid"]
+                            },
+                            {
+                                "domain": "auth.riotgames.com",
+                                "hostOnly": True,
+                                "httpOnly": True,
+                                "name": "clid",
+                                "path": "/",
+                                "persistent": True,
+                                "secureOnly": True,
+                                "value": account_data["cookies"]["clid"]
+                            },
+                            {
+                                "domain": "auth.riotgames.com",
+                                "hostOnly": True,
+                                "httpOnly": False,
+                                "name": "sub",
+                                "path": "/",
+                                "persistent": True,
+                                "secureOnly": True,
+                                "value": account_data["cookies"]["sub"]
+                            },
+                            {
+                                "domain": "auth.riotgames.com",
+                                "hostOnly": True,
+                                "httpOnly": False,
+                                "name": "csid",
+                                "path": "/",
+                                "persistent": True,
+                                "secureOnly": True,
+                                "value": account_data["cookies"]["csid"]
+                            },
+                        ]
+                    }
+                }
+            }
+        }
+        # with open(self.pritvate_settings, "w") as f:
+        #     f.write("")
+
+    def add_account_with_client(self):
+        subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with open(self.pritvate_settings, "w") as f:
+            f.write("")
+        time.sleep(5)
+        subprocess.Popen([self.riot_client_path])
+
 
     def load_account_auth(self):
         with open(self.pritvate_settings, 'r') as f:
             yaml_data = yaml.safe_load(f)
+            try:
+                if len(yaml_data["riot-login"]["persist"]["session"]["cookies"]) != 5:
+                    # self.error(f"Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}")
+                    return None
+            except TypeError:
+                #self.log("No cookies found in riot games private settings")
+                return None
             for cookie in yaml_data["riot-login"]["persist"]["session"]["cookies"]:
                 if cookie["name"] == "sub":
                     self.puuid = cookie["value"]
@@ -100,6 +192,8 @@ class AccountManager:
         access_token = data[0]
         id_token = data[1]
         expires_in = data[2]
+        expire_in_epoch = int(time.time()) + int(expires_in)
+
         # print(r_auth.status_code)
 
         r_entitlements = self.session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers={'Authorization': 'Bearer ' + access_token} | self.headers, json={})
@@ -109,11 +203,17 @@ class AccountManager:
         self.auth_headers.update({
             'Authorization': f"Bearer {access_token}",
             'X-Riot-Entitlements-JWT': entitlements_token})
-
         r = requests.put("https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant", headers={'Authorization': 'Bearer ' + access_token}, json={"id_token": id_token})
         self.region = r.json()["affinities"]["live"]
 
-        return self.session.cookies.get_dict()
+        r = requests.post("https://auth.riotgames.com/userinfo", headers={'Authorization': 'Bearer ' + access_token})
+        self.lol_region = r.json()["region"]["tag"]
+
+        return {
+            "cookies": self.session.cookies.get_dict(),
+            "expire_in": expire_in_epoch,
+            "lol_region": self.lol_region
+        }
         # r = self.session.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=)
 
     def get_account_data(self):
@@ -164,28 +264,30 @@ class AccountManager:
             self.accounts_data = {}
         return self.accounts_data
 
-    def save_account_to_config(self, cookies, data):
+    def save_account_to_config(self, authdata, data):
         self.load_accounts_config()
         self.accounts_data.update({
-            cookies.get("sub"): {
+            authdata.get("cookies").get("sub"): {
                 "rank": data.get("rank"),
                 "name": data.get("name"),
                 "level": data.get("level"),
                 "bp_level": data.get("bp_level"),
+                "expire_in": authdata.get("expire_in"),
+                "lol_region": authdata.get("lol_region"),
                 #convert to base64 maybe in future
                 "cookies": {
-                    "clid": cookies.get("clid"),
-                    "csid": cookies.get("csid"),
-                    "ssid": cookies.get("ssid"),
-                    "sub": cookies.get("sub"),
-                    "tdid": cookies.get("tdid")
+                    "clid": authdata.get("cookies").get("clid"),
+                    "csid": authdata.get("cookies").get("csid"),
+                    "ssid": authdata.get("cookies").get("ssid"),
+                    "sub": authdata.get("cookies").get("sub"),
+                    "tdid": authdata.get("cookies").get("tdid")
                 }
             }
         })
         with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
             json.dump(self.accounts_data, f)
 
-    def test_new_account(self):
+    def test_user_pass_login(self):
         data = {
             "acr_values": "",
             "claims": "",
@@ -226,26 +328,15 @@ class AccountManager:
         with open(path, 'r') as f:
             data = json.load(f)
         for client in self.client_names:
-            os.path.exists(data.get(client))
-            return data.get(client)
+            if os.path.exists(data.get(client)):
+                self.riot_client_path = data.get(client)
+                return data.get(client)
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
         return ansi_escape.sub('', line)
 
-
-    def menu(self, account_data):
-        menu_prompt = {
-            "type": "list",
-            "name": "menu",
-            "message": "Please select optional features:",
-            "choices": [
-                f"Logged in as {account_data.get('name')} | {account_data.get('rank')} | Level: {account_data.get('level')} | Battlepass {account_data.get('bp_level')}/55",
-                "Change accounts",
-                "Start Valorant"
-            ],
-        }
-
+    def menu_change_accounts(self):
         change_accounts_prompt = {
             "type": "list",
             "name": "menu",
@@ -263,40 +354,83 @@ class AccountManager:
             ],
         }
 
+        self.load_accounts_config()
+        for account in self.accounts_data:
+            change_accounts_prompt["choices"].append("Change to: " + self.accounts_data[account]["name"])
+        change_accounts_prompt["choices"].append("Add new account")
+        result = InquirerPy.prompt(change_accounts_prompt)
+        if result["menu"] == "Add new account":
+            result = InquirerPy.prompt(add_account_prompt)
+            option = add_account_prompt["choices"].index(result["menu"])
+            if option == 0:
+                pass
+            elif option == 1:
+                self.add_account_with_client()
+            
+        else:
+            #change to one of saved accounts
+            account_name = result["menu"].split("Change to: ")[1]
+            for account in self.accounts_data:
+                if self.accounts_data[account]["name"] == account_name:
+                    self.session.cookies.update(self.accounts_data[account]["cookies"])
+                    self.switch_to_account(self.accounts_data[account])
+
+                    auth_data = self.load_account_auth()
+                    account_data = acc.get_account_data()
+                    acc.save_account_to_config(auth_data, account_data)
+                    acc.menu(account_data)
+
+    def menu(self, account_data):
+        if account_data is not None:
+            menu_prompt = {
+                "type": "list",
+                "name": "menu",
+                "message": "Please select optional features:",
+                "choices": [
+                    f"Logged in as {account_data.get('name')} | {account_data.get('rank')} | Level: {account_data.get('level')} | Battlepass {account_data.get('bp_level')}/55",
+                    "Change accounts",
+                    "Start Valorant"
+                ],
+            }
+        else:
+            menu_prompt = {
+                "type": "list",
+                "name": "menu",
+                "message": "Please select optional features:",
+                "choices": [
+                    "Not logged in",
+                    "Log in",
+                ],
+            }
+
 
         result = InquirerPy.prompt(menu_prompt)
         option = menu_prompt["choices"].index(result["menu"])
-        if option == 0:
-            pass
-        elif option == 1:
-            self.load_accounts_config()
-            for account in self.accounts_data:
-                change_accounts_prompt["choices"].append("Change to: " + self.accounts_data[account]["name"])
-            change_accounts_prompt["choices"].append("Add new account")
-            result = InquirerPy.prompt(change_accounts_prompt)
-            if result["menu"] == "Add new account":
-                result = InquirerPy.prompt(add_account_prompt)
-                # self.add_account()
-            else:
-                #change to one of saved accounts
-                account_name = result["menu"].split("Change to: ")[1]
-                for account in self.accounts_data:
-                    if self.accounts_data[account]["name"] == account_name:
-                        self.session.cookies.update(self.accounts_data[account]["cookies"])
-                        self.switch_to_account(self.accounts_data[account]["cookies"])
-        elif option == 2:
-            riot_client_path = self.get_riot_client_path()
-            subprocess.Popen([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
-            # subprocess.call([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
-            
+        if account_data != None:
+            if option == 0:
+                pass
+            elif option == 1:
+                self.menu_change_accounts()
+            elif option == 2:
+                subprocess.Popen([self.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+                # subprocess.call([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+        else:
+            if option == 0:
+                pass
+            elif option == 1:
+                self.menu_change_accounts()
 
     
 
 if __name__ == "__main__":
     from constants import NUMBERTORANKS
     acc = AccountManager("a")
+    acc.get_riot_client_path()
     # acc.test_new_account()
-    cookies = acc.load_account_auth()
-    account_data = acc.get_account_data()
-    acc.save_account_to_config(cookies, account_data)
-    acc.menu(account_data)
+    auth_data = acc.load_account_auth()
+    if auth_data is not None:
+        account_data = acc.get_account_data()
+        acc.save_account_to_config(auth_data, account_data)
+        acc.menu(account_data)
+    else:
+        acc.menu(None)
