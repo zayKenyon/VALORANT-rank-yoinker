@@ -89,20 +89,32 @@ class Ws:
                 #currently only game chat no pregame or menu
                 if "ares-coregame" in message["cid"]:
                     if message["id"] not in self.id_seen:
-                        if self.player_data[message["puuid"]]["team"] == "Red":
-                            clr = (238, 77, 77)
-                        else:
+                        for player in self.player_data:
+                            if player == self.Requests.puuid:
+                                self.ally_team = self.player_data[player]["team"]
+                        if message["puuid"] == self.Requests.puuid:
+                            clr = (221, 224, 41)
+                        elif self.player_data[message["puuid"]]["team"] == self.ally_team:
                             clr = (76, 151, 237)
+                        else:
+                            clr = (238, 77, 77)
+
+                        chat_indicator = message["cid"].split("@")[0].rsplit("-", 1)[1]
+                        if chat_indicator == "blue":
+                            chat_prefix = color("[Team]", fore=(116, 162, 214))
+                        else:
+                            chat_prefix = "[All]"
+
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
-                            self.print_message(f"{color(agent, clr)}: {message['body']}")
+                            self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
-                            self.print_message(f"{color(name, clr)}{agent_str}: {message['body']}")
+                            self.print_message(f"{chat_prefix} {color(name, clr)}{agent_str}: {message['body']}")
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
