@@ -1,7 +1,7 @@
 import json
-from threading import Thread
 
 from websocket_server import WebsocketServer
+
 from src.constants import version
 
 # websocket.enableTrace(True)
