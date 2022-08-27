@@ -98,14 +98,14 @@ class Ws:
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
                             self.print_message(f"{color(agent, clr)}: {message['body']}")
-                            self.server.send_payload("chat",{"agent": agent,"message": message['body']})
+                            self.server.send_payload("chat",{"agent": self.colors.escape_ansi(agent),"message": message['body']})
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
                             self.print_message(f"{color(name, clr)}{agent_str}: {message['body']}")
-                            self.server.send_payload("chat",{"player": name,"agent": agent,"message": message['body']})
+                            self.server.send_payload("chat",{"player": name,"agent": self.colors.escape_ansi(agent),"message": message['body']})
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
