@@ -18,7 +18,7 @@ with open("requirements.txt", "r") as f:
 build_exe_options = {
     "path": sys.path,
     "include_files":['configurator.bat', 'updatescript.bat'],
-    "packages": [packages],
+    "packages": packages,
     "excludes": ["tkinter"]
 }
 
