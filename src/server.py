@@ -2,6 +2,7 @@ import json
 from threading import Thread
 
 from websocket_server import WebsocketServer
+from src.constants import version
 
 # websocket.enableTrace(True)
 
@@ -25,6 +26,9 @@ class Server:
             self.Error.PortError(port)
 
     def handle_new_client(self, client, server):
+        Server.send_payload("version",{
+            "version": version
+        })
         for key in self.lastMessages:
             self.send_message(self.lastMessages[key])
 
