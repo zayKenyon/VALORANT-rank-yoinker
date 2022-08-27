@@ -9,6 +9,11 @@ import re
 import json
 import subprocess
 
+
+#temporary
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 FORCED_CIPHERS = [
     'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-ECDSA-CHACHA20-POLY1305',
@@ -37,6 +42,7 @@ class AccountManager:
         self.session.mount("https://", TLSAdapter())
         load_dotenv()
         self.client_names = ["rc_default", "rc_live", "rc_beta"]
+        self.puuid = ""
         self.username = os.getenv("name")
         self.password = os.getenv("password")
         self.headers = {
@@ -54,28 +60,21 @@ class AccountManager:
             "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
         }
 
-        self.menu_prompt = {
-            "type": "list",
-            "name": "menu",
-            "message": "Please select optional features:",
-            "choices": [
-                f"Logged in as Hamper#bad | Diamond 2 | Level 512 | Battlepass 23/55",
-                "Change accounts",
-                "Start Valorant"
-            ],
-    }
+        #hardcoded region for now
+        self.region = "eu"
+        self.content = None
 
-    def get_current_account(self):
-        pass
 
     def switch_to_account(self, account):
         pass
 
-    def load_account_data(self):
+    def load_account_auth(self):
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Data\RiotGamesPrivateSettings.yaml')
         with open(path, 'r') as f:
             yaml_data = yaml.safe_load(f)
             for cookie in yaml_data["riot-login"]["persist"]["session"]["cookies"]:
+                if cookie["name"] == "sub":
+                    self.puuid = cookie["value"]
                 cookie_name = cookie["name"]
                 cookie_value = cookie["value"]
                 self.session.cookies.set(cookie_name, cookie_value)
@@ -97,16 +96,53 @@ class AccountManager:
         access_token = data[0]
         id_token = data[1]
         expires_in = data[2]
-        print(r_auth.status_code)
+        # print(r_auth.status_code)
 
         r_entitlements = self.session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers={'Authorization': 'Bearer ' + access_token} | self.headers, json={})
-        print(r_entitlements.status_code)
-        entitlements_token = r_entitlements['entitlements_token']
+        # print(r_entitlements.status_code)
+        entitlements_token = r_entitlements.json()['entitlements_token']
 
         self.auth_headers.update({
             'Authorization': f"Bearer {access_token}",
             'X-Riot-Entitlements-JWT': entitlements_token})
         # r = self.session.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=)
+
+    def get_account_data(self):
+        #if more advande account data wants to be supported requestsV needs to be edited so it can bue used with custom headers and not lockfile
+        r_mmr = requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.puuid}", headers=self.auth_headers, verify=False)
+        season_info = r_mmr.json()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"].get(self.get_latest_season_id())
+        if season_info is not None:
+            rank = season_info["CompetitiveTier"]
+        else:
+            rank = 0
+        rank = self.escape_ansi(NUMBERTORANKS[rank])
+
+        name = requests.put(f"https://pd.{self.region}.a.pvp.net/name-service/v2/players", json=[self.puuid]).json()
+        name = name[0]["GameName"] + "#" + name[0]["TagLine"]
+
+        r_account_xp = requests.get(f"https://pd.{self.region}.a.pvp.net/account-xp/v1/players/{self.puuid}", headers=self.auth_headers, verify=False)
+        level = r_account_xp.json()["Progress"]["Level"]
+        contracts = requests.get("https://valorant-api.com/v1/contracts")
+        contracts = [a for a in contracts.json()["data"] if a["content"]["relationType"] == "Season"]
+        bp = contracts[-1]
+        r_contracts = requests.get(f"https://pd.{self.region}.a.pvp.net/contracts/v1/contracts/{self.puuid}", headers=self.auth_headers, verify=False)
+        for contract in r_contracts.json()["Contracts"]:
+            if contract["ContractDefinitionID"] == bp["uuid"]:
+                bp_level = contract["ProgressionLevelReached"]
+        return {
+            "rank": rank,
+            "name": name,
+            "level": level,
+            "bp_level": bp_level
+        }
+
+    def get_latest_season_id(self):
+        if self.content is None:
+            self.content = requests.get(f"https://shared.{self.region}.a.pvp.net/content-service/v3/content", headers=self.auth_headers, verify=False)
+        for season in self.content.json()["Seasons"]:
+            if season["IsActive"]:
+                return season["ID"]
+
 
     def test_new_account(self):
         data = {
@@ -152,9 +188,25 @@ class AccountManager:
             os.path.exists(data.get(client))
             return data.get(client)
 
-    def menu(self):
-        result = InquirerPy.prompt(self.menu_prompt)
-        option = self.menu_prompt["choices"].index(result["menu"])
+    def escape_ansi(self, line):
+        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return ansi_escape.sub('', line)
+
+    def menu(self, account_data):
+
+        menu_prompt = {
+            "type": "list",
+            "name": "menu",
+            "message": "Please select optional features:",
+            "choices": [
+                f"Logged in as {account_data.get('name')} | {account_data.get('rank')} | Level: {account_data.get('level')} | Battlepass {account_data.get('bp_level')}/55",
+                "Change accounts",
+                "Start Valorant"
+            ],
+        }
+
+        result = InquirerPy.prompt(menu_prompt)
+        option = menu_prompt["choices"].index(result["menu"])
         if option == 0:
             pass
         elif option == 1:
@@ -168,7 +220,9 @@ class AccountManager:
     
 
 if __name__ == "__main__":
+    from constants import NUMBERTORANKS
     acc = AccountManager("a")
     # acc.test_new_account()
-    # acc.load_account_data()
-    acc.menu()
+    acc.load_account_auth()
+    account_data = acc.get_account_data()
+    acc.menu(account_data)
