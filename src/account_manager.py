@@ -60,17 +60,21 @@ class AccountManager:
             "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
         }
 
-        #hardcoded region for now
-        self.region = "eu"
+        self.region = ""
         self.content = None
+        self.pritvate_settings = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Data\RiotGamesPrivateSettings.yaml')
 
 
-    def switch_to_account(self, account):
-        pass
+    def switch_to_account(self, account_cookies):
+        with open(self.pritvate_settings, 'r') as f:
+            yaml_data = yaml.safe_load(f)
+            for i, cookie in enumerate(yaml_data["riot-login"]["persist"]["session"]["cookies"]):
+                yaml_data["riot-login"]["persist"]["session"]["cookies"][i]["value"] = account_cookies.get(cookie["name"])
+        with open(self.pritvate_settings, "w") as f:
+            yaml.dump(yaml_data, f)
 
     def load_account_auth(self):
-        path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Data\RiotGamesPrivateSettings.yaml')
-        with open(path, 'r') as f:
+        with open(self.pritvate_settings, 'r') as f:
             yaml_data = yaml.safe_load(f)
             for cookie in yaml_data["riot-login"]["persist"]["session"]["cookies"]:
                 if cookie["name"] == "sub":
@@ -105,6 +109,11 @@ class AccountManager:
         self.auth_headers.update({
             'Authorization': f"Bearer {access_token}",
             'X-Riot-Entitlements-JWT': entitlements_token})
+
+        r = requests.put("https://riot-geo.pas.si.riotgames.com/pas/v1/product/valorant", headers={'Authorization': 'Bearer ' + access_token}, json={"id_token": id_token})
+        self.region = r.json()["affinities"]["live"]
+
+        return self.session.cookies.get_dict()
         # r = self.session.post("https://entitlements.auth.riotgames.com/api/token/v1", headers=)
 
     def get_account_data(self):
@@ -143,6 +152,38 @@ class AccountManager:
             if season["IsActive"]:
                 return season["ID"]
 
+    def load_accounts_config(self):
+        try:
+            os.mkdir(os.path.join(os.getenv('APPDATA'), "vry"))
+        except FileExistsError:
+            pass
+        try:
+            with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "r") as f:
+                self.accounts_data = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            self.accounts_data = {}
+        return self.accounts_data
+
+    def save_account_to_config(self, cookies, data):
+        self.load_accounts_config()
+        self.accounts_data.update({
+            cookies.get("sub"): {
+                "rank": data.get("rank"),
+                "name": data.get("name"),
+                "level": data.get("level"),
+                "bp_level": data.get("bp_level"),
+                #convert to base64 maybe in future
+                "cookies": {
+                    "clid": cookies.get("clid"),
+                    "csid": cookies.get("csid"),
+                    "ssid": cookies.get("ssid"),
+                    "sub": cookies.get("sub"),
+                    "tdid": cookies.get("tdid")
+                }
+            }
+        })
+        with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
+            json.dump(self.accounts_data, f)
 
     def test_new_account(self):
         data = {
@@ -192,8 +233,8 @@ class AccountManager:
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
         return ansi_escape.sub('', line)
 
-    def menu(self, account_data):
 
+    def menu(self, account_data):
         menu_prompt = {
             "type": "list",
             "name": "menu",
@@ -205,12 +246,44 @@ class AccountManager:
             ],
         }
 
+        change_accounts_prompt = {
+            "type": "list",
+            "name": "menu",
+            "message": "Please select optional features:",
+            "choices": [],
+        }
+
+        add_account_prompt = {
+            "type": "list",
+            "name": "menu",
+            "message": "Please select optional features:",
+            "choices": [
+                "Add account with username & password",
+                "Add account by signing into riot client"
+            ],
+        }
+
+
         result = InquirerPy.prompt(menu_prompt)
         option = menu_prompt["choices"].index(result["menu"])
         if option == 0:
             pass
         elif option == 1:
-            pass
+            self.load_accounts_config()
+            for account in self.accounts_data:
+                change_accounts_prompt["choices"].append("Change to: " + self.accounts_data[account]["name"])
+            change_accounts_prompt["choices"].append("Add new account")
+            result = InquirerPy.prompt(change_accounts_prompt)
+            if result["menu"] == "Add new account":
+                result = InquirerPy.prompt(add_account_prompt)
+                # self.add_account()
+            else:
+                #change to one of saved accounts
+                account_name = result["menu"].split("Change to: ")[1]
+                for account in self.accounts_data:
+                    if self.accounts_data[account]["name"] == account_name:
+                        self.session.cookies.update(self.accounts_data[account]["cookies"])
+                        self.switch_to_account(self.accounts_data[account]["cookies"])
         elif option == 2:
             riot_client_path = self.get_riot_client_path()
             subprocess.Popen([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
@@ -223,6 +296,7 @@ if __name__ == "__main__":
     from constants import NUMBERTORANKS
     acc = AccountManager("a")
     # acc.test_new_account()
-    acc.load_account_auth()
+    cookies = acc.load_account_auth()
     account_data = acc.get_account_data()
+    acc.save_account_to_config(cookies, account_data)
     acc.menu(account_data)
