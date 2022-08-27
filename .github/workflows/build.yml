@@ -7,28 +7,45 @@ on:
   push:
     branches:
       - 'main'
+    
+  pull_request:
+    types: [review_requested]
 
 jobs:
+  specific_review_requested:
+    
+    runs-on: windows-latest
+    steps: 
+      - run: echo 'A review was requested from the devs'
+      
   build:
+  
     runs-on: windows-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Set up Python
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: 'requirements.txt'
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+            
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
       - name: Install cx_Freeze
         run: pip install cx_Freeze
+      
       - name: Build Native Executable
         run: python setup.py build
+      
       - name: Get commit hash
         id: commit
         uses: pr-mpt/actions-commit-hash@v1
+      
       - name: Upload Compiled Version
         uses: actions/upload-artifact@v3
         with:

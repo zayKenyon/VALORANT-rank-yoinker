@@ -1,10 +1,9 @@
-prettytable==2.1.0
 requests==2.26.0
 urllib3==1.26.6
-alive-progress==1.6.2
 Colr~=0.9.1
 websocket-server==0.6.0
 websockets==10.3
 inquirerpy==0.3.4
 pypresence==4.2.1
 nest_asyncio==1.5.5
+rich==12.5.1
