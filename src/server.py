@@ -26,7 +26,7 @@ class Server:
             self.Error.PortError(port)
 
     def handle_new_client(self, client, server):
-        Server.send_payload("version",{
+        self.send_payload("version",{
             "version": version
         })
         for key in self.lastMessages:
