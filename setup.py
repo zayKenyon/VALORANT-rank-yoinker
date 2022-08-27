@@ -19,7 +19,7 @@ build_exe_options = {
     "path": sys.path,
     "include_files":['configurator.bat', 'updatescript.bat'],
     "packages": ["requests", "colr", "InquirerPy", "websockets", "pypresence", "nest_asyncio", "rich", "websocket_server"],
-    "excludes": ["tkinter"]
+    "excludes": ["tkinter", "test"]
 }
 
 setup(
