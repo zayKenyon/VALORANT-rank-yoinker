@@ -214,6 +214,7 @@ try:
             heartbeat_data = {
                 "time": int(time.time()),
                 "state": game_state,
+                "selfPuuid": Requests.puuid,
                 "players": {}
             }
 
