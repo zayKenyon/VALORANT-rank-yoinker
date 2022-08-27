@@ -1,11 +1,13 @@
 import InquirerPy
 import requests
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 import os
 from secrets import token_urlsafe
 import ssl
 import yaml
 import re
+import json
+import subprocess
 
 FORCED_CIPHERS = [
     'ECDHE-ECDSA-AES128-GCM-SHA256',
@@ -34,6 +36,7 @@ class AccountManager:
         self.session = requests.Session()
         self.session.mount("https://", TLSAdapter())
         load_dotenv()
+        self.client_names = ["rc_default", "rc_live", "rc_beta"]
         self.username = os.getenv("name")
         self.password = os.getenv("password")
         self.headers = {
@@ -141,9 +144,27 @@ class AccountManager:
         r = requests.get("https://valorant-api.com/v1/version")
         return r.json()["data"]["riotClientVersion"]
     
+    def get_riot_client_path(self):
+        path = os.path.join(os.getenv("ALLUSERSPROFILE"), R'Riot Games\RiotClientInstalls.json')
+        with open(path, 'r') as f:
+            data = json.load(f)
+        for client in self.client_names:
+            os.path.exists(data.get(client))
+            return data.get(client)
+
     def menu(self):
         result = InquirerPy.prompt(self.menu_prompt)
-        print(self.menu_prompt["choices"].index(result["menu"]))
+        option = self.menu_prompt["choices"].index(result["menu"])
+        if option == 0:
+            pass
+        elif option == 1:
+            pass
+        elif option == 2:
+            riot_client_path = self.get_riot_client_path()
+            subprocess.Popen([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+            # subprocess.call([riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+            
+
     
 
 if __name__ == "__main__":
