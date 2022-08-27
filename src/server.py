@@ -30,7 +30,8 @@ class Server:
             "core": version
         })
         for key in self.lastMessages:
-            self.send_message(self.lastMessages[key])
+            if key not in ["chat","version"]:
+                self.send_message(self.lastMessages[key])
 
     def send_message(self, message):
         self.server.send_message_to_all(message)
