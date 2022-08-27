@@ -678,7 +678,6 @@ except KeyboardInterrupt:
     os._exit(0)
 except:
     log(traceback.format_exc())
-    print(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
         f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
