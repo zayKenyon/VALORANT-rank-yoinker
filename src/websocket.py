@@ -8,7 +8,7 @@ import re
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc=None):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, server, rpc=None):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -26,6 +26,7 @@ class Ws:
         self.up = "\033[A"
         self.chat_limit = 5
         self.chatlog = chatlog
+        self.server = server
         if self.cfg.get_feature_flag("discord_rpc"):
             self.rpc = rpc
 
@@ -97,12 +98,14 @@ class Ws:
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
                             self.print_message(f"{color(agent, clr)}: {message['body']}")
+                            self.server.send_payload("chat",{"agent": agent,"message": message['body']})
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
                             self.print_message(f"{color(name, clr)}{agent_str}: {message['body']}")
+                            self.server.send_payload("chat",{"player": name,"agent": agent,"message": message['body']})
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
