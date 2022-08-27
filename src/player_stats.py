@@ -7,7 +7,7 @@ class PlayerStats:
 
     #in future rewrite this code
     def get_stats(self, puuid):
-        if not self.config.get_table_flag("headshot_percent"):
+        if not self.config.get_table_flag("headshot_percent") and not self.config.get_table_flag("kd"):
             return {
                 "kd": "N/a",
                 "hs": "N/a"
