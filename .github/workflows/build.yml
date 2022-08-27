@@ -1,5 +1,8 @@
 name: Build
 
+env:
+  PYTHON_VERSION: '3.10'
+
 on:
   push:
     branches:
@@ -21,11 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+          cache-dependency-path: 'requirements.txt'
             
       - name: Install dependencies
         run: |
