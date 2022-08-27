@@ -96,7 +96,7 @@ class Ws:
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
-                            self.print_message(f"{color(agent, clr)}: {message['body']}")
+                            self.print_message(f"{color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
                         else:
                             if agent == "":
                                 agent_str = ""
