@@ -41,7 +41,7 @@ from rich.console import Console as RichConsole
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-os.system('cls')
+# os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
 
 server = ""
@@ -67,9 +67,13 @@ try:
                 message="Do you want to run vRY now?", default=True
             ).execute()
             if run_app:
+                os.system('mode 150,35')
                 os.system('cls')
             else:
                 os._exit(0)
+        else:
+            os.system('mode 150,35')
+            os.system('cls')
     except Exception as e:
         print("Something went wrong while running configurator!")
         log(f"configurator encountered an error")
@@ -230,6 +234,7 @@ try:
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
+                isRange = False
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status: 
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -345,6 +350,8 @@ try:
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
+                        if agent == "" and len(Players) == 1:
+                            isRange = True
 
                         # NAME
                         name = Namecolor
@@ -648,6 +655,11 @@ try:
                     table.set_runtime_col_flag('Party', False)
                     table.set_runtime_col_flag('Agent',False)
                     table.set_runtime_col_flag('Skin',False)
+
+                if game_state == "INGAME":
+                    if isRange:
+                        table.set_runtime_col_flag('Party', False)
+                        table.set_runtime_col_flag('Agent',False)
 
                 table.set_caption(f"VALORANT rank yoinker v{version}")
                 table.display()

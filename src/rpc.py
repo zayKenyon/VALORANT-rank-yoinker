@@ -24,6 +24,7 @@ class Rpc():
         }
         self.last_presence_data = {}
         self.colors = colors
+        self.start_time = time.time()
 
     def set_data(self, data):
         self.data = self.data | data
@@ -61,6 +62,10 @@ class Rpc():
                         if mapText is None or mapText == "":
                             mapText = None
                             mapImage = None
+
+                        if self.last_presence_data.get("sessionLoopState") != presence["sessionLoopState"]:
+                            self.start_time = time.time()
+
                         self.rpc.update(
                             state=f"In a Party ({presence['partySize']} of {presence['maxPartySize']})",
                             details=details,
@@ -68,7 +73,7 @@ class Rpc():
                             large_text=mapText,
                             small_image=agent_img,
                             small_text=agent,
-                            start=time.time(),
+                            start=self.start_time,
                             buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC in-game data update")
@@ -85,9 +90,15 @@ class Rpc():
                         else:
                             party_string = "Closed Party"
 
+                        if presence["partyState"] == "CUSTOM_GAME_SETUP":
+                            gamemode = "Custom Game"
+                        else:
+                            gamemode = self.gamemodes.get(presence['queueId'])
+
+
                         self.rpc.update(
                             state=f"{party_string} ({presence['partySize']} of {presence['maxPartySize']})",
-                            details=f" Lobby - {self.gamemodes.get(presence['queueId'])}",
+                            details=f" Lobby - {gamemode}",
                             large_image=image,
                             large_text=image_text,
                             small_image=str(self.data.get("rank")),
@@ -96,7 +107,7 @@ class Rpc():
                         )
                         self.log("RPC menu data update")
                     elif presence["sessionLoopState"] == "PREGAME":
-                        if presence["provisioningFlow"] == "CustomGame":
+                        if presence["provisioningFlow"] == "CustomGame" or presence["partyState"] == "CUSTOM_GAME_SETUP":
                             gamemode = "Custom Game"
                         else:
                             gamemode = self.gamemodes.get(presence['queueId'])
