@@ -30,12 +30,13 @@ class Rpc():
         self.log("New data set in RPC")
         self.set_rpc(self.last_presence_data)
 
+
     def set_rpc(self, presence):
         if self.discord_running:
             try:
                 if presence["isValid"]:
                     if presence["sessionLoopState"] == "INGAME":
-                        if self.data.get("agent") is None or self.data.get("agent") is "":
+                        if self.data.get("agent") is None or self.data.get("agent") == "":
                             agent_img = None
                             agent = None
                         else:
@@ -57,7 +58,7 @@ class Rpc():
                             agent = self.data.get("rank_name")
                         else:
                             mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
-                        if mapText is None or mapText is "":
+                        if mapText is None or mapText == "":
                             mapText = None
                             mapImage = None
                         self.rpc.update(
@@ -67,7 +68,8 @@ class Rpc():
                             large_text=mapText,
                             small_image=agent_img,
                             small_text=agent,
-                            start=time.time()
+                            start=time.time(),
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC in-game data update")
                     elif presence["sessionLoopState"] == "MENUS":
@@ -89,7 +91,8 @@ class Rpc():
                             large_image=image,
                             large_text=image_text,
                             small_image=str(self.data.get("rank")),
-                            small_text=self.data.get("rank_name")
+                            small_text=self.data.get("rank_name"),
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC menu data update")
                     elif presence["sessionLoopState"] == "PREGAME":
@@ -100,7 +103,7 @@ class Rpc():
 
                         mapText = self.map_dict.get(presence["matchMap"].lower())
                         mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()
-                        if mapText is None or mapText is "":
+                        if mapText is None or mapText == "":
                             mapText = None
                             mapImage = None
 
@@ -111,7 +114,8 @@ class Rpc():
                             large_image=mapImage,
                             large_text=mapText,
                             small_image=str(self.data.get("rank")),
-                            small_text=self.data.get("rank_name")
+                            small_text=self.data.get("rank_name"),
+                            buttons=[{"label": "What's this? 👀", "url": "https://zaykenyon.github.io/VALORANT-rank-yoinker/"}]
                         )
                         self.log("RPC agent-select data update")
             except InvalidID:
