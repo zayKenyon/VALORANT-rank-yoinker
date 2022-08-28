@@ -14,7 +14,7 @@ class ChatLogging:
     def chat_log(self, string_to_log: str):
         """Creates a folder for and logs for chat."""
         try:
-            os.mkdir(os.getcwd() + "\chat_logs")
+            os.mkdir(os.getcwd() + r"\chat_logs")
         except FileExistsError:
             pass
         filenames = []
