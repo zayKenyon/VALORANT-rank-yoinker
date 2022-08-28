@@ -93,9 +93,10 @@ class AccountManager:
         #Change to: {account_name}
         else:
             #change to one of saved accounts
+            #no longer account name but more stats make it better in future
             account_name = result["menu"].split("Change to: ")[1]
             for account in self.account_config.accounts_data:
-                if self.account_config.accounts_data[account]["name"] == account_name:
+                if self.account_config.accounts_data[account]["name"] in account_name:
                     #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
                     self.account_config.switch_to_account(self.account_config.accounts_data[account])
 
@@ -161,7 +162,7 @@ class AccountManager:
             self.menu(None)
 
     def start_valorant(self):
-        subprocess.Popen([self.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+        subprocess.Popen([self.account_config.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
 
 if __name__ == "__main__":
     from account_config import AccountConfig
