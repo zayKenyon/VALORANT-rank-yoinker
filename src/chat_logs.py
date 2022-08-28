@@ -26,13 +26,15 @@ class ChatLogging:
             with open(f"chat_logs/chat_log-{max(filenames)}.txt",
                       "a", encoding=locale.getpreferredencoding()) as log_file:
                 log_file.write(
-                    f"{self.to_plain(string_to_log.encode('ascii', 'replace').decode())}\n")
+                    f"""{self.to_plain(string_to_log.encode('ascii',
+'replace').decode())}\n""")
         else:
             with open(f"chat_logs/chat_log-{max(filenames) + 1}.txt",
                       "w", encoding=locale.getpreferredencoding()) as log_file:
                 self.chat_file_opened = True
                 log_file.write(
-                    f"{self.to_plain(string_to_log.encode('ascii', 'replace').decode())}\n")
+                    f"""{self.to_plain(string_to_log.encode('ascii',
+'replace').decode())}\n""")
 
     @staticmethod
     def to_plain(line):
