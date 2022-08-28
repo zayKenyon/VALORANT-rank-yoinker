@@ -107,7 +107,7 @@ class Rank:
 
 
 if __name__ == "__main__":
-    from constants import before_ascendant_seasons, version, NUMBERTORANKS
+    from constants import BEFORE_ASCENDANT_SEASONS, VERSION, NUMBER_TO_RANKS
     from requestsV import Requests
     from logs import Logging
     from errors import Error
@@ -120,16 +120,16 @@ if __name__ == "__main__":
 
     ErrorSRC = Error(log)
 
-    Requests = Requests(version, log, ErrorSRC)
+    Requests = Requests(VERSION, log, ErrorSRC)
     #custom region
     # Requests.pd_url = "https://pd.na.a.pvp.net"
 
     #season id
     s_id = "67e373c7-48f7-b422-641b-079ace30b427" 
 
-    r = Rank(Requests, log, before_ascendant_seasons)
+    r = Rank(Requests, log, BEFORE_ASCENDANT_SEASONS)
 
     res = r.get_rank("", s_id)
     print(res)
     #[[rank, rr, leadeboard, peak rank, wr,] status]
-    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")
+    # print(f"Rank: {res[0][0]} - {NUMBER_TO_RANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBER_TO_RANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")

@@ -2,7 +2,7 @@ import time
 from typing import final
 import requests
 from colr import color
-from src.constants import sockets, hide_names
+from src.constants import sockets, HIDE_NAMES
 import json
 # import pyperclip
 
@@ -77,7 +77,7 @@ class Loadouts:
                 )
 
                 #creates name field
-                if hide_names:
+                if HIDE_NAMES:
                     for agent in valoApiAgents.json()["data"]:
                         if agent["uuid"] == players[i]["CharacterID"]:
                             final_json[players[i]["Subject"]].update({"Name": agent["displayName"]})

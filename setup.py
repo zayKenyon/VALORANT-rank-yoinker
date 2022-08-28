@@ -1,6 +1,6 @@
 import sys
 from cx_Freeze import setup, Executable
-from src.constants import version
+from src.constants import VERSION
 
 # with open("requirements.txt", "r") as f:
 #     requirements = f.read().splitlines()
@@ -24,7 +24,7 @@ build_exe_options = {
 
 setup(
     name = "VALORANT rank yoinker",
-    version = version,
+    version = VERSION,
     description='vRY - Live Match Rank Viewer',
     executables = [Executable("main.py", icon="./assets/Logo.ico", target_name="vry.exe")],
     options={"build_exe": build_exe_options}

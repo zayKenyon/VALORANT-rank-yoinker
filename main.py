@@ -42,7 +42,7 @@ from rich.console import Console as RichConsole
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # os.system('cls')
-os.system(f"title VALORANT rank yoinker v{version}")
+os.system(f"title VALORANT rank yoinker v{VERSION}")
 
 server = ""
 
@@ -84,7 +84,7 @@ try:
 
     ErrorSRC = Error(log)
     
-    Requests = Requests(version, log, ErrorSRC)
+    Requests = Requests(VERSION, log, ErrorSRC)
     Requests.check_version()
     Requests.check_status()
 
@@ -92,7 +92,7 @@ try:
 
     content = Content(Requests, log)
 
-    rank = Rank(Requests, log, content, before_ascendant_seasons)
+    rank = Rank(Requests, log, content, BEFORE_ASCENDANT_SEASONS)
     pstats = PlayerStats(Requests, log, cfg)
 
     namesClass = Names(Requests, log)
@@ -111,7 +111,7 @@ try:
     agent_dict = content.get_all_agents()
     map_dict = content.get_maps()
 
-    colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
+    colors = Colors(HIDE_NAMES, agent_dict, AGENT_COLOR_LIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server)
     table = Table(cfg, chatlog, log)
@@ -119,16 +119,16 @@ try:
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log)
+        rpc = Rpc(map_dict, GAMEMODES, colors, log)
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, HIDE_NAMES, chatlog, rpc)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
 
-    log(f"VALORANT rank yoinker v{version}")
+    log(f"VALORANT rank yoinker v{VERSION}")
 
 
 
@@ -300,9 +300,9 @@ try:
                         for party in partyOBJ:
                             if player["Subject"] in partyOBJ[party]:
                                 if party not in partyIcons:
-                                    partyIcons.update({party: PARTYICONLIST[partyCount]})
+                                    partyIcons.update({party: PARTY_ICON_LIST[partyCount]})
                                     # PARTY_ICON
-                                    party_icon = PARTYICONLIST[partyCount]
+                                    party_icon = PARTY_ICON_LIST[partyCount]
                                     partyCount += 1
                                 else:
                                     # PARTY_ICON
@@ -310,7 +310,7 @@ try:
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBER_TO_RANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -341,7 +341,7 @@ try:
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         if player["PlayerIdentity"]["HideAccountLevel"]:
-                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or HIDE_LEVELS == False:
                                 PLcolor = colors.level_to_color(player_level)
                             else:
                                 PLcolor = ""
@@ -363,7 +363,7 @@ try:
                         skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = NUMBER_TO_RANKS[playerRank["rank"]]
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -375,7 +375,7 @@ try:
 
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = NUMBER_TO_RANKS[playerRank["peakrank"]] + peakRankAct
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -451,9 +451,9 @@ try:
                         for party in partyOBJ:
                             if player["Subject"] in partyOBJ[party]:
                                 if party not in partyIcons:
-                                    partyIcons.update({party: PARTYICONLIST[partyCount]})
+                                    partyIcons.update({party: PARTY_ICON_LIST[partyCount]})
                                     # PARTY_ICON
-                                    party_icon = PARTYICONLIST[partyCount]
+                                    party_icon = PARTY_ICON_LIST[partyCount]
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
@@ -462,7 +462,7 @@ try:
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBER_TO_RANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -487,7 +487,7 @@ try:
                                                             player["Subject"], Requests.puuid, party_members=partyMembersList)
 
                         if player["PlayerIdentity"]["HideAccountLevel"]:
-                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or HIDE_LEVELS == False:
                                 PLcolor = colors.level_to_color(player_level)
                             else:
                                 PLcolor = ""
@@ -516,7 +516,7 @@ try:
                         # skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = NUMBER_TO_RANKS[playerRank["rank"]]
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -526,7 +526,7 @@ try:
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = NUMBER_TO_RANKS[playerRank["peakrank"]] + peakRankAct
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -570,12 +570,12 @@ try:
                         if player not in seen:
                             status.update(f"Loading players... [{playersLoaded}/{len(Players)}]")
                             playersLoaded += 1
-                            party_icon = PARTYICONLIST[0]
+                            party_icon = PARTY_ICON_LIST[0]
                             playerRank = rank.get_rank(player["Subject"], seasonID)
 
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
-                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBER_TO_RANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
 
                             # rankStatus = playerRank[1]
                             #useless code since rate limit is handled in the requestsV
@@ -600,7 +600,7 @@ try:
                             name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                             # RANK
-                            rankName = NUMBERTORANKS[playerRank["rank"]]
+                            rankName = NUMBER_TO_RANKS[playerRank["rank"]]
 
                             # RANK RATING
                             rr = playerRank["rr"]
@@ -611,7 +611,7 @@ try:
                                 peakRankAct = ""
 
                             # PEAK RANK
-                            peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                            peakRank = NUMBER_TO_RANKS[playerRank["peakrank"]] + peakRankAct
 
                             # LEADERBOARD
                             leaderboard = playerRank["leaderboard"]
@@ -661,12 +661,12 @@ try:
                         table.set_runtime_col_flag('Party', False)
                         table.set_runtime_col_flag('Agent',False)
 
-                table.set_caption(f"VALORANT rank yoinker v{version}")
+                table.set_caption(f"VALORANT rank yoinker v{VERSION}")
                 table.display()
                 firstPrint = False
 
-                # print(f"VALORANT rank yoinker v{version}")
-                # chatlog(f"VALORANT rank yoinker v{version}")
+                # print(f"VALORANT rank yoinker v{VERSION}")
+                # chatlog(f"VALORANT rank yoinker v{VERSION}")
                                         #                 {
                                         #     "times": sum(stats_data[player["Subject"]]),
                                         #     "name": curr_player_stat["name"],

@@ -1,18 +1,18 @@
 from colr import color
-from src.constants import tierDict
+from src.constants import TIER_DICT
 import re
 
 class Colors:
-    def __init__(self, hide_names, agent_dict, AGENTCOLORLIST):
-        self.hide_names = hide_names
+    def __init__(self, HIDE_NAMES, agent_dict, AGENT_COLOR_LIST):
+        self.HIDE_NAMES = HIDE_NAMES
         self.agent_dict = agent_dict
-        self.tier_dict = tierDict
-        self.AGENTCOLORLIST = AGENTCOLORLIST
+        self.tier_dict = TIER_DICT
+        self.AGENT_COLOR_LIST = AGENT_COLOR_LIST
 
     def get_color_from_team(self, team, name, playerPuuid, selfPuuid, agent=None, party_members=None):
         orig_name = name
         if agent is not None:
-            if self.hide_names:
+            if self.HIDE_NAMES:
                 if agent != "":
                     name = self.agent_dict[agent.lower()]
                 else:
@@ -53,8 +53,8 @@ class Colors:
 
     def get_agent_from_uuid(self, agentUUID):
         agent = str(self.agent_dict.get(agentUUID))
-        if self.AGENTCOLORLIST.get(agent.lower()) != None:
-            agent_color = self.AGENTCOLORLIST.get(agent.lower())
+        if self.AGENT_COLOR_LIST.get(agent.lower()) != None:
+            agent_color = self.AGENT_COLOR_LIST.get(agent.lower())
             return color(agent, fore=agent_color)
         else:
             return agent

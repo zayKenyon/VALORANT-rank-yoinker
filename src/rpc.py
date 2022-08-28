@@ -4,7 +4,7 @@ import nest_asyncio
 import time
 
 class Rpc():
-    def __init__(self, map_dict, gamemodes, colors, log):
+    def __init__(self, map_dict, GAMEMODES, colors, log):
         nest_asyncio.apply()
         self.log = log
         self.discord_running = True
@@ -15,7 +15,7 @@ class Rpc():
         except DiscordNotFound:
             self.log("Failed connecting to discord")
             self.discord_running = False
-        self.gamemodes = gamemodes
+        self.GAMEMODES = GAMEMODES
         self.map_dict = map_dict
         self.data = {
             "agent": None,
@@ -47,7 +47,7 @@ class Rpc():
                         if presence["provisioningFlow"] == "CustomGame":
                             gamemode = "Custom Game"
                         else:
-                            gamemode = self.gamemodes.get(presence['queueId'])
+                            gamemode = self.GAMEMODES.get(presence['queueId'])
                         
                         details = f"{gamemode} // {presence['partyOwnerMatchScoreAllyTeam']} - {presence['partyOwnerMatchScoreEnemyTeam']}"
 
@@ -93,7 +93,7 @@ class Rpc():
                         if presence["partyState"] == "CUSTOM_GAME_SETUP":
                             gamemode = "Custom Game"
                         else:
-                            gamemode = self.gamemodes.get(presence['queueId'])
+                            gamemode = self.GAMEMODES.get(presence['queueId'])
 
 
                         self.rpc.update(
@@ -110,7 +110,7 @@ class Rpc():
                         if presence["provisioningFlow"] == "CustomGame" or presence["partyState"] == "CUSTOM_GAME_SETUP":
                             gamemode = "Custom Game"
                         else:
-                            gamemode = self.gamemodes.get(presence['queueId'])
+                            gamemode = self.GAMEMODES.get(presence['queueId'])
 
                         mapText = self.map_dict.get(presence["matchMap"].lower())
                         mapImage = f"splash_{self.map_dict.get(presence['matchMap'].lower())}_square".lower()

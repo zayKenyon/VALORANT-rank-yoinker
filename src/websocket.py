@@ -8,7 +8,7 @@ import re
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc=None):
+    def __init__(self, lockfile, Requests, cfg, colors, HIDE_NAMES, chatlog, rpc=None):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -21,7 +21,7 @@ class Ws:
         self.player_data = {}
         self.messages = 0
         self.colors = colors
-        self.hide_names = hide_names
+        self.HIDE_NAMES = HIDE_NAMES
         self.message_history = []
         self.up = "\033[A"
         self.chat_limit = 5
@@ -107,7 +107,7 @@ class Ws:
 
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
                         name = f"{message['game_name']}#{message['game_tag']}"
-                        if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
+                        if self.player_data[message['puuid']]['streamer_mode'] and self.HIDE_NAMES and message['puuid'] not in self.player_data["ignore"]:
                             self.print_message(f"{chat_prefix} {color(self.colors.to_plain(agent), clr)}: {message['body']}")
                         else:
                             if agent == "":
