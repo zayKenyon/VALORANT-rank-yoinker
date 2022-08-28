@@ -57,13 +57,13 @@ class AccountAuth:
         return requests.get("https://valorant-api.com/v1/version").json()["data"]["riotClientVersion"]
 
     def auth_account(self, username=None, password=None, cookies=None):
+        self.session.cookies.clear()
         if cookies != None:
             for cookie in cookies:
+                self.session.cookies.set(cookie, cookies[cookie])
                 if cookie == "sub":
                     self.puuid = cookies[cookie]
-                    print(self.puuid)
-                    #need to way to load puuid from login details
-            self.session.cookies.set(cookies)
+                
         data = {
             "acr_values": "",
             "claims": "",
@@ -76,6 +76,7 @@ class AccountAuth:
             "scope": "openid link ban lol_region account",
         }
         r = self.session.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=self.headers)
+
         if username != None and password != None:
             body = {
                         "language": "en_US",
@@ -102,6 +103,9 @@ class AccountAuth:
         self.region = r.json()["affinities"]["live"]
         r = requests.post("https://auth.riotgames.com/userinfo", headers={'Authorization': 'Bearer ' + access_token})
         self.lol_region = r.json()["region"]["tag"]
+
+        if cookies == None:
+            self.puuid = self.session.cookies.get_dict()["sub"]
         return {
             "cookies": self.session.cookies.get_dict(),
             "expire_in": expire_in_epoch,
@@ -127,7 +131,6 @@ class AccountAuth:
 
         name = requests.put(f"https://pd.{self.region}.a.pvp.net/name-service/v2/players", json=[self.puuid]).json()
         name = name[0]["GameName"] + "#" + name[0]["TagLine"]
-
         r_account_xp = requests.get(f"https://pd.{self.region}.a.pvp.net/account-xp/v1/players/{self.puuid}", headers=self.auth_headers, verify=False)
         level = r_account_xp.json()["Progress"]["Level"]
         contracts = requests.get("https://valorant-api.com/v1/contracts")
@@ -143,3 +146,7 @@ class AccountAuth:
             "level": level,
             "bp_level": bp_level
         }
+
+    def escape_ansi(self, line):
+        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return ansi_escape.sub('', line)

@@ -116,7 +116,7 @@ class AccountConfig:
 
     def save_account_to_config(self, authdata, data):
         self.load_accounts_config()
-        self.accounts_data.update({
+        updated_data = {
             authdata.get("cookies").get("sub"): {
                 "rank": data.get("rank"),
                 "name": data.get("name"),
@@ -133,10 +133,12 @@ class AccountConfig:
                     "tdid": authdata.get("cookies").get("tdid")
                 }
             }
-        })
+        }
+        self.accounts_data.update(updated_data)
         with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
             json.dump(self.accounts_data, f)
-
+        return updated_data
+        
     def add_account_with_client(self):
         subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         with open(self.pritvate_settings, "w") as f:

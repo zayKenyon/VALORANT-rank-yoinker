@@ -42,10 +42,6 @@ class AccountManager:
 
 
 
-    def escape_ansi(self, line):
-        ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-        return ansi_escape.sub('', line)
-
     def menu_change_accounts(self):
         change_accounts_prompt = {
             "type": "list",
@@ -66,7 +62,7 @@ class AccountManager:
 
         self.account_config.load_accounts_config()
         for account in self.account_config.accounts_data:
-            change_accounts_prompt["choices"].append("Change to: " + self.account_config.accounts_data[account]["name"])
+            change_accounts_prompt["choices"].append(f"Change to: {self.account_config.accounts_data[account]['name']:<16}  | {self.account_config.accounts_data[account].get('rank'):<12} | Level: {self.account_config.accounts_data[account].get('level'):<4} | Battlepass {self.account_config.accounts_data[account].get('bp_level'):<2}/55")
         change_accounts_prompt["choices"].append("Add new account")
         result = InquirerPy.prompt(change_accounts_prompt)
         #Add new account
@@ -75,23 +71,37 @@ class AccountManager:
             option = add_account_prompt["choices"].index(result["menu"])
             #Add account with username & password
             if option == 0:
-                username = InquirerPy.text(message="Username:").execute()
-                password = InquirerPy.password(message="Password:").execute()
-                self.auth.auth_account(username=username, password=password)
+                questions = [
+                    {"type": "input", "message": "Please type username of the account you want to add:", "name": "username"},
+                    {"type": "password", "message": "Please type password of the account you want to add:", "name": "password"}
+                ]
+                result = InquirerPy.prompt(questions)
+                username = result["username"]
+                password = result["password"]
+                current_account_auth_data = self.auth.auth_account(username=username, password=password)
+                current_account_data = self.auth.get_account_data()
+                #SAVING NEW COOKIES BECAUSE OLD DOESN'T EXIST
+                self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
+                #switch to new account with new auth data
+                self.account_config.switch_to_account(current_account_auth_data)
+
+                self.menu(current_account_data)
             #Add account by signing into riot client
             elif option == 1:
                 self.account_config.add_account_with_client()
+                #watchdog in add_account_with_client function
         #Change to: {account_name}
         else:
             #change to one of saved accounts
             account_name = result["menu"].split("Change to: ")[1]
-            for account in self.accounts_data:
+            for account in self.account_config.accounts_data:
                 if self.account_config.accounts_data[account]["name"] == account_name:
-                    #better way of doing this?
+                    #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
                     self.account_config.switch_to_account(self.account_config.accounts_data[account])
 
-                    current_account_auth_data = self.auth.auth_account(cookies=self.accounts_data[account]["cookies"])
+                    current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
                     current_account_data = self.auth.get_account_data()
+                    #OVERRIDING ACCOUNT DATA AND COOKIES (Cookies maybe shouldn't be renewed but rather used original data, we'll see) WITH NEW ONE
                     self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
                     self.menu(current_account_data)
 
@@ -145,7 +155,7 @@ class AccountManager:
         current_account_auth_data = self.auth.auth_account(cookies=current_account_cookies)
         if current_account_auth_data is not None:
             current_account_data = self.auth.get_account_data()
-            self.save_account_to_config(current_account_auth_data, current_account_data)
+            self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
             self.menu(current_account_data)
         else:
             self.menu(None)
@@ -156,7 +166,6 @@ class AccountManager:
 if __name__ == "__main__":
     from account_config import AccountConfig
     from account_auth import AccountAuth
-    print(AccountAuth)
     acc = AccountManager("a", AccountConfig, AccountAuth, NUMBERTORANKS)
     acc.start_menu()
     # username = input("Username: ")
