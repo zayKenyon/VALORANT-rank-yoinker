@@ -31,7 +31,7 @@ from src.stats import Stats
 from src.configurator import configure
 from src.player_stats import PlayerStats
 
-from src.chatlogs import ChatLogging
+from src.chat_logs import ChatLogging
 
 from src.rpc import Rpc
 
@@ -58,7 +58,7 @@ try:
     log = Logging.log
 
     ChatLogging = ChatLogging()
-    chatlog = ChatLogging.chatLog
+    chatlog = ChatLogging.chat_log
 
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
@@ -310,7 +310,7 @@ try:
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -462,7 +462,7 @@ try:
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -575,7 +575,7 @@ try:
 
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
-                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.to_plain(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
 
                             # rankStatus = playerRank[1]
                             #useless code since rate limit is handled in the requestsV

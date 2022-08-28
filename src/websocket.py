@@ -108,7 +108,7 @@ class Ws:
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
-                            self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
+                            self.print_message(f"{chat_prefix} {color(self.colors.to_plain(agent), clr)}: {message['body']}")
                         else:
                             if agent == "":
                                 agent_str = ""
@@ -123,8 +123,8 @@ class Ws:
         if self.messages > self.chat_limit:
             print(self.up * self.chat_limit, end="")
             for i in range(len(self.message_history) - self.chat_limit + 1, len(self.message_history)):
-                print(self.message_history[i] + " " * max([0, len(self.colors.escape_ansi(self.message_history[i-1])) - len(self.colors.escape_ansi(self.message_history[i]))]))
-            print(message + " " * max([0, len(self.colors.escape_ansi(self.message_history[-1])) - len(self.colors.escape_ansi(message))]))
+                print(self.message_history[i] + " " * max([0, len(self.colors.to_plain(self.message_history[i-1])) - len(self.colors.to_plain(self.message_history[i]))]))
+            print(message + " " * max([0, len(self.colors.to_plain(self.message_history[-1])) - len(self.colors.to_plain(message))]))
         else:
             print(message)
 
