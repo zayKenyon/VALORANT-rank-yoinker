@@ -30,7 +30,7 @@ class TLSAdapter(requests.adapters.HTTPAdapter):
 
 
 class AccountAuth:
-    def __innit__(self, log, NUMBERTORANKS):
+    def __init__(self, log, NUMBERTORANKS):
         self.log = log
         self.session = requests.Session()
         self.session.mount("https://", TLSAdapter())

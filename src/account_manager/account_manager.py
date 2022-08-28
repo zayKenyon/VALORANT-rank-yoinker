@@ -35,10 +35,10 @@ NUMBERTORANKS = [
 
 
 class AccountManager:
-    def __init__(self, log, account_config, auth, NUMBERTORANKS):
+    def __init__(self, log, AccountConfig, AccountAuth, NUMBERTORANKS):
         self.log = log
-        self.auth = auth(log, NUMBERTORANKS)
-        self.account_config = account_config(log)
+        self.account_config = AccountConfig(log)
+        self.auth = AccountAuth(log, NUMBERTORANKS)
 
 
 
