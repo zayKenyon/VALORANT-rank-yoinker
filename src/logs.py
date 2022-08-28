@@ -1,8 +1,8 @@
 """Record VALORANT-rank-yoinker's actions and state."""
-import locale
 from glob import glob
-import os
-import time
+from locale import getpreferredencoding
+from os import mkdir, getcwd
+from time import time, strftime, localtime
 
 
 # pylint: disable=too-few-public-methods
@@ -15,7 +15,7 @@ class Logging:
     def log(self, string_to_log: str):
         """Creates a folder for and logs the actions and state."""
         try:
-            os.mkdir(os.getcwd() + r"\logs")
+            mkdir(getcwd() + r"\logs")
         except FileExistsError:
             pass
         filenames = []
@@ -25,16 +25,14 @@ class Logging:
             filenames.append(0)
         if self.log_file_opened:
             with open(f"logs/log-{max(filenames)}.txt",
-                      "a", encoding=locale.getpreferredencoding()) as log_file:
+                      "a", encoding=getpreferredencoding()) as log_file:
                 log_file.write(
-                    f"""[{time.strftime('%Y.%m.%d-%H.%M.%S',
-                                        time.localtime(time.time()))}]"""
+                    f"[{strftime('%Y.%m.%d-%H.%M.%S', localtime(time()))}]"
                     f" {string_to_log.encode('ascii', 'replace').decode()}\n")
         else:
             with open(f"logs/log-{max(filenames) + 1}.txt",
-                      "w", encoding=locale.getpreferredencoding()) as log_file:
+                      "w", encoding=getpreferredencoding()) as log_file:
                 self.log_file_opened = True
                 log_file.write(
-                    f"""[{time.strftime('%Y.%m.%d-%H.%M.%S',
-                                        time.localtime(time.time()))}]"""
+                    f"[{strftime('%Y.%m.%d-%H.%M.%S', localtime(time()))}]"
                     f" {string_to_log.encode('ascii', 'replace').decode()}\n")
