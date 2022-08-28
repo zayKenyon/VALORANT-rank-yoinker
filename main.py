@@ -215,9 +215,16 @@ try:
 
             is_leaderboard_needed = False
 
+            priv_presence = presences.get_private_presence(presence)
+            if priv_presence["provisioningFlow"] == "CustomGame" or priv_presence["partyState"] == "CUSTOM_GAME_SETUP":
+                gamemode = "Custom Game"
+            else:
+                gamemode = gamemodes.get(priv_presence['queueId'])
+
             heartbeat_data = {
                 "time": int(time.time()),
                 "state": game_state,
+                "mode": gamemode,
                 "selfPuuid": Requests.puuid,
                 "players": {}
             }
@@ -422,7 +429,7 @@ try:
 
                         heartbeat_data["players"][player["Subject"]] = {
                             "name": names[player["Subject"]],
-                            "partyIcon": party_icon,
+                            "partyNumber": partyCount if party_icon != "" else 0,
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "map": map_dict[coregame_stats["MapID"].lower()],
                             "rank": playerRank["rank"],
@@ -593,7 +600,7 @@ try:
 
                         heartbeat_data["players"][player["Subject"]] = {
                             "name": names[player["Subject"]],
-                            "partyIcon": party_icon,
+                            "partyNumber": partyCount if party_icon != "" else 0,
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
