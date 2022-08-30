@@ -225,7 +225,7 @@ try:
                 "time": int(time.time()),
                 "state": game_state,
                 "mode": gamemode,
-                "selfPuuid": Requests.puuid,
+                "puuid": Requests.puuid,
                 "players": {}
             }
 
@@ -260,12 +260,14 @@ try:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
+                heartbeat_data["map"] = map_dict[coregame_stats["MapID"].lower()],
                 with richConsole.status("Loading Players...") as status: 
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
+                    partyNum = 0
                     partyIcons = {}
                     lastTeamBoolean = False
                     lastTeam = "Red"
@@ -319,7 +321,6 @@ try:
                                                 })
 
                         party_icon = ''
-
                         # set party premade icon
                         for party in partyOBJ:
                             if player["Subject"] in partyOBJ[party]:
@@ -327,6 +328,7 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    partyNum = partyCount + 1
                                     partyCount += 1
                                 else:
                                     # PARTY_ICON
@@ -428,14 +430,17 @@ try:
                                               ])
 
                         heartbeat_data["players"][player["Subject"]] = {
+                            "puuid": player["Subject"],
                             "name": names[player["Subject"]],
-                            "partyNumber": partyCount if party_icon != "" else 0,
+                            "partyNumber": partyNum if party_icon != "" else 0,
                             "agent": agent_dict[player["CharacterID"].lower()],
-                            "map": map_dict[coregame_stats["MapID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
                             "peakRankAct": peakRankAct,
                             "rr": rr,
+                            "kd": ppstats["kd"],
+                            "headshotPercentage": ppstats["hs"],
+                            "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
                             "level": player_level,
                             "agentImgLink": loadouts_data["Players"][player["Subject"]].get("Agent",None),
                             "team": loadouts_data["Players"][player["Subject"]].get("Team",None),
@@ -497,6 +502,7 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    partyNum = partyCount + 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
@@ -600,7 +606,7 @@ try:
 
                         heartbeat_data["players"][player["Subject"]] = {
                             "name": names[player["Subject"]],
-                            "partyNumber": partyCount if party_icon != "" else 0,
+                            "partyNumber": partyNum if party_icon != "" else 0,
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
