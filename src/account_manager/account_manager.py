@@ -1,4 +1,5 @@
 import InquirerPy, subprocess, re
+from InquirerPy import inquirer
 
 #temporary until it is implemented in main
 from colr import color
@@ -39,6 +40,7 @@ class AccountManager:
         self.log = log
         self.account_config = AccountConfig(log)
         self.auth = AccountAuth(log, NUMBERTORANKS)
+        self.last_account_data = None
 
 
 
@@ -55,13 +57,15 @@ class AccountManager:
             "name": "menu",
             "message": "Please select optional features:",
             "choices": [
-                "Add account with username & password",
-                "Add account by signing into riot client"
+                "Add account with username & password. (MFA/2FA not supported yet)",
+                "Add account by signing into riot client."
             ],
         }
 
         self.account_config.load_accounts_config()
+        account_order_list = []
         for account in self.account_config.accounts_data:
+            account_order_list.append(account)
             change_accounts_prompt["choices"].append(f"Change to: {self.account_config.accounts_data[account]['name']:<16}  | {self.account_config.accounts_data[account].get('rank'):<12} | Level: {self.account_config.accounts_data[account].get('level'):<4} | Battlepass {self.account_config.accounts_data[account].get('bp_level'):<2}/55")
         change_accounts_prompt["choices"].append("Add new account")
         result = InquirerPy.prompt(change_accounts_prompt)
@@ -75,38 +79,52 @@ class AccountManager:
                     {"type": "input", "message": "Please type username of the account you want to add:", "name": "username"},
                     {"type": "password", "message": "Please type password of the account you want to add:", "name": "password"}
                 ]
-                result = InquirerPy.prompt(questions)
-                username = result["username"]
-                password = result["password"]
-                current_account_auth_data = self.auth.auth_account(username=username, password=password)
-                current_account_data = self.auth.get_account_data()
-                #SAVING NEW COOKIES BECAUSE OLD DOESN'T EXIST
-                self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
-                #switch to new account with new auth data
-                self.account_config.switch_to_account(current_account_auth_data)
+                try_again = True
+                while try_again:
+                    result = InquirerPy.prompt(questions)
+                    username = result["username"]
+                    password = result["password"]
+                    current_account_auth_data = self.auth.auth_account(username=username, password=password)
+                    if current_account_auth_data is None:
+                        try_again = inquirer.confirm(message="Invalid username or password! Do you want to try again?", default=True).execute()
+                if current_account_auth_data is None:
+                    self.menu(self.last_account_data)
+                else:
+                    current_account_data = self.auth.get_account_data()
+                    #SAVING NEW COOKIES BECAUSE OLD DOESN'T EXIST
+                    self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
+                    #switch to new account with new auth data
+                    self.account_config.switch_to_account(current_account_auth_data)
 
-                self.menu(current_account_data)
+                    self.menu(current_account_data)
             #Add account by signing into riot client
             elif option == 1:
-                self.account_config.add_account_with_client()
-                #watchdog in add_account_with_client function
+                current_account_cookies = self.account_config.add_account_with_client()
+                current_account_auth_data = self.auth.auth_account(cookies=current_account_cookies)
+                if current_account_auth_data is not None:
+                    current_account_data = self.auth.get_account_data()
+                    self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
+                    self.menu(current_account_data)
+                else:
+                    self.log("Failed to add account with client! (cookies are fetched but auth_data is none)")
+                    self.menu(self.last_account_data)
         #Change to: {account_name}
         else:
             #change to one of saved accounts
             #no longer account name but more stats make it better in future
-            account_name = result["menu"].split("Change to: ")[1]
-            for account in self.account_config.accounts_data:
-                if self.account_config.accounts_data[account]["name"] in account_name:
-                    #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
-                    self.account_config.switch_to_account(self.account_config.accounts_data[account])
+            account_option = change_accounts_prompt["choices"].index(result["menu"])
+            account = account_order_list[account_option]
+            #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
+            self.account_config.switch_to_account(self.account_config.accounts_data[account])
 
-                    current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
-                    current_account_data = self.auth.get_account_data()
-                    #OVERRIDING ACCOUNT DATA AND COOKIES (Cookies maybe shouldn't be renewed but rather used original data, we'll see) WITH NEW ONE
-                    self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
-                    self.menu(current_account_data)
+            current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
+            current_account_data = self.auth.get_account_data()
+            #OVERRIDING ACCOUNT DATA ONLY (Cookies maybe shouldn't be renewed but rather used original data, we'll see) NOT BEING OVERRIDDEN NOW
+            self.account_config.save_account_to_config(current_account_auth_data, current_account_data, save_cookies=False)
+            self.menu(current_account_data)
 
     def menu(self, account_data):
+        self.last_account_data = account_data
         if account_data is not None:
             menu_prompt = {
                 "type": "list",

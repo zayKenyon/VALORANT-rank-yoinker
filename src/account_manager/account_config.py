@@ -1,10 +1,7 @@
 import yaml, json, os, subprocess, time
-
-
 class AccountConfig:
     def __init__(self, log):
         self.log = log
-        # self.puuid = ""
         self.client_names = ["rc_default", "rc_live", "rc_beta"]
         self.pritvate_settings = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Data\RiotGamesPrivateSettings.yaml')
         self.riot_client_path = ""
@@ -37,13 +34,11 @@ class AccountConfig:
                 if len(yaml_data["riot-login"]["persist"]["session"]["cookies"]) != 5:
                     # self.log(f"Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}")
                     return None
-            except TypeError:
+            except (TypeError, KeyError):
                 #self.log("No cookies found in riot games private settings")
                 return None
             cookies = {}
             for cookie in yaml_data["riot-login"]["persist"]["session"]["cookies"]:
-                # if cookie["name"] == "sub":
-                    # self.puuid = cookie["value"]
                 cookie_name = cookie["name"]
                 cookie_value = cookie["value"]
                 cookies.update({cookie_name: cookie_value})
@@ -114,26 +109,39 @@ class AccountConfig:
             }
         }
 
-    def save_account_to_config(self, authdata, data):
+    def save_account_to_config(self, authdata, data, save_cookies=True):
         self.load_accounts_config()
+        if save_cookies:
+            cookies_dict = {"cookies": {
+                "clid": authdata["cookies"].get("clid"),
+                "csid": authdata["cookies"].get("csid"),
+                "ssid": authdata["cookies"].get("ssid"),
+                "sub": authdata["cookies"].get("sub"),
+                "tdid": authdata["cookies"].get("tdid")
+            }}
+        else:
+            puuid = authdata["cookies"].get("sub")
+            cookies_dict = {
+                "cookies": {
+                    "clid": self.accounts_data[puuid]["cookies"].get("clid"),
+                    "ssid": self.accounts_data[puuid]["cookies"].get("ssid"),
+                    "csid": self.accounts_data[puuid]["cookies"].get("csid"),
+                    "sub": self.accounts_data[puuid]["cookies"].get("sub"),
+                    "tdid": self.accounts_data[puuid]["cookies"].get("tdid")
+                }
+            }
         updated_data = {
-            authdata.get("cookies").get("sub"): {
+            authdata["cookies"].get("sub"): {
                 "rank": data.get("rank"),
                 "name": data.get("name"),
                 "level": data.get("level"),
                 "bp_level": data.get("bp_level"),
                 "expire_in": authdata.get("expire_in"),
                 "lol_region": authdata.get("lol_region"),
-                #convert to base64 maybe in future
-                "cookies": {
-                    "clid": authdata.get("cookies").get("clid"),
-                    "csid": authdata.get("cookies").get("csid"),
-                    "ssid": authdata.get("cookies").get("ssid"),
-                    "sub": authdata.get("cookies").get("sub"),
-                    "tdid": authdata.get("cookies").get("tdid")
-                }
+                #convert to base64 maybe in future        
             }
         }
+        updated_data[authdata.get("cookies").get("sub")].update(cookies_dict)
         self.accounts_data.update(updated_data)
         with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
             json.dump(self.accounts_data, f)
@@ -143,9 +151,17 @@ class AccountConfig:
         subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         with open(self.pritvate_settings, "w") as f:
             f.write("")
-        time.sleep(5)
+        time.sleep(3)
         subprocess.Popen([self.riot_client_path])
         #watchdog wait for login
+        last_modified = os.path.getmtime(self.pritvate_settings)
+        while True:
+            if os.path.getmtime(self.pritvate_settings) != last_modified:
+                account_cookies = self.load_current_account_cookies()
+                if account_cookies is not None:
+                    return account_cookies
+                last_modified = os.path.getmtime(self.pritvate_settings)
+            time.sleep(0.5)
 
     def switch_to_account(self, account_data):
         subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

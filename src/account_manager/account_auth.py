@@ -61,8 +61,6 @@ class AccountAuth:
         if cookies != None:
             for cookie in cookies:
                 self.session.cookies.set(cookie, cookies[cookie])
-                if cookie == "sub":
-                    self.puuid = cookies[cookie]
                 
         data = {
             "acr_values": "",
@@ -76,6 +74,8 @@ class AccountAuth:
             "scope": "openid link ban lol_region account",
         }
         r = self.session.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=self.headers)
+        if r.json().get("response") == None:
+            return None
 
         if username != None and password != None:
             body = {
@@ -88,6 +88,8 @@ class AccountAuth:
             }
 
             r = self.session.put("https://auth.riotgames.com/api/v1/authorization", json=body, headers=self.headers)
+            if r.json().get("error") == "auth_failure":
+                return None
         pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
         data = pattern.findall(r.json()['response']['parameters']['uri'])[0]
         access_token = data[0]
@@ -104,8 +106,7 @@ class AccountAuth:
         r = requests.post("https://auth.riotgames.com/userinfo", headers={'Authorization': 'Bearer ' + access_token})
         self.lol_region = r.json()["region"]["tag"]
 
-        if cookies == None:
-            self.puuid = self.session.cookies.get_dict()["sub"]
+        self.puuid = self.session.cookies.get_dict()["sub"]
         return {
             "cookies": self.session.cookies.get_dict(),
             "expire_in": expire_in_epoch,
@@ -122,9 +123,12 @@ class AccountAuth:
     def get_account_data(self):
         #if more advande account data wants to be supported requestsV needs to be edited so it can bue used with custom headers and not lockfile
         r_mmr = requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.puuid}", headers=self.auth_headers, verify=False)
-        season_info = r_mmr.json()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"].get(self.get_latest_season_id())
-        if season_info is not None:
-            rank = season_info["CompetitiveTier"]
+        if r_mmr.json()["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID") is not None:
+            season_info = r_mmr.json()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"].get(self.get_latest_season_id())
+            if season_info is not None:
+                rank = season_info["CompetitiveTier"]
+            else:
+                rank = 0
         else:
             rank = 0
         rank = self.escape_ansi(self.NUMBERTORANKS[rank])
