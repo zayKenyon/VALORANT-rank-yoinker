@@ -57,7 +57,7 @@ class AccountManager:
             "name": "menu",
             "message": "Please select optional features:",
             "choices": [
-                "Add account with username & password. (MFA/2FA not supported yet)",
+                "Add account with username & password.",
                 "Add account by signing into riot client."
             ],
         }
@@ -92,6 +92,8 @@ class AccountManager:
                     current_account_auth_data = self.auth.auth_account(username=username, password=password)
                     if current_account_auth_data is None:
                         try_again = inquirer.confirm(message="Invalid username or password! Do you want to try again?", default=True).execute()
+                    else:
+                        try_again = False
                 if current_account_auth_data is None:
                     self.menu(self.last_account_data)
                 else:

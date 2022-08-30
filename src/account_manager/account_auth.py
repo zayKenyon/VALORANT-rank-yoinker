@@ -1,5 +1,6 @@
 import requests, time, re, ssl
 from secrets import token_urlsafe
+from InquirerPy import prompt
 
 #temporary
 import urllib3
@@ -61,7 +62,6 @@ class AccountAuth:
         if cookies != None:
             for cookie in cookies:
                 self.session.cookies.set(cookie, cookies[cookie])
-                
         data = {
             "acr_values": "",
             "claims": "",
@@ -74,9 +74,9 @@ class AccountAuth:
             "scope": "openid link ban lol_region account",
         }
         r = self.session.post('https://auth.riotgames.com/api/v1/authorization', json=data, headers=self.headers)
-        if r.json().get("response") == None:
-            return None
-
+        if username == None and password == None:
+            if r.json().get("response") == None:
+                return None
         if username != None and password != None:
             body = {
                         "language": "en_US",
@@ -88,6 +88,15 @@ class AccountAuth:
             }
 
             r = self.session.put("https://auth.riotgames.com/api/v1/authorization", json=body, headers=self.headers)
+            #check for 2fa
+            if r.json().get("type") == "multifactor":
+                #get 2fa code
+                body = {
+                    "type": "multifactor",
+                    "code": self.ask_for_mfa(),
+                    "remember": True
+                }
+                r = self.session.put("https://auth.riotgames.com/api/v1/authorization", json=body, headers=self.headers)
             if r.json().get("error") == "auth_failure":
                 return None
         pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
@@ -154,3 +163,6 @@ class AccountAuth:
     def escape_ansi(self, line):
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
         return ansi_escape.sub('', line)
+
+    def ask_for_mfa(self):
+        return prompt({"type": "input", "message": "Please enter your MFA/2FA code:", "name": "mfa"})["mfa"]
