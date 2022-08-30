@@ -64,10 +64,15 @@ class AccountManager:
 
         self.account_config.load_accounts_config()
         account_order_list = []
+        accounts_list = []
         for account in self.account_config.accounts_data:
             account_order_list.append(account)
-            change_accounts_prompt["choices"].append(f"Change to: {self.account_config.accounts_data[account]['name']:<16}  | {self.account_config.accounts_data[account].get('rank'):<12} | Level: {self.account_config.accounts_data[account].get('level'):<4} | Battlepass {self.account_config.accounts_data[account].get('bp_level'):<2}/55")
+            acc_string = f"Change to: {self.account_config.accounts_data[account]['name']:<16}  | {self.account_config.accounts_data[account].get('rank'):<12} | Level: {self.account_config.accounts_data[account].get('level'):<4} | Battlepass {self.account_config.accounts_data[account].get('bp_level'):<2}/55"
+            accounts_list.append(acc_string)
+            change_accounts_prompt["choices"].append(acc_string)
         change_accounts_prompt["choices"].append("Add new account")
+        change_accounts_prompt["choices"].append("Remove account")
+        change_accounts_prompt["choices"].append("Back")
         result = InquirerPy.prompt(change_accounts_prompt)
         #Add new account
         if result["menu"] == "Add new account":
@@ -108,20 +113,51 @@ class AccountManager:
                 else:
                     self.log("Failed to add account with client! (cookies are fetched but auth_data is none)")
                     self.menu(self.last_account_data)
+        #Remove account
+        elif result["menu"] == "Remove account":
+            remove_account_prompt = {
+                "type": "list",
+                "name": "menu",
+                "message": "Please select account to remove:",
+                "choices": accounts_list,
+            }
+            result = InquirerPy.prompt(remove_account_prompt)
+            account_option = remove_account_prompt["choices"].index(result["menu"])
+            account = account_order_list[account_option]
+
+            
+            if self.last_account_data["name"] == self.account_config.accounts_data[account]["name"]:
+                self.account_config.remove_account(account)
+                self.menu(None)
+            else:
+                self.account_config.remove_account(account)
+                self.menu(self.last_account_data)
+        #Back
+        elif result["menu"] == "Back":
+            self.menu(self.last_account_data)
         #Change to: {account_name}
         else:
             #change to one of saved accounts
             #no longer account name but more stats make it better in future
             account_option = change_accounts_prompt["choices"].index(result["menu"])
             account = account_order_list[account_option]
-            #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
-            self.account_config.switch_to_account(self.account_config.accounts_data[account])
 
             current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
-            current_account_data = self.auth.get_account_data()
-            #OVERRIDING ACCOUNT DATA ONLY (Cookies maybe shouldn't be renewed but rather used original data, we'll see) NOT BEING OVERRIDDEN NOW
-            self.account_config.save_account_to_config(current_account_auth_data, current_account_data, save_cookies=False)
-            self.menu(current_account_data)
+            if current_account_auth_data is None:
+                # self.log("Failed to auth account with cookies! (change accounts) ")
+                print("Cookies are invalid or have expired! Please login again.")
+                self.account_config.remove_account(account)
+                self.menu(self.last_account_data)
+            else:
+                #SWITCH TO ACCOUNT WITH OLD COOKIES NOT RENEWED
+                self.account_config.switch_to_account(self.account_config.accounts_data[account])
+
+                current_account_data = self.auth.get_account_data()
+
+
+                #OVERRIDING ACCOUNT DATA ONLY (Cookies maybe shouldn't be renewed but rather used original data, we'll see) NOT BEING OVERRIDDEN NOW
+                self.account_config.save_account_to_config(current_account_auth_data, current_account_data, save_cookies=False)
+                self.menu(current_account_data)
 
     def menu(self, account_data):
         self.last_account_data = account_data
@@ -137,13 +173,13 @@ class AccountManager:
                 ],
             }
         else:
+            print("Not logged in!")
             menu_prompt = {
                 "type": "list",
                 "name": "menu",
                 "message": "Please select optional features:",
                 "choices": [
-                    "Not logged in",
-                    "Log in",
+                    "Log in.",
                 ],
             }
 
@@ -163,10 +199,10 @@ class AccountManager:
         else:
             #Not logged in
             if option == 0:
-                pass
-            #Log in
-            elif option == 1:
                 self.menu_change_accounts()
+            #Log in
+            # elif option == 1:
+                # self.menu_change_accounts()
 
     def start_menu(self):
         self.account_config.get_riot_client_path()

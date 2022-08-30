@@ -146,6 +146,12 @@ class AccountConfig:
         with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
             json.dump(self.accounts_data, f)
         return updated_data
+
+    def remove_account(self, puuid):
+        self.load_accounts_config()
+        del self.accounts_data[puuid]
+        with open(os.path.join(os.getenv('APPDATA'), "vry/accounts.json"), "w") as f:
+            json.dump(self.accounts_data, f)
         
     def add_account_with_client(self):
         subprocess.call("TASKKILL /F /IM RiotClientUx.exe", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
