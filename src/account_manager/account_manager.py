@@ -1,39 +1,6 @@
 import InquirerPy, subprocess, re
 from InquirerPy import inquirer
 
-#temporary until it is implemented in main
-from colr import color
-NUMBERTORANKS = [
-            color('Unranked', fore=(46, 46, 46)),
-            color('Unranked', fore=(46, 46, 46)),
-            color('Unranked', fore=(46, 46, 46)),
-            color('Iron 1', fore=(72, 69, 62)),
-            color('Iron 2', fore=(72, 69, 62)),
-            color('Iron 3', fore=(72, 69, 62)),
-            color('Bronze 1', fore=(187, 143, 90)),
-            color('Bronze 2', fore=(187, 143, 90)),
-            color('Bronze 3', fore=(187, 143, 90)),
-            color('Silver 1', fore=(174, 178, 178)),
-            color('Silver 2', fore=(174, 178, 178)),
-            color('Silver 3', fore=(174, 178, 178)),
-            color('Gold 1', fore=(197, 186, 63)),
-            color('Gold 2', fore=(197, 186, 63)),
-            color('Gold 3', fore=(197, 186, 63)),
-            color('Platinum 1', fore=(24, 167, 185)),
-            color('Platinum 2', fore=(24, 167, 185)),
-            color('Platinum 3', fore=(24, 167, 185)),
-            color('Diamond 1', fore=(216, 100, 199)),
-            color('Diamond 2', fore=(216, 100, 199)),
-            color('Diamond 3', fore=(216, 100, 199)),
-            color('Ascendant 1', fore=(24, 148, 82)),
-            color('Ascendant 2', fore=(24, 148, 82)),
-            color('Ascendant 3', fore=(24, 148, 82)),
-            color('Immortal 1', fore=(221, 68, 68)),
-            color('Immortal 2', fore=(221, 68, 68)),
-            color('Immortal 3', fore=(221, 68, 68)),
-            color('Radiant', fore=(255, 253, 205)),
-        ]
-
 
 class AccountManager:
     def __init__(self, log, AccountConfig, AccountAuth, NUMBERTORANKS):
@@ -41,6 +8,8 @@ class AccountManager:
         self.account_config = AccountConfig(log)
         self.auth = AccountAuth(log, NUMBERTORANKS)
         self.last_account_data = None
+
+        self.log("Account manager initialized")
 
 
 
@@ -146,7 +115,7 @@ class AccountManager:
 
             current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
             if current_account_auth_data is None:
-                # self.log("Failed to auth account with cookies! (change accounts) ")
+                self.log("Failed to auth account with cookies! (change accounts) ")
                 print("Cookies are invalid or have expired! Please login again.")
                 self.account_config.remove_account(account)
                 self.menu(self.last_account_data)
@@ -207,24 +176,29 @@ class AccountManager:
                 # self.menu_change_accounts()
 
     def start_menu(self):
+        self.log("Starting menu...")
         self.account_config.get_riot_client_path()
         current_account_cookies = self.account_config.load_current_account_cookies()
         current_account_auth_data = self.auth.auth_account(cookies=current_account_cookies)
         if current_account_auth_data is not None:
+            self.log("Authed with cookies!")
             current_account_data = self.auth.get_account_data()
             self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
+            self.log("Opening menu")
             self.menu(current_account_data)
         else:
+            self.log("Failed to auth account with cookies! (start menu) ")
             self.menu(None)
 
     def start_valorant(self):
+        self.log("Starting Valorant...")
         subprocess.Popen([self.account_config.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
 
-if __name__ == "__main__":
-    from account_config import AccountConfig
-    from account_auth import AccountAuth
-    acc = AccountManager("a", AccountConfig, AccountAuth, NUMBERTORANKS)
-    acc.start_menu()
+# if __name__ == "__main__":
+    # from account_config import AccountConfig
+    # from account_auth import AccountAuth
+    # acc = AccountManager("a", AccountConfig, AccountAuth, NUMBERTORANKS)
+    # acc.start_menu()
     # username = input("Username: ")
     # password = input("Password: ")
     # acc.add_account_with_user_pass_login(username, password)

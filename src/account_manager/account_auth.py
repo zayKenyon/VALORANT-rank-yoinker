@@ -78,6 +78,7 @@ class AccountAuth:
             if r.json().get("response") == None:
                 return None
         if username != None and password != None:
+            self.log("authing with username and password")
             body = {
                         "language": "en_US",
                         "password": password,
@@ -90,6 +91,7 @@ class AccountAuth:
             r = self.session.put("https://auth.riotgames.com/api/v1/authorization", json=body, headers=self.headers)
             #check for 2fa
             if r.json().get("type") == "multifactor":
+                self.log("2fa detected")
                 #get 2fa code
                 body = {
                     "type": "multifactor",
@@ -123,6 +125,7 @@ class AccountAuth:
         }
     
     def get_latest_season_id(self):
+        self.log("get latest season id")
         if self.content is None:
             self.content = requests.get(f"https://shared.{self.region}.a.pvp.net/content-service/v3/content", headers=self.auth_headers, verify=False)
         for season in self.content.json()["Seasons"]:
@@ -165,4 +168,5 @@ class AccountAuth:
         return ansi_escape.sub('', line)
 
     def ask_for_mfa(self):
+        self.log("asking for mfa")
         return prompt({"type": "input", "message": "Please enter your MFA/2FA code:", "name": "mfa"})["mfa"]

@@ -5,9 +5,9 @@ import os
 
 class Error:
     
-    def __init__(self, log):
+    def __init__(self, log, acc_manager):
         self.log = log
-
+        self.acc_manager = acc_manager
 
     def PortError(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,8 +29,9 @@ class Error:
         if os.path.exists(path):
             return True
         else:
-            # self.log("Lockfile does not exist, VALORANT is not open")
-            print("\nVALORANT is not open. Please open valorant\n")
+            self.log("Lockfile does not exist, VALORANT is not open")
+            self.acc_manager.start_menu()
+            
             while not os.path.exists(path):
                 time.sleep(1)
             os.system('cls')

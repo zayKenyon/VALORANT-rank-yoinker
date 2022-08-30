@@ -32,10 +32,10 @@ class AccountConfig:
             yaml_data = yaml.safe_load(f)
             try:
                 if len(yaml_data["riot-login"]["persist"]["session"]["cookies"]) != 5:
-                    # self.log(f"Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}")
+                    self.log(f'Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}')
                     return None
             except (TypeError, KeyError):
-                #self.log("No cookies found in riot games private settings")
+                self.log("No cookies found in riot games private settings")
                 return None
             cookies = {}
             for cookie in yaml_data["riot-login"]["persist"]["session"]["cookies"]:
@@ -180,7 +180,7 @@ class AccountConfig:
             except TypeError:
                 yaml_data = self.create_yaml_config_file(account_data)
             else:
-                # self.log.error(f"Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}")
+                self.log(f'Account not logged in, incorrect amount of cookies, amount of cookies {len(yaml_data["riot-login"]["persist"]["session"]["cookies"])}')
                 yaml_data = self.create_yaml_config_file(account_data)
                 #need to create riotgamesprivatesettings.yaml file with content in it generated
         with open(self.pritvate_settings, "w") as f:
