@@ -610,8 +610,12 @@ try:
                             "agent": agent_dict[player["CharacterID"].lower()],
                             "rank": playerRank["rank"],
                             "peakRank": playerRank["peakrank"],
+                            "peakRankAct": peakRankAct,
                             "level": player_level,
                             "rr": rr,
+                            "kd": ppstats["kd"],
+                            "headshotPercentage": ppstats["hs"],
+                            "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
                         }
 
                         # bar()
@@ -703,8 +707,12 @@ try:
                                 "name": names[player["Subject"]],
                                 "rank": playerRank["rank"],
                                 "peakRank": playerRank["peakrank"],
+                                "peakRankAct": peakRankAct,
                                 "level": player_level,
                                 "rr": rr,
+                                "kd": ppstats["kd"],
+                                "headshotPercentage": ppstats["hs"],
+                                "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
                             }
 
                             # bar()

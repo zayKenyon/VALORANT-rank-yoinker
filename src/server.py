@@ -1,11 +1,12 @@
 import json
-
+import logging
 from websocket_server import WebsocketServer
 
 from src.constants import version
 
-# websocket.enableTrace(True)
+logging.getLogger('websocket_server.websocket_server').disabled = True
 
+# websocket.enableTrace(True)
 
 class Server:
     def __init__(self, log, Error):
