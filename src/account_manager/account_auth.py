@@ -83,7 +83,7 @@ class AccountAuth:
                         "language": "en_US",
                         "password": password,
                         "region": None,
-                        "remember": False,
+                        "remember": True,
                         "type": "auth",
                         "username": username,
             }
