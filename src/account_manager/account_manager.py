@@ -127,7 +127,8 @@ class AccountManager:
 
 
                 #OVERRIDING ACCOUNT DATA ONLY (Cookies maybe shouldn't be renewed but rather used original data, we'll see) NOT BEING OVERRIDDEN NOW
-                self.account_config.save_account_to_config(current_account_auth_data, current_account_data, save_cookies=False)
+                #Testing with saving cookies, now happens that vry says it is logged in but can't launch valorant because riot client is not logged in
+                self.account_config.save_account_to_config(current_account_auth_data, current_account_data, save_cookies=True)
                 self.menu(current_account_data)
 
     def menu(self, account_data):
