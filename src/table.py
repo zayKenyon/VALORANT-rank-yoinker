@@ -23,7 +23,7 @@ TABLE_COLUMN_NAMES = Literal[
 class Table:
     def __init__(self, config, chatlog, log):
         self.log = log
-        self.rich_table = RichTable()
+        self.rich_table = RichTable(expand=True)
         self.col_flags = [
             True,  # Party
             True,  # Agent
@@ -48,7 +48,7 @@ class Table:
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
         self.chatlog = chatlog
-        self.console = RichConsole()
+        self.console = RichConsole(color_system="truecolor")
 
 
         #only to get init value not used
