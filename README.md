@@ -74,7 +74,7 @@ If you want to make a small change to the application, you can:
 
 ## What about that Tweet?
 
- The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies outlines how
+ The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies, outlines how
  applications are not allowed to expose data hidden by the game client. As of Version 1.262, vRY respects streamer mode.
 
 ## Contributing
