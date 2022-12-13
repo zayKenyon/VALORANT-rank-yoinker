@@ -18,7 +18,7 @@ class Stats:
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             original_data = {}
 
-        updated_data = original_data
+        updated_data = original_data.copy()
         for puuid in data.keys():
             if original_data.get(puuid) is None:
                 updated_data.update({puuid: [data[puuid]]})
