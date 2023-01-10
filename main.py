@@ -407,7 +407,7 @@ try:
                                 player["Subject"]: {
                                     "name": names[player["Subject"]],
                                     "agent": agent_dict[player["CharacterID"].lower()],
-                                    "map": map_dict[coregame_stats["MapID"].lower()],
+                                    "map": map_dict.get(coregame_stats["MapID"].lower()),
                                     "rank": playerRank["rank"],
                                     "rr": rr,
                                     "match_id": coregame.match_id,
