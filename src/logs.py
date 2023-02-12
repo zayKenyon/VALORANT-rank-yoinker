@@ -8,7 +8,7 @@ class Logging:
     def __init__(self):
         self.logFileOpened = False
 
-    # log_string is a string that represents the log message that will be written to the log file. 
+    # `log_string` is a string that is the log message that will be written to the log file. 
     def log(self, log_string: str):
         logs_directory = os.getcwd() + "/logs"
 
