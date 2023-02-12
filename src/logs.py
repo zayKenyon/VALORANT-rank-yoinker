@@ -15,7 +15,6 @@ class Logging:
         if not os.path.exists(logs_directory):
             os.mkdir(logs_directory)
         
-        # A list of log files is obtained using the `glob` module
         log_files = glob.glob(r"logs/log-*.txt")
 
         # The log file numbers are extracted from the filenames
