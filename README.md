@@ -35,9 +35,10 @@
 
 ### Bundled Release:
 
-1) Download the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
-2) Extract **all** files.
-3) Run vRY.exe.
+1) Download [Microsoft Visual C++ Libraries](https://github.com/abbodi1406/vcredist/releases)
+2) Download the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
+3) Extract **all** files.
+4) Run vRY.exe.
 
 ### Running from source:
 
