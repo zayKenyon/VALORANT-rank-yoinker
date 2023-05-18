@@ -35,6 +35,8 @@ from src.chatlogs import ChatLogging
 
 from src.rpc import Rpc
 
+from src.os import get_os
+
 from colr import color as colr
 
 from rich.console import Console as RichConsole
@@ -56,6 +58,14 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
 try:
     Logging = Logging()
     log = Logging.log
+
+    # OS Logging + quit if OS unsupported
+    if get_os()[1] == False:
+        print(f"Unsupported operating system: {get_os()[0]}\n")
+        log(f"Unsupported operating system: {get_os()[0]}\n")
+        program_exit(0)
+    else:
+        log(f"Operating system: {get_os()[0]}\n")
 
     ChatLogging = ChatLogging()
     chatlog = ChatLogging.chatLog
