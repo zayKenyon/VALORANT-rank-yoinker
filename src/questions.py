@@ -17,7 +17,8 @@ FLAGS_OPTS = {
     "pre_cls": "Pre-Clear Screen",
     "game_chat": "Print Game Chat",
     "peak_rank_act": "Peak Rank Act",
-    "discord_rpc": "Discord Rich Presence"
+    "discord_rpc": "Discord Rich Presence",
+    "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
 }
 
 weapon_question = lambda config: {

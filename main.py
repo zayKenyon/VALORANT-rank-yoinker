@@ -374,6 +374,8 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                            rankName += f" ({playerRank['rr']})"
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -527,6 +529,8 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                            rankName += f" ({playerRank['rr']})"
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -611,6 +615,8 @@ try:
 
                             # RANK
                             rankName = NUMBERTORANKS[playerRank["rank"]]
+                            if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                                rankName += f" ({playerRank['rr']})"
 
                             # RANK RATING
                             rr = playerRank["rr"]
@@ -670,6 +676,9 @@ try:
                     if isRange:
                         table.set_runtime_col_flag('Party', False)
                         table.set_runtime_col_flag('Agent',False)
+
+                # We don't to show the RR column if the "aggregate_rank_rr" feature flag is True.
+                table.set_runtime_col_flag('RR', cfg.table.get("rr") and not cfg.get_feature_flag("aggregate_rank_rr"))
 
                 table.set_caption(f"VALORANT rank yoinker v{version}")
                 table.display()
