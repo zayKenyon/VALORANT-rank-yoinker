@@ -154,6 +154,7 @@ DEFAULT_CONFIG = {
         "cooldown": 10,
         "port": 1100,
         "weapon": "Vandal",
+        "chat_limit": 5,
         "table": {
             "skin": True,
             "rr": True,

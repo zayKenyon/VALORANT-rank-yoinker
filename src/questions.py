@@ -62,9 +62,20 @@ flags_question = lambda config: {
         "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
     }
 
+chat_limit_question = lambda config: {
+        "type": "number",
+        "name": "chat_limit",
+        "message": "Please enter the length of the chat messages history:",
+        "default": config.get("chat_limit", 5),
+        "min_allowed":0,
+        "max_allowed": 100,
+        "filter": lambda ans: int(ans)
+    }
+
 basic_questions = lambda config: [
     weapon_question(config=config),
-    table_question(config=config)
+    table_question(config=config),
+    chat_limit_question(config=config)
 ]
 
 advance_questions = lambda config: [
