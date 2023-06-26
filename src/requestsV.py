@@ -196,8 +196,8 @@ class Requests:
                 return dict(zip(keys, data))
 
 
-    def get_headers(self):
-        if self.headers == {}:
+    def get_headers(self, refresh=False):
+        if self.headers == {} or refresh:
             local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                 ('riot:' + self.lockfile['password']).encode()).decode()}
             response = requests.get(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token",
