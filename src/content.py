@@ -16,6 +16,21 @@ class Content():
                 self.log(f"retrieved season id: {season['ID']}")
                 return season["ID"]
 
+    def get_previous_season_id(self, content):
+        print("Trying to find previous season.")
+        previous = content["Seasons"][0]
+        for season in content["Seasons"]:
+            #print(season)
+            if season["IsActive"]:
+                self:log(f"retrieved previous season id: {previous['ID']}")
+                #print(f"Found season {previous}")
+                return previous["ID"]
+            # Only store the previous act.
+            if (season["Type"] == "episode"):
+                continue
+            previous = season
+        return None
+
     def get_all_agents(self):
         rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
         agent_dict = {}

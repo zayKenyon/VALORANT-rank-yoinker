@@ -6,6 +6,7 @@ TABLE_OPTS = {
     "rr": "Ranked Rating",
     "leaderboard": "Leaderboard Position",
     "peakrank": "Peak Rank",
+    "previousrank": "Previous Rank",
     "headshot_percent": "Headshot Percentage",
     "winrate": "WinRate",
     "kd": "K/D Ratio <!> Last Game Only <!>"

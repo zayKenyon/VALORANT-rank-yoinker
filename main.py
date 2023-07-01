@@ -146,6 +146,7 @@ try:
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)
+    previousSeasonID = content.get_previous_season_id(gameContent)
     lastGameState = ""
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
@@ -318,6 +319,8 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
+
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
@@ -387,6 +390,9 @@ try:
                         # PEAK RANK
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
+                        # PREVIOUS RANK
+                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
@@ -406,6 +412,7 @@ try:
                                               rankName,
                                               rr,
                                               peakRank,
+                                              previousRank,
                                               leaderboard,
                                               hs,
                                               wr,
@@ -469,6 +476,7 @@ try:
                                     party_icon = partyIcons[party]
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
@@ -538,6 +546,9 @@ try:
                         # PEAK RANK
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
+                        # PREVIOUS RANK
+                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
@@ -558,6 +569,7 @@ try:
                                               rankName,
                                               rr,
                                               peakRank,
+                                              previousRank,
                                               leaderboard,
                                               hs,
                                               wr,
@@ -582,7 +594,7 @@ try:
                             playersLoaded += 1
                             party_icon = PARTYICONLIST[0]
                             playerRank = rank.get_rank(player["Subject"], seasonID)
-
+                            previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
                                     rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
@@ -623,6 +635,9 @@ try:
                             # PEAK RANK
                             peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
+                            # PREVIOUS RANK
+                            previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+
                             # LEADERBOARD
                             leaderboard = playerRank["leaderboard"]
 
@@ -642,6 +657,7 @@ try:
                                                 rankName,
                                                 rr,
                                                 peakRank,
+                                                previousRank,
                                                 leaderboard,
                                                 hs,
                                                 wr,
