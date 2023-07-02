@@ -194,7 +194,11 @@ try:
             else:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
+                previous_game_state = game_state
                 game_state = loop.run_until_complete(Wss.recconect_to_websocket(game_state))
+                # We invalidate the cached responses when going from any state to menus
+                if previous_game_state != game_state and game_state == "MENUS":
+                    rank.invalidate_cached_responses()
                 log(f"new game state: {game_state}")
                 loop.close()
             firstTime = False
@@ -211,13 +215,13 @@ try:
                 "INGAME": color('In-Game', fore=(241, 39, 39)),
                 "PREGAME": color('Agent Select', fore=(103, 237, 76)),
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
-            }
+    }
 
             if (not firstPrint) and cfg.get_feature_flag("pre_cls"):
                     os.system('cls')
 
             is_leaderboard_needed = False
-
+            
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 if coregame_stats == None:
