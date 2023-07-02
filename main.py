@@ -215,13 +215,13 @@ try:
                 "INGAME": color('In-Game', fore=(241, 39, 39)),
                 "PREGAME": color('Agent Select', fore=(103, 237, 76)),
                 "MENUS": color('In-Menus', fore=(238, 241, 54)),
-    }
+            }
 
             if (not firstPrint) and cfg.get_feature_flag("pre_cls"):
                     os.system('cls')
 
             is_leaderboard_needed = False
-            
+
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
                 if coregame_stats == None:

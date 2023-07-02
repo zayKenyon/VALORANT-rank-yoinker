@@ -10,6 +10,7 @@ class Rank:
     def get_request(self, puuid):
         if puuid in self.requestMap:
             return self.requestMap[puuid]
+
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
         self.requestMap[puuid] = response
         return response
