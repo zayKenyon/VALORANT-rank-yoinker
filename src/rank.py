@@ -16,7 +16,6 @@ class Rank:
         return response
 
     def invalidate_cached_responses(self):
-        print(f"Invalidating cached reponses")
         self.requestMap = {}
 
     #in future rewrite this code
