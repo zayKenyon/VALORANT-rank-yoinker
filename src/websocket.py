@@ -24,7 +24,7 @@ class Ws:
         self.hide_names = hide_names
         self.message_history = []
         self.up = "\033[A"
-        self.chat_limit = 5
+        self.chat_limit = cfg.chat_limit
         self.chatlog = chatlog
         if self.cfg.get_feature_flag("discord_rpc"):
             self.rpc = rpc
