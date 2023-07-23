@@ -12,6 +12,7 @@ TABLE_COLUMN_NAMES = Literal[
     "Rank",
     "RR",
     "Peak Rank",
+    "Previous Rank",
     "Pos.",
     "HS",
     "WR",
@@ -32,6 +33,7 @@ class Table:
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
+            bool(config.table.get("previousrank", False)), # Previous Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             bool(
                 config.table.get("headshot_percent", True)

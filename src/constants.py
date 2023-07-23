@@ -159,6 +159,7 @@ DEFAULT_CONFIG = {
             "skin": True,
             "rr": True,
             "peakrank": True,
+            "previousrank" : False,
             "leaderboard": True,
             "headshot_percent": True,
             "winrate": True,
