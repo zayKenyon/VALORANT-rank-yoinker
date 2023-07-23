@@ -169,6 +169,7 @@ DEFAULT_CONFIG = {
             "pre_cls": False,
             "game_chat": True,
             "peak_rank_act": True,
-            "discord_rpc": True
+            "discord_rpc": True,
+            "aggregate_rank_rr": True
         }
     }
