@@ -6,9 +6,7 @@
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
-[![Language][language-shield]][language-url]
-[![License][license-shield]][license-url]
-     
+    
  
   <ol>
     <li><a href="#about-the-project">About The Project</a></li>
@@ -105,11 +103,5 @@ If you want to make a small change to the application, you can:
 [discord-url]: https://discord.gg/HeTKed64Ka
 [discord-banner]: https://discordapp.com/api/guilds/872101595037446144/widget.png?style=banner2
 
-[downloads-shield]: https://img.shields.io/github/downloads/isaacKenyon/VALORANT-rank-yoinker/total?style=for-the-badge&logo=github
-[downloads-url]: https://github.com/isaacKenyon/VALORANT-rank-yoinker/releases/latest
-
-[language-shield]: https://img.shields.io/github/languages/top/isaacKenyon/Valorant-rank-yoinker?logo=python&logoColor=yellow&style=for-the-badge
-[language-url]: https://www.python.org/
-
-[license-shield]: https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge
-[license-url]: https://github.com/isaacKenyon/valorant-rank-yoinker/blob/main/LICENSE
+[downloads-shield]: https://img.shields.io/github/downloads/zayKenyon/VALORANT-rank-yoinker/total?style=for-the-badge&logo=github
+[downloads-url]: https://github.com/zayKenyon/VALORANT-rank-yoinker/releases/latest
