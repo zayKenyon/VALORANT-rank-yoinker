@@ -32,7 +32,7 @@ TABLE_COLUMN_NAMES = Literal [
 class Table:
     def __init__(self, config, chatlog, log):
         self.log = log
-        self.rich_table = RichTable(expand=True)
+        self.rich_table = RichTable()
         self.col_flags = [
             True,  # Party
             True,  # Agent
@@ -50,7 +50,7 @@ class Table:
                 config.table.get("winrate", True)
             ),  # wr
             bool(config.table.get("kd", True)),  # KD
-            True,  # Level
+            bool(config.table.get("level", True)),  # Level
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
