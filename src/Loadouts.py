@@ -34,18 +34,23 @@ class Loadouts:
             inv = PlayerInventorys["Loadouts"][invindex]
             if state == "game":
                 inv = inv["Loadout"]
+
+            weaponLists[players[player]["Subject"]] = {}
             for weapon in valApiWeapons["data"]:
-                if weapon["displayName"].lower() == weaponChoose.lower():
-                    skin_id = \
-                        inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
-                            "ID"]
-                    for skin in valoApiSkins.json()["data"]:
-                        if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
-                            # if rgb_color is not None:
-                            weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
-                            # else:
-                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+                if weapon["displayName"].lower() not in [weapon.lower() for weapon in weaponChoose]:
+                    continue
+                skin_id = \
+                inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
+
+                for skin in valoApiSkins.json()["data"]:
+                    if skin_id.lower() != skin["uuid"].lower():
+                        continue
+                    rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
+                    # if rgb_color is not None:
+                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (color(" ".join(skin["displayName"].split(" ")[0:-1]), fore=rgb_color))
+                    # else:
+                    #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         # self.log(f"json for website: {final_json}")
         self.Server.send_message(json.dumps(final_json))
