@@ -14,7 +14,7 @@ class Loadouts:
         # self.namesClass = namesClass
         self.Server = Server
 
-    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
+    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, cfg, state="game"):
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
@@ -47,7 +47,13 @@ class Loadouts:
                         continue
                     rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                     # if rgb_color is not None:
-                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (color(" ".join(skin["displayName"].split(" ")[0:-1]), fore=rgb_color))
+                    skin_name = skin["displayName"]
+                    if cfg.hide_skin_weapon_suffix:
+                        skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
+                    if cfg.skin_abbreviations["status"]:
+                        skin_name = cfg.skin_abbreviations["abbreviations"].get(skin_name, skin_name)
+
+                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (color(skin_name, fore=rgb_color))
                     # else:
                     #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
 

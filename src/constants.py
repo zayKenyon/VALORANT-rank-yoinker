@@ -156,6 +156,22 @@ DEFAULT_CONFIG = {
         "port": 1100,
         "weapons": "Vandal, Phantom",
         "chat_limit": 5,
+        "hide_skin_weapon_suffix": True,
+        "skin_abbreviations": {
+            "status": True,
+            "abbreviations": {
+                "Gravitational Uranium Neuroblaster": "GUN",
+                "Radiant Entertainment System": "RES",
+                "VALORANT GO! Vol. 1": "V. G. Vol. 1",
+                "VALORANT GO! Vol. 2": "V. G. Vol. 2",
+                "Radiant Crisis 001": "RC 001",
+                "Sentinels of Light": "SoL",
+                "Prelude to Chaos": "PtC",
+                "Winterwunderland": "Winter",
+                "Kohaku & Matsuba": "K&M",
+                "Gaia's Vengeance": "Gaia"
+            }
+        },
         "table": {
             "skin": True,
             "rr": True,
