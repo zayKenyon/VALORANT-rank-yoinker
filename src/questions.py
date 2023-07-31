@@ -8,7 +8,8 @@ TABLE_OPTS = {
     "peakrank": "Peak Rank",
     "headshot_percent": "Headshot Percentage",
     "winrate": "WinRate",
-    "kd": "K/D Ratio <!> Last Game Only <!>"
+    "kd": "K/D Ratio <!> Last Game Only <!>",
+    "level": "Level"
 }
 
 FLAGS_OPTS = {
