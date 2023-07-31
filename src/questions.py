@@ -9,7 +9,8 @@ TABLE_OPTS = {
     "previousrank": "Previous Rank",
     "headshot_percent": "Headshot Percentage",
     "winrate": "WinRate",
-    "kd": "K/D Ratio <!> Last Game Only <!>"
+    "kd": "K/D Ratio <!> Last Game Only <!>",
+    "level": "Account Level"
 }
 
 FLAGS_OPTS = {
