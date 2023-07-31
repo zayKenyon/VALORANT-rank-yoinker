@@ -24,7 +24,7 @@ TABLE_COLUMN_NAMES = Literal[
 class Table:
     def __init__(self, config, chatlog, log):
         self.log = log
-        self.rich_table = RichTable(expand=True)
+        self.rich_table = RichTable()
         self.col_flags = [
             True,  # Party
             True,  # Agent
