@@ -361,13 +361,13 @@ try:
                                                                    player["Subject"], Requests.puuid,
                                                                    agent=player["CharacterID"],
                                                                    party_members=partyMembersList,
-                                                                   already_seen=bool(times))
+                                                                   already_seen=True if times > 0 else False)
                         else:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
                                                                    names[player["Subject"]],
                                                                    player["Subject"], Requests.puuid,
                                                                    party_members=partyMembersList,
-                                                                   already_seen=bool(times))
+                                                                   already_seen=True if times > 0 else False)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 table.add_empty_row()
