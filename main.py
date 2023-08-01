@@ -663,7 +663,7 @@ try:
                             table.add_row_table([party_icon,
                                                 agent,
                                                 name,
-                                                "",
+                                                *["" for weapon in cfg.weapons],
                                                 rankName,
                                                 rr,
                                                 peakRank,
