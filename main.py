@@ -272,7 +272,7 @@ try:
                     for player in Players:
                         status.update(f"Loading players... [{playersLoaded}/{len(Players)}]")
                         playersLoaded += 1
-                        last_seen = 0
+                        times = 0
 
                         if player["Subject"] in stats_data.keys():
                             if player["Subject"] != Requests.puuid and player["Subject"] not in partyMembersList:
@@ -284,15 +284,11 @@ try:
                                     curr_player_stat = stats_data[player["Subject"]][-i]
                                 if curr_player_stat["match_id"] != coregame.match_id:
                                     #checking for party memebers and self players
-                                    times = 0
                                     m_set = ()
                                     for m in stats_data[player["Subject"]]:
                                         if m["match_id"] != coregame.match_id and m["match_id"] not in m_set:
-                                            if m["epoch"] > last_seen:
-                                                # get the last match they played with or against you
-                                                last_seen = m["epoch"]
-                                                # saves if they were on your team or not, defaults to true for old data
-                                                teammate = m.get("team", True)
+                                            # saves if they were on your team or not, defaults to true for old data
+                                            teammate = m.get("team", True)
                                             times += 1
                                             m_set += (m["match_id"],)
 
@@ -365,13 +361,13 @@ try:
                                                                    player["Subject"], Requests.puuid,
                                                                    agent=player["CharacterID"],
                                                                    party_members=partyMembersList,
-                                                                   already_seen=bool(last_seen))
+                                                                   already_seen=bool(times))
                         else:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
                                                                    names[player["Subject"]],
                                                                    player["Subject"], Requests.puuid,
                                                                    party_members=partyMembersList,
-                                                                   already_seen=bool(last_seen))
+                                                                   already_seen=bool(times))
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 table.add_empty_row()
