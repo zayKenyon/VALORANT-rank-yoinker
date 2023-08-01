@@ -573,7 +573,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              "",
+                                              *["" for _ in cfg.weapons],
                                               rankName,
                                               rr,
                                               peakRank,
