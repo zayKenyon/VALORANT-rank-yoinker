@@ -152,44 +152,68 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
-        "cooldown": 10,
-        "port": 1100,
-        "weapons": "Vandal, Phantom",
-        "chat_limit": 5,
-        "hide_skin_weapon_suffix": True,
-        "skin_abbreviations": {
-            "status": True,
-            "abbreviations": {
-                "Gravitational Uranium Neuroblaster": "GUN",
-                "Radiant Entertainment System": "RES",
-                "VALORANT GO! Vol. 1": "V. G. Vol. 1",
-                "VALORANT GO! Vol. 2": "V. G. Vol. 2",
-                "Radiant Crisis 001": "RC 001",
-                "Sentinels of Light": "SoL",
-                "Prelude to Chaos": "PtC",
-                "Winterwunderland": "Winter",
-                "Kohaku & Matsuba": "K&M",
-                "Gaia's Vengeance": "Gaia"
-            }
-        },
-        "table": {
-            "skin": True,
-            "rr": True,
-            "peakrank": True,
-            "previousrank" : False,
-            "leaderboard": True,
-            "headshot_percent": True,
-            "winrate": True,
-            "kd": False,
-            "level": True
-        },
-        "flags": {
-            "last_played": True,
-            "auto_hide_leaderboard": True,
-            "pre_cls": False,
-            "game_chat": True,
-            "peak_rank_act": True,
-            "discord_rpc": True,
-            "aggregate_rank_rr": True
+    "cooldown": 10,
+    "port": 1100,
+    "weapon_amount": 2,
+    "weapons": "Vandal, Phantom",
+    "chat_limit": 5,
+    "hide_skin_weapon_suffix": True,
+    "skin_abbreviations": {
+        "status": True,
+        "abbreviations": {
+            "Gravitational Uranium Neuroblaster": "G.U.N.",
+            "Radiant Entertainment System": "R.E.S.",
+            "VALORANT GO! Vol. 1": "Val. Go! 1",
+            "VALORANT GO! Vol. 2": "Val. Go! 2",
+            "Radiant Crisis 001": "R.C. 001",
+            "Sentinels of Light": "SoL",
+            "Premiere Collision": "Premiere",
+            "Kohaku & Matsuba": "K&M",
+            "Winterwunderland": "Winter",
+            "Gaia's Vengeance": "Gaia",
+            "Prelude to Chaos": "Chaos",
+            "Coalition: Cobra": "Cobra",
+            "Nunca Olvidados": "Nunca",
+            "Tethered Realms": "Tethered",
+            "Starlit Odyssey": "Odyssey",
+            "Protocol 781-A": "Protocol",
+            "Champions 2021": "Champ 2021",
+            "Champions 2022": "Champ 2022",
+            "Champions 2023": "Champ 2023",
+            "Piedra del Sol": "Piedra",
+            "Task Force 809": "Task Force",
+            "Iridian Thorn": "Iridian",
+            "Black.Market": "Black M.",
+            "Crimsonbeast": "Crimson",
+            "Neo Frontier": "Neo",
+            "VCT LOCK//IN": "VCT",
+            "Divine Swine": "Swine",
+            "Immortalized": "Immortal",
+            "Lycan's Bane": "Lycan",
+            "Doodle Buds": "Doodle",
+            "RGX 11z Pro": "RGX 11z",
+            "Singularity": "Sing.",
+            "Monstrocity": "Monst.",
         }
+    },
+    "table": {
+        "skin": True,
+        "rr": True,
+        "peakrank": True,
+        "previousrank" : False,
+        "leaderboard": True,
+        "headshot_percent": True,
+        "winrate": True,
+        "kd": False,
+        "level": True
+    },
+    "flags": {
+        "last_played": True,
+        "auto_hide_leaderboard": True,
+        "pre_cls": False,
+        "game_chat": True,
+        "peak_rank_act": True,
+        "discord_rpc": True,
+        "aggregate_rank_rr": True
     }
+}

@@ -23,13 +23,22 @@ FLAGS_OPTS = {
     "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
 }
 
-weapon_question = lambda config: {
-        "type": "fuzzy",
-        "name": "weapon",
-        "message": "Please select a weapon to show skin for:",
-        "default": config.get("weapon","Vandal"),
-        "choices": WEAPONS,
-    }
+weapon_amount_question = lambda config: {
+    "type": "number",
+    "name": "weapon_amount",
+    "message": "Please select the amount of weapons to display:",
+    "min_allowed": 0,
+    "max_allowed": 100,
+    "filter": lambda ans: int(ans)
+}
+
+weapon_question = lambda config, index: {
+    "type": "fuzzy",
+    "name": f"weapon",
+    "message": f"Please select a weapon to display at position {index + 1}:",
+    "choices": WEAPONS
+}
+
 
 table_question = lambda config: {
         "type": "checkbox",
@@ -76,11 +85,10 @@ chat_limit_question = lambda config: {
     }
 
 basic_questions = lambda config: [
-    weapon_question(config=config),
     table_question(config=config),
     chat_limit_question(config=config)
 ]
 
 advance_questions = lambda config: [
     port_question(config=config),
-] + basic_questions(config=config)
+]

@@ -34,6 +34,15 @@ def configure():
         "Exit Configurator"
     ]
 
+    def weapon_prompt(cfg):
+        cfg |= prompt(weapon_amount_question(config=cfg))
+        weapons = []
+        for i in range(cfg["weapon_amount"]):
+            cfg |= prompt(weapon_question(config=cfg, index=i))
+            weapons.append(cfg[f"weapon"])
+        cfg["weapons"] = ", ".join(weapons)
+        return cfg
+
     changed_config = {}
     while True:
         loop_config = user_config | changed_config
@@ -45,17 +54,20 @@ def configure():
         ).execute()
 
         if choice is menu_choices[0]:
-            changed_config |= prompt([weapon_question(config=loop_config)])
+            changed_config |= weapon_prompt(loop_config)
         elif choice is menu_choices[1]:
             changed_config |= prompt([table_question(config=loop_config)])
         elif choice is menu_choices[2]:
             changed_config |= prompt([flags_question(config=loop_config)])
         elif choice is menu_choices[4]:
+            changed_config |= weapon_prompt(loop_config)
             changed_config |= prompt(basic_questions(config=loop_config))
         elif choice is menu_choices[5]:
             changed_config |= prompt(advance_questions(config=loop_config))
+            changed_config |= weapon_prompt(loop_config)
+            changed_config |= prompt(basic_questions(config=loop_config))
         elif choice is menu_choices[7]:
-            proceed=True
+            proceed = True
             break
         else:
             proceed = (not len(changed_config.keys()) > 0) or inquirer.confirm(
