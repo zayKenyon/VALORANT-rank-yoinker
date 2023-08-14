@@ -20,7 +20,7 @@ TABLE_COLUMN_NAMES = Literal [
     "Rank",
     "RR",
     "Peak Rank",
-    "Previous Rank",
+    "Previous Act Rank",
     "Pos.",
     "HS",
     "WR",
