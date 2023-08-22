@@ -22,8 +22,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 body {
   background-color: #222222;
 }
+
+@import "@/assets/styles/tooltip.scss";
 </style>

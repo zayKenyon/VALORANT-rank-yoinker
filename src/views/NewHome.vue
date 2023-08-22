@@ -1,78 +1,76 @@
 <template>
   <div class="match">
     <div class="match__team match__attacking-team">
-      <div
-        class="player-card"
-        v-for="(player, playerIndex) in attackingTeam"
-        :key="`attacking-team-${playerIndex}`"
-      >
-        <div
-          class="player-card__avatar"
-          :style="{
-            backgroundImage: `url(${player.avatar})`,
-          }"
-        ></div>
-      </div>
+      <PlayerCard :team="attackingTeam" />
     </div>
     <div class="match__divider">
-      <p>vs</p>
+      <template v-if="timeStamp">
+        <p class="match__vs">vs</p>
+        <p class="match__time">
+          {{ new Date(timeStamp * 1000).toLocaleDateString() }}
+        </p>
+      </template>
+      <template v-else>
+        <p class="match__not-found"></p>
+      </template>
     </div>
     <div class="match__team match__defending-team">
-      <div
-        class="player-card"
-        v-for="(player, playerIndex) in defendingTeam"
-        :key="`defending-team-${playerIndex}`"
-      >
-        <div
-          class="player-card__avatar"
-          :style="{
-            backgroundImage: `url(${player.avatar})`,
-          }"
-        ></div>
-      </div>
+      <PlayerCard :team="defendingTeam" />
     </div>
   </div>
 </template>
 
 <script>
+const PRIMARY_WEAPONS = ["Sheriff", "Phantom", "Vandal", "Melee"];
+import PlayerCard from "@/components/PlayerCard.vue";
 export default {
+  components: { PlayerCard },
+  mounted() {
+    let connection = new WebSocket("ws://localhost:1100/");
+
+    connection.onmessage = this.onMessage;
+
+    connection.onerror = () => {
+      this.timeStamp = null;
+    };
+  },
   data() {
     return {
-      attackingTeam: [
-        {
-          avatar: "/RazeArtwork.png",
-        },
-        {
-          avatar: "/CypherArtwork.png",
-        },
-        {
-          avatar: "/JettArtwork.png",
-        },
-        {
-          avatar: "/OmenArtwork.png",
-        },
-        {
-          avatar: "/SovaArtwork.png",
-        },
-      ],
-      defendingTeam: [
-        {
-          avatar: "/RazeArtwork.png",
-        },
-        {
-          avatar: "/CypherArtwork.png",
-        },
-        {
-          avatar: "/JettArtwork.png",
-        },
-        {
-          avatar: "/OmenArtwork.png",
-        },
-        {
-          avatar: "/SovaArtwork.png",
-        },
-      ],
+      attackingTeam: [],
+      defendingTeam: [],
+      timeStamp: new Date().getTime() / 1000,
     };
+  },
+  methods: {
+    onMessage(event) {
+      const { Players, time } = JSON.parse(event.data);
+
+      this.timeStamp = time;
+
+      this.attackingTeam = Object.values(Players)
+        .filter((p) => p.Team == "Red")
+        .map((p) => {
+          return {
+            ...p,
+            primaryWeapons: this.filterWeapons(p.Weapons),
+          };
+        });
+      this.defendingTeam = Object.values(Players)
+        .filter((p) => p.Team == "Blue")
+        .map((p) => {
+          return {
+            ...p,
+            primaryWeapons: this.filterWeapons(p.Weapons),
+          };
+        });
+
+      console.log(this.defendingTeam);
+    },
+    filterWeapons(weapons) {
+      return Object.values(weapons).filter((w) =>
+        PRIMARY_WEAPONS.includes(w.weapon)
+      );
+    },
   },
 };
 </script>
@@ -93,12 +91,23 @@ export default {
 
   &__divider {
     display: flex;
-
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
 
+  &__vs {
     font-size: 50px;
     color: white;
+    margin: 0;
+  }
+
+  &__time {
+    color: #61cba4;
+  }
+
+  &__not-found {
+    color: #ff5d57;
   }
 
   &__team {
@@ -112,40 +121,20 @@ export default {
 
   &__attacking-team {
     & > .player-card {
-      border-left: 3px solid #ff5d57;
+      border-left: 10px solid #ff5d57;
     }
   }
 
   &__defending-team {
     & > .player-card {
-      border-right: 3px solid #61cba4;
+      border-right: 10px solid #61cba4;
 
       flex-direction: row-reverse;
+
+      .player-card__agent-name {
+        text-align: right;
+      }
     }
-  }
-}
-.player-card {
-  width: 100%;
-  max-width: 500px;
-  min-width: 300px;
-  height: 150px;
-
-  background-color: #171717;
-
-  display: flex;
-
-  &__avatar {
-    width: 150px;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background-size: cover;
-    background-position: -150px -25px;
-    background-repeat: no-repeat;
-    background-size: 300%;
   }
 }
 </style>
