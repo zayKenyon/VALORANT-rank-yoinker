@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "moment": "^2.29.4",
     "sass": "^1.66.1",
     "sass-loader": "10",
     "vue": "^3.0.0",

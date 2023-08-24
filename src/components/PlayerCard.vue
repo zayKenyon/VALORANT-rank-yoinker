@@ -3,6 +3,7 @@
     class="player-card"
     v-for="(player, playerIndex) in team"
     :key="`attacking-team-${playerIndex}`"
+    @click="$emit('openInventory', player)"
   >
     <div
       class="player-card__avatar"
@@ -11,7 +12,12 @@
       }"
     ></div>
     <div class="player-card__info">
-      <h1 class="player-card__agent-name">{{ player.Name }}</h1>
+      <div class="player-card__account">
+        <h1 class="player-card__agent-name">{{ player.Name }}</h1>
+        <div class="player-card__player-level">
+          {{ player.Level }}
+        </div>
+      </div>
       <div class="player-card__weapons">
         <div
           v-for="(weapon, weaponIndex) in player.primaryWeapons"
@@ -37,6 +43,7 @@ export default {
       required: true,
     },
   },
+  emits: ["openInventory"],
 };
 </script>
 
@@ -47,7 +54,7 @@ export default {
   min-width: 300px;
   height: 150px;
 
-  background-color: #171717;
+  background-color: rgba(0, 0, 0, 0.3);
   color: white;
 
   display: flex;
@@ -77,6 +84,28 @@ export default {
 
   &__info {
     width: 100%;
+  }
+
+  &__account {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__player-level {
+    width: 32px;
+    height: 24px;
+
+    border-radius: 25px;
+    box-sizing: border-box;
+
+    color: white;
+
+    font-size: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__weapons {

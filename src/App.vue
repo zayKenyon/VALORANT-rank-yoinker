@@ -1,10 +1,4 @@
 <template>
-  <!-- <div id="nav">
-    <router-link to="/">Home</router-link>
-    <router-link to="/matchLoadouts">Match Loadouts</router-link>
-    <a @click="redirectToGithub" class="github">GitHub</a>
-    <a @click="redirectToDiscord" class="github">Discord</a>
-  </div> -->
   <router-view />
 </template>
 
@@ -24,7 +18,20 @@ export default {
 
 <style lang="scss">
 body {
-  background-color: #222222;
+  background: url("https://progioco.com/wp-content/uploads/2023/03/Confermata-la-versione-beta-globale-di-Valorant-Premier-nuova-modalita.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+
+  backdrop-filter: blur(15px);
+
+  overflow: hidden;
+
+  @media (max-width: 1100px) {
+    overflow: unset;
+    overflow-x: hidden;
+  }
 }
 
 @import "@/assets/styles/tooltip.scss";
