@@ -20,7 +20,7 @@ class Content():
         previous = content["Seasons"][0]
         for season in content["Seasons"]:
             if season["IsActive"]:
-                self:log(f"retrieved previous season id: {previous['ID']}")
+                self.log(f"retrieved previous season id: {previous['ID']}")
                 return previous["ID"]
             # Only store the previous act.
             if (season["Type"] == "episode"):
