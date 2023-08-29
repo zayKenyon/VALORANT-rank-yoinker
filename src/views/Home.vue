@@ -65,6 +65,7 @@ export default {
 
     connection.onerror = () => {
       this.timeStamp = null;
+      this.currentMap = null;
     };
 
     if (this.attackingTeam.length == 0 && this.defendingTeam.length == 0) {
@@ -76,6 +77,7 @@ export default {
       attackingTeam: [],
       defendingTeam: [],
       timeStamp: new Date().getTime() / 1000,
+      currentMap: "N/A",
       showInventory: false,
       inventory: {},
       pages: {
@@ -101,9 +103,10 @@ export default {
       this.inventory = {};
     },
     onMessage(event) {
-      const { Players, time } = JSON.parse(event.data);
+      const { Players, time, map } = JSON.parse(event.data);
 
       this.timeStamp = time;
+      this.currentMap = map
 
       this.attackingTeam = Object.values(Players)
         .filter((p) => p.Team == "Red")
