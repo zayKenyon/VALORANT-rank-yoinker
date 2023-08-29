@@ -38,18 +38,21 @@ class Coregame:
     def get_coregame_stats(self):
         self.match_id = self.get_coregame_match_id()
         if self.match_id != 0:
-            return self.Requests.fetch(url_type="glz", endpoint=f"/core-game/v1/matches/{self.match_id}", method="get")
+            return self.Requests.fetch(url_type="glz",
+                                       endpoint=f"/core-game/v1/matches/{self.match_id}",
+                                       method="get")
         else:
             return None
 
-    def get_current_map(self, map_dict) -> str:
+    def get_current_map(self, map_urls, map_splashes) -> dict:
         """
-        Abstracts get_coregame_stats() to get the current map name.
-        :return: Map name.
+        Abstracts get_coregame_stats() to get the current map name and splash.
+        :return: Dictionary of appropriate name and splash.
         """
         coregame_stats = self.get_coregame_stats()
 
         if coregame_stats is None:
             return 'N/A'
 
-        return map_dict.get(coregame_stats['MapID'].lower())
+        current_map = map_urls.get(coregame_stats['MapID'].lower())
+        return {'name': current_map, 'splash': map_splashes[current_map]}

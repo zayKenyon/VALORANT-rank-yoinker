@@ -119,18 +119,22 @@ try:
 
 
     agent_dict = content.get_all_agents()
-    map_dict = content.get_maps()
+
+    map_info = content.get_all_maps()
+    map_urls = content.get_map_urls(map_info)
+    map_splashes = content.get_map_splashes(map_info)
+
+    current_map = coregame.get_current_map(map_urls, map_splashes)
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
-    loadoutsClass = Loadouts(Requests, log, colors, Server,
-                             coregame.get_current_map(map_dict))
+    loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, chatlog, log)
 
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log)
+        rpc = Rpc(map_urls, gamemodes, colors, log)
     else:
         rpc = None
 
@@ -427,7 +431,7 @@ try:
                                 player["Subject"]: {
                                     "name": names[player["Subject"]],
                                     "agent": agent_dict[player["CharacterID"].lower()],
-                                    "map": coregame.get_current_map(map_dict),
+                                    "map": current_map,
                                     "rank": playerRank["rank"],
                                     "rr": rr,
                                     "match_id": coregame.match_id,
