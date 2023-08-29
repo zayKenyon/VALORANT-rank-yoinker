@@ -65,7 +65,7 @@ export default {
 
     connection.onerror = () => {
       this.timeStamp = null;
-      this.currentMap = null;
+      this.map = null;
     };
 
     if (this.attackingTeam.length == 0 && this.defendingTeam.length == 0) {
@@ -106,7 +106,8 @@ export default {
       const { Players, time, map } = JSON.parse(event.data);
 
       this.timeStamp = time;
-      this.currentMap = map
+      this.mapName = map.name;
+      this.mapSplash = map.splash;
 
       this.attackingTeam = Object.values(Players)
         .filter((p) => p.Team == "Red")
