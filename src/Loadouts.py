@@ -47,11 +47,7 @@ class Loadouts:
                         continue
                     rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                     # if rgb_color is not None:
-                    skin_name = skin["displayName"]
-                    if cfg.hide_skin_weapon_suffix:
-                        skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
-                    if cfg.skin_abbreviations["status"]:
-                        skin_name = cfg.skin_abbreviations["abbreviations"].get(skin_name, skin_name)
+                    skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
 
                     weaponLists[players[player]["Subject"]][weapon["displayName"]] = (color(skin_name, fore=rgb_color))
                     # else:
