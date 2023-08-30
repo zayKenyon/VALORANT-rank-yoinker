@@ -93,7 +93,7 @@ try:
 
 
     ErrorSRC = Error(log)
-    
+
     Requests = Requests(version, log, ErrorSRC)
     Requests.check_version()
     Requests.check_status()
@@ -119,28 +119,32 @@ try:
 
 
     agent_dict = content.get_all_agents()
-    map_dict = content.get_maps()
+
+    map_info = content.get_all_maps()
+    map_urls = content.get_map_urls(map_info)
+    map_splashes = content.get_map_splashes(map_info)
+
+    current_map = coregame.get_current_map(map_urls, map_splashes)
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
-    loadoutsClass = Loadouts(Requests, log, colors, Server)
+    loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, chatlog, log)
 
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log)
+        rpc = Rpc(map_urls, gamemodes, colors, log)
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog,
+             rpc)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
 
     log(f"VALORANT rank yoinker v{version}")
-
-
 
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
@@ -155,10 +159,7 @@ try:
 
     richConsole = RichConsole()
 
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_until_complete(Wss.conntect_to_websocket(game_state))
-    # loop.close()
+
     firstTime = True
     firstPrint = True
     while True:
@@ -251,7 +252,7 @@ try:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -430,7 +431,7 @@ try:
                                 player["Subject"]: {
                                     "name": names[player["Subject"]],
                                     "agent": agent_dict[player["CharacterID"].lower()],
-                                    "map": map_dict.get(coregame_stats["MapID"].lower()),
+                                    "map": current_map,
                                     "rank": playerRank["rank"],
                                     "rr": rr,
                                     "match_id": coregame.match_id,
@@ -455,7 +456,7 @@ try:
                 # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
                                             #   state="pregame")
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -590,7 +591,7 @@ try:
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)

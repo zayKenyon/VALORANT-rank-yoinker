@@ -4,11 +4,11 @@ import ssl
 import base64
 import json
 from colr import color
-import re
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc=None):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog,
+                 rpc=None):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -31,23 +31,6 @@ class Ws:
 
     def set_player_data(self, player_data):
         self.player_data = player_data
-
-    # async def conntect_to_websocket(self, initial_game_state):
-
-
-    #     local_headers = {}
-    #     local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
-    #     url = f"wss://127.0.0.1:{self.lockfile['port']}"
-    #     self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
-    #     async with self.websocket_client as websocket:
-    #         await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
-    #         return None
-    #         # while True:
-    #         #     response = await websocket.recv()
-    #         #     h = self.handle(response, initial_game_state)
-    #         #     if h is not None:
-    #         #         return h
-
 
     async def recconect_to_websocket(self, initial_game_state):
         #wont actually recconect :)
@@ -76,7 +59,7 @@ class Ws:
                         state = None
                     else:
                         state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
-                    
+
                     if state is not None:
                         if self.cfg.get_feature_flag("discord_rpc"):
                             self.rpc.set_rpc(json.loads(base64.b64decode(presence['private'])))
@@ -129,23 +112,3 @@ class Ws:
             print(message)
 
         self.message_history.append(message)
-
-    
-
-# if __name__ == "__main__":
-#     try:
-#         with open(os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')) as lockfile:
-#             data = lockfile.read().split(':')
-#             keys = ['name', 'PID', 'port', 'password', 'protocol']
-#             lockfile = dict(zip(keys, data))
-#     except:
-#         raise Exception("Lockfile not found")
-
-
-#     ws = Ws(lockfile, "MENUS")
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(ws.conntect_to_websocket("MENUS"))
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_forever()
