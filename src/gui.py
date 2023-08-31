@@ -26,11 +26,18 @@ class LabelGrid(tk.Frame):
     def _create_labels(self):
         def __put_content_in_label(row, column):
             content = self.content[row][column]
-            label = tk.Label(self, font=("Segoe UI", 12), pady=3, padx=5, anchor="center", relief="groove",
-                             borderwidth=1)
+            print(type(content).__name__, content)
+            if row == 0:
+                label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=3, padx=5, anchor="center")
+            else:
+                label = tk.Label(self, font=("Segoe UI", 12), pady=3, padx=5, anchor="center")
             label.row = row  # Store the row information as an attribute
             label.column = column  # Store the column information as an attribute
 
+            if type(content).__name__ == "tuple":
+                content, clr = content
+                print(clr)
+                label['foreground'] = clr
             if column == 1 and row != 0:
                 label['text'] = content
                 label.bind("<Button-1>", on_label_click)
@@ -67,19 +74,19 @@ class GUI:
         self.frame.iconbitmap("../assets/Logo.ico")
         self.style = ttk.Style(theme="darkly")
 
-        self.tab_frame = ttk.Frame(self.frame, relief="groove", borderwidth=1, padding=5)
+        self.tab_frame = ttk.Frame(self.frame, padding=5)
         self.create_tabs()
         self.tab_frame.grid(row=0, column=0)
 
-        self.live_game_frame = ttk.Frame(self.frame, relief="groove", borderwidth=1, padding=5)
-        self.game_info_frame = ttk.Frame(self.live_game_frame, relief="groove", borderwidth=1, padding=10)
-        self.game_time_label = ttk.Label(self.game_info_frame, text="00:00", relief="groove", borderwidth=1, padding=5, font=("Segoe UI", 12))
-        self.game_map_label = ttk.Label(self.game_info_frame, text="Ascent", relief="groove", borderwidth=1, padding=5, font=("Segoe UI", 12))
-        self.game_mode_label = ttk.Label(self.game_info_frame, text="Unrated", relief="groove", borderwidth=1, padding=5, font=("Segoe UI", 12))
-        self.game_state_label = ttk.Label(self.game_info_frame, text="In Game", relief="groove", borderwidth=1, padding=5, font=("Segoe UI", 12))
+        self.live_game_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.game_info_frame = ttk.Frame(self.live_game_frame)
+        self.game_time_label = ttk.Label(self.game_info_frame, text="00:00", font=("Segoe UI", 12))
+        self.game_map_label = ttk.Label(self.game_info_frame, text="Ascent", font=("Segoe UI", 12))
+        self.game_mode_label = ttk.Label(self.game_info_frame, text="Unrated", font=("Segoe UI", 12))
+        self.game_state_label = ttk.Label(self.game_info_frame, text="In Game", font=("Segoe UI", 12))
         self.player_table = LabelGrid(self.live_game_frame)
         self.create_live_game_frame()
-        self.live_game_frame.grid(row=1, column=0, padx=10)
+        self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def create_tabs(self):
         self.live_game_tab = ttk.Button(self.tab_frame,
@@ -98,19 +105,14 @@ class GUI:
         self.settings_tab.grid(row=0, column=2)
 
     def create_live_game_frame(self):
-        self.ally_team_average_frame = ttk.Frame(self.live_game_frame, relief="groove", borderwidth=1, padding=5)
-        self.enemy_team_average_frame = ttk.Frame(self.live_game_frame, relief="groove", borderwidth=1, padding=5)
+        self.ally_team_average_frame = ttk.Frame(self.live_game_frame, padding=5)
+        self.enemy_team_average_frame = ttk.Frame(self.live_game_frame, padding=5)
 
         self.ally_team_average_label = ttk.Label(self.ally_team_average_frame, text="Ally Team Average", font=("Segoe UI", 12))
         self.enemy_team_average_label = ttk.Label(self.enemy_team_average_frame, text="Enemy Team Average", font=("Segoe UI", 12))
 
-        ally_img = Image.open(r"..\assets\Logo.png")
-        ally_img = ally_img.resize((35, 35))
-        ally_team_average_image = ImageTk.PhotoImage(ally_img)
-
-        enemy_img = Image.open(r"..\assets\Logo.png")
-        enemy_img = enemy_img.resize((35, 35))
-        enemy_team_average_image = ImageTk.PhotoImage(enemy_img)
+        ally_team_average_image = self.load_image(r"..\assets\Logo.png", 35, 35)
+        enemy_team_average_image = self.load_image(r"..\assets\Logo.png", 35, 35)
 
         self.ally_team_average_image = ttk.Label(self.ally_team_average_frame, padding=5)
         self.ally_team_average_image.image = ally_team_average_image
@@ -132,10 +134,10 @@ class GUI:
                                       content=[
                                           ["Agent", "Name", "Rank", "Preak Rank", "Previous Rank", "HS", "WR", "KD", "Level"],
 
-                                          ["Chamber", "SomeLongName#12345", "Platinum 2", "Diamond 2", "Platinum 1", "17", "50", "1.2", "125"],
+                                          [("Chamber", "#00ff00"), "SomeLongName#12345", "Platinum 2", "Diamond 2", "Platinum 1", "17", "50", "1.2", "125"],
                                           ["Sage", "Short#000", "Gold 3", "Platinum 1", "Gold 2", "22", "45", "1.1", "37"],
                                           ["Jett", "MiddleName#0000", "Platinum 2", "Diamond 3", "Platinum 1", "17", "72", "1.2", "45"],
-                                          ["Harbor", "Ranadad#210", "Platinum 2", "Immortal 1", "Platinum 1", "17", "50", "1.2", "321"],
+                                          ["Harbor", "Ranadad#210", "Platinum 2", "Immortal 1", "Platinum 1", "17", "50", "1.2", ("321", "#ff0000")],
                                           ["Brimstone", "EzWin#420", "Gold 3", "Gold 1", "Gold 2", "22", "45", "1.1", "42"],
                                           ["", "", "", "", "", "", "", "", ""],
                                           ["Sova", "UnicodeNameッ#012", "Platinum 2", "Ascendant 2", "Platinum 1", "17", "30", "1.2", "93"],
@@ -157,6 +159,10 @@ class GUI:
     def show_live_game_frame(self):
         print("showing live game frame")
 
+    def load_image(self, path, x, y):
+        img = Image.open(path)
+        img = img.resize((x, y))
+        return ImageTk.PhotoImage(img)
 
 if __name__ == "__main__":
     gui = GUI()
