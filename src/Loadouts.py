@@ -1,18 +1,18 @@
 import time
-from typing import final
 import requests
 from colr import color
 from src.constants import sockets, hide_names
 import json
-# import pyperclip
+
 
 class Loadouts:
-    def __init__(self, Requests, log, colors, Server):
+    def __init__(self, Requests, log, colors, Server, current_map):
+
         self.Requests = Requests
         self.log = log
         self.colors = colors
-        # self.namesClass = namesClass
         self.Server = Server
+        self.current_map = current_map
 
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
         playersBackup = players
@@ -47,14 +47,12 @@ class Loadouts:
                             # else:
                             #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
-        # self.log(f"json for website: {final_json}")
         self.Server.send_message(json.dumps(final_json))
         return weaponLists
 
     #this will convert valorant loadouts to json with player names
     def convertLoadoutToJsonArray(self, PlayerInventorys, players, state, names):
         #get agent dict from main in future
-        # pyperclip.copy(json.dumps(PlayerInventorys))
         # names = self.namesClass.get_names_from_puuids(players)
         valoApiSprays = requests.get("https://valorant-api.com/v1/sprays")
         valoApiWeapons = requests.get("https://valorant-api.com/v1/weapons")
@@ -62,9 +60,11 @@ class Loadouts:
         valoApiAgents = requests.get("https://valorant-api.com/v1/agents")
         valoApiTitles = requests.get("https://valorant-api.com/v1/playertitles")
         valoApiPlayerCards = requests.get("https://valorant-api.com/v1/playercards")
-        final_final_json = {"Players": {}}
 
-        final_final_json.update({"time": int(time.time())})
+        final_final_json = {"Players": {},
+                            "time": int(time.time()),
+                            "map": self.current_map}
+
         final_json = final_final_json["Players"]
         if state == "game":
             PlayerInventorys = PlayerInventorys["Loadouts"]
@@ -116,11 +116,11 @@ class Loadouts:
                                 "displayName": sprayValApi["displayName"],
                                 "displayIcon": sprayValApi["displayIcon"],
                                 "fullTransparentIcon": sprayValApi["fullTransparentIcon"]
-                                })
+                            })
 
                 #create weapons field
                 final_json[players[i]["Subject"]].update({"Weapons": {}})
-                
+
                 for skin in PlayerInventory["Items"]:
 
                     #create skin field
@@ -131,7 +131,7 @@ class Loadouts:
                         for var_socket in sockets:
                             if socket == sockets[var_socket]:
                                 final_json[players[i]["Subject"]]["Weapons"][skin].update(
-                                    {  
+                                    {
                                         var_socket: PlayerInventory["Items"][skin]["Sockets"][socket]["Item"]["ID"]
                                     }
                                 )
@@ -194,4 +194,5 @@ class Loadouts:
                                                 )
                                     if skinValApi["displayName"].startswith("Standard") or skinValApi["displayName"].startswith("Melee"):
                                         final_json[players[i]["Subject"]]["Weapons"][skin]["skinDisplayIcon"] = weapon["displayIcon"]
+
         return final_final_json
