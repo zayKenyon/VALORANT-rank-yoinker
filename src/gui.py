@@ -78,7 +78,7 @@ class GUI:
 
         self.frame.geometry(f"{int(self.screen_width // 1.75)}x{int(self.screen_height // 1.7)}")
 
-        self.frame.iconbitmap("../assets/Logo.ico")
+        self.frame.iconbitmap("assets/Logo.ico")
         self.style = ttk.Style(theme="darkly")
 
         self.tab_frame = ttk.Frame(self.frame, padding=5)
@@ -125,8 +125,8 @@ class GUI:
         self.ally_team_average_label = ttk.Label(self.ally_team_average_frame, text="Ally Team Average", font=("Segoe UI", 12))
         self.enemy_team_average_label = ttk.Label(self.enemy_team_average_frame, text="Enemy Team Average", font=("Segoe UI", 12))
 
-        ally_team_average_image = self.load_image(r"..\assets\Logo.png", 35, 35)
-        enemy_team_average_image = self.load_image(r"..\assets\Logo.png", 35, 35)
+        ally_team_average_image = self.load_image(r"assets\Logo.png", 35, 35)
+        enemy_team_average_image = self.load_image(r"assets\Logo.png", 35, 35)
 
         self.ally_team_average_image = ttk.Label(self.ally_team_average_frame)
         self.ally_team_average_image.image = ally_team_average_image
@@ -155,8 +155,8 @@ class GUI:
                                       ],
                                       takefocus=False)
 
-        force_refresh_image = self.load_image(r"..\assets\gui\Refresh.png", 20, 20)
-        clear_cash_image = self.load_image(r"..\assets\gui\Trash.png", 20, 20)
+        force_refresh_image = self.load_image(r"assets\gui\Refresh.png", 20, 20)
+        clear_cash_image = self.load_image(r"assets\gui\Trash.png", 20, 20)
 
         self.force_refresh_button = ttk.Button(self.live_game_frame, takefocus=False, command=self.force_refresh)
         self.force_refresh_button.image = force_refresh_image
@@ -311,7 +311,7 @@ class GUI:
         return ImageTk.PhotoImage(img)
 
     def load_agent_image(self, agent):
-        cache_file = r"..\assets\gui\cache\agents.json"
+        cache_file = r"assets\gui\cache\agents.json"
 
         # check if the cache file exists
         if os.path.exists(cache_file):
@@ -369,7 +369,7 @@ class GUI:
 
     def clear_cash(self):
         # Path to the JSON cache file
-        cache_file = r"..\assets\gui\cache\agents.json"
+        cache_file = r"assets\gui\cache\agents.json"
 
         try:
             # Check if the cache file exists
@@ -385,7 +385,3 @@ class GUI:
     def force_refresh(self):
         # TODO force refresh
         print("force refreshing")
-
-if __name__ == "__main__":
-    gui = GUI()
-    gui.frame.mainloop()
