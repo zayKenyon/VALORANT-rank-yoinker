@@ -8,6 +8,7 @@ from colr import color
 from InquirerPy import inquirer
 
 from src.constants import *
+from src.gui import GUI
 from src.requestsV import Requests
 from src.logs import Logging
 from src.config import Config
@@ -758,6 +759,10 @@ try:
         else:
             # time.sleep(cfg.cooldown)
             pass
+
+        gui = GUI()
+        gui.frame.mainloop()
+
 except KeyboardInterrupt:
     #lame implementation of fast ctrl+c exit
     os._exit(0)
