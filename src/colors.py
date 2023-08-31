@@ -1,4 +1,3 @@
-from colr import color
 from src.constants import tierDict
 import re
 
@@ -19,18 +18,18 @@ class Colors:
                     name = "Player"
         if team == 'Red':
             if playerPuuid not in party_members:
-                Teamcolor = color(name, fore=(238, 77, 77))
+                Teamcolor = name, (238, 77, 77)
             else:
-                Teamcolor = color(orig_name, fore=(238, 77, 77))
+                Teamcolor = orig_name, (238, 77, 77)
         elif team == 'Blue':
             if playerPuuid not in party_members:
-                Teamcolor = color(name, fore=(76, 151, 237))
+                Teamcolor = name, (76, 151, 237)
             else:
-                Teamcolor = color(orig_name, fore=(76, 151, 237))
+                Teamcolor = orig_name, (76, 151, 237)
         else:
             Teamcolor = ''
         if playerPuuid == selfPuuid:
-            Teamcolor = color(orig_name, fore=(221, 224, 41))
+            Teamcolor = orig_name, (221, 224, 41)
         return Teamcolor
 
 
@@ -41,21 +40,21 @@ class Colors:
 
     def level_to_color(self, level):
         if level >= 400:
-            return level, self.rgb_to_hex((102, 212, 212))
+            return level, (102, 212, 212)
         elif level >= 300:
-            return level, self.rgb_to_hex((207, 207, 76))
+            return level, (207, 207, 76)
         elif level >= 200:
-            return level, self.rgb_to_hex((71, 71, 204))
+            return level, (71, 71, 204)
         elif level >= 100:
-            return level, self.rgb_to_hex((241, 144, 54))
+            return level, (241, 144, 54)
         elif level < 100:
-            return level, self.rgb_to_hex((211, 211, 211))
+            return level, (211, 211, 211)
 
     def get_agent_from_uuid(self, agentUUID):
         agent = str(self.agent_dict.get(agentUUID))
         if self.AGENTCOLORLIST.get(agent.lower()) != None:
             agent_color = self.AGENTCOLORLIST.get(agent.lower())
-            return color(agent, fore=agent_color)
+            return agent, agent_color
         else:
             return agent
 
@@ -63,7 +62,7 @@ class Colors:
         try:
             number = int(number)
         except ValueError:
-            return "n/A", self.rgb_to_hex((46, 46, 46))
+            return "n/A", (46, 46, 46)
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)
@@ -89,13 +88,13 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return number, self.rgb_to_hex(f)
+                return number, f
 
     def get_wr_gradient(self, number):
         try:
             number = int(number)
         except ValueError:
-            return "n/A", self.rgb_to_hex((46, 46, 46))
+            return "n/A", (46, 46, 46)
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)
@@ -121,7 +120,7 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return number, self.rgb_to_hex(f)
+                return number, f
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')

@@ -1,10 +1,10 @@
 import traceback
-import requests
 import urllib3
 import os
 import sys
 import time
 import asyncio
+from colr import color
 from InquirerPy import inquirer
 
 from src.constants import *
@@ -327,7 +327,8 @@ try:
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -342,16 +343,20 @@ try:
 
                         player_level = player["PlayerIdentity"].get("AccountLevel")
 
-
-
                         if player["PlayerIdentity"]["Incognito"]:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"], party_members=partyMembersList)
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"],
+                                                                   Requests.puuid,
+                                                                   agent=player["CharacterID"],
+                                                                   party_members=partyMembersList)
                         else:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, party_members=partyMembersList)
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"],
+                                                                   Requests.puuid,
+                                                                   party_members=partyMembersList)
+                        Namecolor = color(Namecolor[0], fore=Namecolor[1])
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 table.add_empty_row()
@@ -364,11 +369,15 @@ try:
                                 PLcolor = ""
                         else:
                             PLcolor = colors.level_to_color(player_level)
+                        if PLcolor != "":
+                            PLcolor = color(PLcolor[0], fore=PLcolor[1])
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
                         if agent == "" and len(Players) == 1:
                             isRange = True
+                        else:
+                            agent = color(agent[0], fore=agent[1])
 
                         # NAME
                         name = Namecolor
@@ -381,6 +390,7 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = color(rankName[0], fore=rankName[1])
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
                             rankName += f" ({playerRank['rr']})"
 
@@ -392,18 +402,21 @@ try:
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
-
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                        peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                         # PREVIOUS RANK
                         previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                        previousRank = color(previousRank[0], fore=previousRank[1])
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
+                        hs = color(hs[0], fore=hs[1])
+                        wr = colors.get_wr_gradient(playerRank["wr"])
+                        wr = color(wr[0], fore=wr[1]) + f" ({playerRank['numberofgames']})"
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -486,7 +499,8 @@ try:
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -503,13 +517,18 @@ try:
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
                             NameColor = colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"], party_members=partyMembersList)
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"],
+                                                                   Requests.puuid,
+                                                                   agent=player["CharacterID"],
+                                                                   party_members=partyMembersList)
                         else:
                             NameColor = colors.get_color_from_team(pregame_stats['Teams'][0]['TeamID'],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, party_members=partyMembersList)
-
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"],
+                                                                   Requests.puuid,
+                                                                   party_members=partyMembersList)
+                        NameColor = color(NameColor[0], fore=NameColor[1])
                         if player["PlayerIdentity"]["HideAccountLevel"]:
                             if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
                                 PLcolor = colors.level_to_color(player_level)
@@ -517,6 +536,8 @@ try:
                                 PLcolor = ""
                         else:
                             PLcolor = colors.level_to_color(player_level)
+                        if PLcolor != "":
+                            PLcolor = color(PLcolor[0], fore=PLcolor[1])
                         if player["CharacterSelectionState"] == "locked":
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())),
                                                 fore=(255, 255, 255))
@@ -541,6 +562,7 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = color(rankName[0], fore=rankName[1])
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
                             rankName += f" ({playerRank['rr']})"
 
@@ -552,16 +574,20 @@ try:
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                        peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                         # PREVIOUS RANK
                         previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                        previousRank = color(previousRank[0], fore=previousRank[1])
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
 
                         hs = colors.get_hs_gradient(hs)
-                        wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
+                        hs = color(hs[0], fore=hs[1])
+                        wr = colors.get_wr_gradient(playerRank["wr"])
+                        wr = color(wr[0], fore=wr[1]) + f" ({playerRank['numberofgames']})"
 
                         if(int(leaderboard)>0):
                             is_leaderboard_needed = True
@@ -605,7 +631,8 @@ try:
                             previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
-                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                    rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
+                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
 
                             # rankStatus = playerRank[1]
                             #useless code since rate limit is handled in the requestsV
@@ -622,6 +649,7 @@ try:
 
                             player_level = player["PlayerIdentity"].get("AccountLevel")
                             PLcolor = colors.level_to_color(player_level)
+                            PLcolor = color(PLcolor[0], fore=PLcolor[1])
 
                             # AGENT
                             agent = ""
@@ -630,8 +658,8 @@ try:
                             name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                             # RANK
-                            print("curr:", playerRank["rank"], "rr:", playerRank["rr"])
                             rankName = NUMBERTORANKS[playerRank["rank"]]
+                            rankName = color(rankName[0], fore=rankName[1])
                             if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
                                 rankName += f" ({playerRank['rr']})"
 
@@ -644,18 +672,20 @@ try:
                                 peakRankAct = ""
 
                             # PEAK RANK
-                            print("peak:", playerRank["peakrank"])
-                            peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                            peakRank = NUMBERTORANKS[playerRank["peakrank"]]
+                            peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                             # PREVIOUS RANK
-                            print("prev:", previousPlayerRank["rank"], "rr:", previousPlayerRank["rr"])
                             previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                            previousRank = color(previousRank[0], fore=previousRank[1])
 
                             # LEADERBOARD
                             leaderboard = playerRank["leaderboard"]
 
                             hs = colors.get_hs_gradient(hs)
-                            wr = colors.get_wr_gradient(playerRank["wr"]) + f" ({playerRank['numberofgames']})"
+                            hs = color(hs[0], fore=hs[1])
+                            wr = colors.get_wr_gradient(playerRank["wr"])
+                            wr = color(wr[0], fore=wr[1]) + f" ({playerRank['numberofgames']})"
 
                             if(int(leaderboard)>0):
                                 is_leaderboard_needed = True
