@@ -155,28 +155,32 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
-        "cooldown": 10,
-        "port": 1100,
-        "weapon": "Vandal",
-        "chat_limit": 5,
-        "table": {
-            "skin": True,
-            "rr": True,
-            "peakrank": True,
-            "previousrank" : False,
-            "leaderboard": True,
-            "headshot_percent": True,
-            "winrate": True,
-            "kd": False,
-            "level": True
-        },
-        "flags": {
-            "last_played": True,
-            "auto_hide_leaderboard": True,
-            "pre_cls": False,
-            "game_chat": True,
-            "peak_rank_act": True,
-            "discord_rpc": True,
-            "aggregate_rank_rr": True
-        }
+    "cooldown": 10,
+    "port": 1100,
+    "weapon": "Vandal",
+    "chat_limit": 5,
+    "table": {
+        "party": True,
+        "agent": True,
+        "name": True,
+        "skin": True,
+        "rank": True,
+        "rr": True,
+        "peakrank": True,
+        "previousrank" : False,
+        "leaderboard": True,
+        "headshot_percent": True,
+        "winrate": True,
+        "kd": False,
+        "level": True
+    },
+    "flags": {
+        "last_played": True,
+        "auto_hide_leaderboard": True,
+        "pre_cls": False,
+        "game_chat": True,
+        "peak_rank_act": True,
+        "discord_rpc": True,
+        "aggregate_rank_rr": True
     }
+}

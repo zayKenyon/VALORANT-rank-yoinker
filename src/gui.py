@@ -45,7 +45,7 @@ class LabelGrid(tk.Frame):
             if type(content).__name__ == "tuple":  # ability to color, using a tuple
                 content, clr = content
                 label['foreground'] = colors.rgb_to_hex(clr)
-            if column == 1 and row != 0:  # ability to click on the name to open tracker.gg
+            if column == 2 and row != 0:  # ability to click on the name to open tracker.gg
                 label['text'] = content
                 label.bind("<Button-1>", on_label_click)
             content_type = type(content).__name__
@@ -190,7 +190,11 @@ class GUI:
 
     def create_settings_frame(self):
         table_options = {
+            "party": "Party",
+            "agent": "Agent",
+            "name": "Name",
             "skin": "Skin",
+            "rank": "Rank",
             "rr": "Ranked Rating",
             "leaderboard": "Leaderboard Position",
             "peakrank": "Peak Rank",
