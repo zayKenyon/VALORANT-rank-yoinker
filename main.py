@@ -630,6 +630,7 @@ try:
                             name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                             # RANK
+                            print("curr:", playerRank["rank"], "rr:", playerRank["rr"])
                             rankName = NUMBERTORANKS[playerRank["rank"]]
                             if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
                                 rankName += f" ({playerRank['rr']})"
@@ -643,9 +644,11 @@ try:
                                 peakRankAct = ""
 
                             # PEAK RANK
+                            print("peak:", playerRank["peakrank"])
                             peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
 
                             # PREVIOUS RANK
+                            print("prev:", previousPlayerRank["rank"], "rr:", previousPlayerRank["rr"])
                             previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
 
                             # LEADERBOARD
