@@ -213,11 +213,6 @@ try:
         if True:
             log(f"getting new {game_state} scoreboard")
             lastGameState = game_state
-            game_state_dict = {
-                "INGAME": color('In-Game', fore=(241, 39, 39)),
-                "PREGAME": color('Agent Select', fore=(103, 237, 76)),
-                "MENUS": color('In-Menus', fore=(238, 241, 54)),
-            }
 
             if (not firstPrint) and cfg.get_feature_flag("pre_cls"):
                     os.system('cls')
@@ -710,7 +705,7 @@ try:
                                                 level
                                                 ])
                     seen.append(player["Subject"])
-            if (title := game_state_dict.get(game_state)) is None:
+            if (title := GAMESATEDICT.get(game_state)) is None:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":

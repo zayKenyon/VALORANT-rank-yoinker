@@ -6,11 +6,6 @@ enablePrivateLogging = True
 hide_names = True
 hide_levels = True
 
-
-def rgb_to_hex(rgb):
-    r, g, b = rgb
-    return '#{:02x}{:02x}{:02x}'.format(r, g, b)
-
 gamemodes = {
     "newmap": "New Map",
     "competitive": "Competitive",
@@ -93,6 +88,12 @@ PARTYICONLIST = [
     color(symbol, fore=(212, 82, 207)),
     symbol
 ]
+
+GAMESATEDICT = {
+    "INGAME": ('In-Game', (241, 39, 39)),
+    "PREGAME": ('Agent Select', (103, 237, 76)),
+    "MENUS": ('In-Menus', (238, 241, 54)),
+}
 
 NUMBERTORANKS = [
     ('Unranked', (46, 46, 46)),

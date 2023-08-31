@@ -1,12 +1,12 @@
-import os
-
 from PIL import Image, ImageTk
+from datetime import datetime
 import ttkbootstrap as ttk
 from io import BytesIO
 import tkinter as tk
 import requests
 import base64
 import json
+import os
 
 import urllib.parse
 import webbrowser
@@ -76,6 +76,8 @@ class GUI:
         self.screen_width = self.frame.winfo_screenwidth()
         self.screen_height = self.frame.winfo_screenheight()
 
+        self.start_time = datetime.now()
+
         self.frame.geometry(f"{int(self.screen_width // 1.75)}x{int(self.screen_height // 1.7)}")
 
         self.frame.iconbitmap("assets/Logo.ico")
@@ -87,16 +89,37 @@ class GUI:
 
         self.live_game_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
         self.game_info_frame = ttk.Frame(self.live_game_frame)
-        self.game_time_label = ttk.Label(self.game_info_frame, text="00:00", font=("Segoe UI", 12))
-        self.game_map_label = ttk.Label(self.game_info_frame, text="Ascent", font=("Segoe UI", 12))
-        self.game_mode_label = ttk.Label(self.game_info_frame, text="Unrated", font=("Segoe UI", 12))
-        self.game_state_label = ttk.Label(self.game_info_frame, text="In Game", font=("Segoe UI", 12))
+
+        self.game_time_var = tk.StringVar()
+        self.game_time_label = ttk.Label(self.game_info_frame, textvariable=self.game_time_var, font=("Segoe UI", 12))
+        self.game_time_var.set("00:00")
+
+        self.game_map_var = tk.StringVar()
+        self.game_map_label = ttk.Label(self.game_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12))
+        self.game_map_var.set("Ascent")
+
+        self.game_server_var = tk.StringVar()
+        self.game_server_label = ttk.Label(self.game_info_frame, textvariable=self.game_server_var, font=("Segoe UI", 12))
+        self.game_server_var.set("Frankfurt")
+        self.game_server_label.configure(foreground=colors.rgb_to_hex((200, 200, 200)))
+
+        self.game_mode_var = tk.StringVar()
+        self.game_mode_label = ttk.Label(self.game_info_frame, textvariable=self.game_mode_var, font=("Segoe UI", 12))
+        self.game_mode_var.set("Unrated")
+
+        self.game_state_var = tk.StringVar()
+        self.game_state_label = ttk.Label(self.game_info_frame, textvariable=self.game_state_var, font=("Segoe UI", 12))
+        self.game_state_var.set("In Game")
+        self.game_state_label.configure(foreground=colors.rgb_to_hex((241, 39, 39)))
+
         self.player_table = LabelGrid(self.live_game_frame)
         self.create_live_game_frame()
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
         self.settings_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
         self.config = {}
+        self.table_column_vars = {}
+        self.optional_feature_vars = {}
         self.create_settings_frame()
 
     def create_tabs(self):
@@ -180,6 +203,7 @@ class GUI:
         self.game_map_label.pack(side="left", expand=True)
         self.game_mode_label.pack(side="left", expand=True)
         self.game_state_label.pack(side="left", expand=True)
+        self.game_server_label.pack(side="left", expand=True)
 
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
@@ -214,13 +238,19 @@ class GUI:
             "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
         }
 
-        self.config = {
-            "weapons": "Vandal",
-            "table": {"skin": True, "rr": True, "leaderboard": False},
-            "port": 1100,
-            "flags": {"last_played": True, "auto_hide_leaderboard": False},
-            "chat_limit": 5
-        }
+        default_config = DEFAULT_CONFIG.copy()
+
+        try:
+            with open("config.json", "r") as openfile:
+                user_config = default_config | json.load(openfile)
+        except FileNotFoundError:
+            print("Generating default configuration")
+            user_config = default_config
+        except json.JSONDecodeError:
+            print("config file maybe broken, using default instead")
+            user_config = default_config
+
+        self.config = user_config
 
         self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
 
@@ -237,9 +267,8 @@ class GUI:
         self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.table_columns_lable = ttk.Label(self.table_frame, text="Table Columns", font=("Segoe UI", 12, "bold"))
         self.table_columns_explanation_lable = ttk.Label(self.table_frame, text="Select table columns to display:")
-        self.table_column_vars = {}
         for i, (key, value) in enumerate(table_options.items()):
-            var = tk.BooleanVar(value=bool(self.config.get("table", DEFAULT_CONFIG["table"]).get(key, DEFAULT_CONFIG["table"][key])))
+            var = tk.BooleanVar(value=bool(self.config.get("table", default_config["table"]).get(key, default_config["table"][key])))
             checkbox = ttk.Checkbutton(self.table_frame, text=value, variable=var)
             checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
             self.table_column_vars[key] = var
@@ -256,10 +285,9 @@ class GUI:
         self.optional_flags_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.optional_flag_label = ttk.Label(self.optional_flags_frame, text="Optional Features", font=("Segoe UI", 12, "bold"))
         self.optional_flag_explanation_label = ttk.Label(self.optional_flags_frame, text="Select optional features:")
-        self.optional_feature_vars = {}
         for i, (key, value) in enumerate(flag_options.items()):
             var = tk.BooleanVar(value=bool(
-                self.config.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key])))
+                self.config.get("flags", default_config["flags"]).get(key, default_config["flags"][key])))
             checkbox = ttk.Checkbutton(self.optional_flags_frame, text=value, variable=var)
             checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
             self.optional_feature_vars[key] = var
@@ -272,7 +300,9 @@ class GUI:
         self.chat_limit_entry.insert(0, self.config.get("chat_limit", 5))
 
         # Create a Save button to apply the configuration
-        self.save_config_button = ttk.Button(self.settings_frame, text="Save", command=self.save_config, takefocus=False)
+        self.continue_config_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
+        self.save_config_button = ttk.Button(self.continue_config_frame, text="Save", command=self.save_config, takefocus=False)
+        self.reset_config_button = ttk.Button(self.continue_config_frame, text="Reset", command=self.reset_config, takefocus=False)
 
         self.settings_label.grid(row=0, column=0, columnspan=2)
 
@@ -299,11 +329,35 @@ class GUI:
         self.chat_limit_label_explanation.grid(row=1, column=0, sticky="w")
         self.chat_limit_entry.grid(row=1, column=1, sticky="w")
 
-        self.save_config_button.grid(row=3, column=1, columnspan=3, pady=5)
+        self.continue_config_frame.grid(row=3, column=1, columnspan=3, pady=5)
+        self.save_config_button.grid(row=0, column=0, padx=5, pady=5)
+        self.reset_config_button.grid(row=0, column=1, padx=5, pady=5)
 
     def save_config(self):
-        # TODO save config
-        print("saving config")
+        """ saves the configuration to config.json """
+        self.config["weapon"] = self.weapon_combobox.get()
+        self.config["port"] = self.port_entry.get()
+        self.config["chat_limit"] = self.chat_limit_entry.get()
+        self.config["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
+        self.config["flags"] = {key: var.get() for key, var in self.optional_feature_vars.items()}
+        self.config = DEFAULT_CONFIG | self.config
+        with open("config.json", "w") as outfile:
+            json.dump(self.config, outfile, indent=2)
+        print("Config saved successfully")
+
+    def reset_config(self):
+        """ resets the configuration to default """
+        self.config = DEFAULT_CONFIG.copy()
+        self.weapon_combobox.set(DEFAULT_CONFIG.get("weapon", "Vandal"))
+        self.port_entry.delete(0, "end")
+        self.port_entry.insert(0, DEFAULT_CONFIG.get("port", 1100))
+        self.chat_limit_entry.delete(0, "end")
+        self.chat_limit_entry.insert(0, DEFAULT_CONFIG.get("chat_limit", 5))
+        for key, var in self.table_column_vars.items():
+            var.set(DEFAULT_CONFIG.get("table", DEFAULT_CONFIG["table"]).get(key, DEFAULT_CONFIG["table"][key]))
+        for key, var in self.optional_feature_vars.items():
+            var.set(DEFAULT_CONFIG.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key]))
+        print("Config reset successfully")
 
     def load_image(self, path, x, y):
         img = Image.open(path)
@@ -385,3 +439,26 @@ class GUI:
     def force_refresh(self):
         # TODO force refresh
         print("force refreshing")
+
+    def set_game_map(self, map):
+        self.game_map_var.set(map)
+
+    def set_game_mode(self, mode):
+        self.game_mode_var.set(gamemodes.get(mode, "n/A"))
+
+    def set_game_state(self, state):
+        self.start_time = datetime.now()
+        game_state = GAMESATEDICT.get(state, None)
+        self.game_state_var.set(game_state[0])
+        self.game_state_label.configure(foreground=game_state[1])
+
+    def set_player_table(self, table):
+        self.player_table.content = table
+        self.player_table._create_labels()
+        self.player_table._display_labels()
+        self.frame.update()
+
+    def refresh_game_time(self):
+        diff = datetime.now() - self.start_time
+        past_time = divmod(diff.days * 86400 + diff.seconds, 60)
+        self.game_time_var.set(f"{past_time[0]}:{past_time[1]}")
