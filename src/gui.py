@@ -200,27 +200,25 @@ class GUI:
             # load image from cache
             print("Loading image from cache")
             base64_data = agents[agent]
-        else:
-            # fetch image from the web
-            print("Fetching image from web")
-            with requests.Session() as s:
-                response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
-                base64_data = base64.b64encode(response.content).decode("utf-8")
-                # Store the fetched image in the cache
-                agents[agent] = base64_data
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(agents, f)
-
-        try:
-            # decode and load the image
             img_data = base64.b64decode(base64_data)
             img = Image.open(BytesIO(img_data))
-            img = img.resize((35, 35))
             return ImageTk.PhotoImage(img)
-        except Exception as e:
-            print(f"Error loading image: {str(e)}")
 
-        return None
+        # fetch image from the web
+        print("Fetching image from web")
+        with requests.Session() as s:
+            response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
+            img = Image.open(BytesIO(response.content))
+            img = img.resize((35, 35))
+            # Store the fetched image in the cache
+            img_bytesio = BytesIO()
+            img.save(img_bytesio, format="PNG")
+            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+            agents[agent] = base64_data
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(agents, f)
+
+            return ImageTk.PhotoImage(img)
 
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
