@@ -95,6 +95,10 @@ class GUI:
         self.create_live_game_frame()
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
+        self.settings_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.config = {}
+        self.create_settings_frame()
+
     def create_tabs(self):
         self.live_game_tab = ttk.Button(self.tab_frame,
                                         text="Agents",
@@ -180,6 +184,123 @@ class GUI:
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
 
+    def create_skins_frame(self):
+        # TODO create skins frame
+        pass
+
+    def create_settings_frame(self):
+        table_options = {
+            "skin": "Skin",
+            "rr": "Ranked Rating",
+            "leaderboard": "Leaderboard Position",
+            "peakrank": "Peak Rank",
+            "previousrank": "Previous Rank",
+            "headshot_percent": "Headshot Percentage",
+            "winrate": "WinRate",
+            "kd": "K/D Ratio <!> Last Game Only <!>",
+            "level": "Account Level"
+        }
+
+        flag_options = {
+            "last_played": "Last Played Stats",
+            "auto_hide_leaderboard": "Auto Hide Leaderboard Column",
+            "game_chat": "Print Game Chat",
+            "peak_rank_act": "Peak Rank Act",
+            "discord_rpc": "Discord Rich Presence",
+            "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
+        }
+
+        self.config = {
+            "weapons": "Vandal",
+            "table": {"skin": True, "rr": True, "leaderboard": False},
+            "port": 1100,
+            "flags": {"last_played": True, "auto_hide_leaderboard": False},
+            "chat_limit": 5
+        }
+
+        self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
+
+        # Create a frame for weapon selection
+        self.weapon_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+
+        self.weapon_selection_label = ttk.Label(self.weapon_frame, text="Weapon Selection", font=("Segoe UI", 12, "bold"))
+        self.weapon_selection_explanation_label = ttk.Label(self.weapon_frame, text="Select a weapon to show skin for:")
+
+        self.weapon_combobox = ttk.Combobox(self.weapon_frame, values=WEAPONS)
+        self.weapon_combobox.set(self.config.get("weapon", "Vandal"))
+
+        # Create a frame for table columns
+        self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.table_columns_lable = ttk.Label(self.table_frame, text="Table Columns", font=("Segoe UI", 12, "bold"))
+        self.table_columns_explanation_lable = ttk.Label(self.table_frame, text="Select table columns to display:")
+        self.table_column_vars = {}
+        for i, (key, value) in enumerate(table_options.items()):
+            var = tk.BooleanVar(value=bool(self.config.get("table", DEFAULT_CONFIG["table"]).get(key, DEFAULT_CONFIG["table"][key])))
+            checkbox = ttk.Checkbutton(self.table_frame, text=value, variable=var)
+            checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+            self.table_column_vars[key] = var
+
+        # Create a frame for server port
+        self.port_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.port_lable = ttk.Label(self.port_frame, text="Server Port", font=("Segoe UI", 12, "bold"))
+        self.port_explanation_lable = ttk.Label(self.port_frame, text="Enter the port for the server to run:")
+
+        self.port_entry = ttk.Entry(self.port_frame)
+        self.port_entry.insert(0, self.config.get("port", 1100))
+
+        # Create a frame for optional features
+        self.optional_flags_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.optional_flag_label = ttk.Label(self.optional_flags_frame, text="Optional Features", font=("Segoe UI", 12, "bold"))
+        self.optional_flag_explanation_label = ttk.Label(self.optional_flags_frame, text="Select optional features:")
+        self.optional_feature_vars = {}
+        for i, (key, value) in enumerate(flag_options.items()):
+            var = tk.BooleanVar(value=bool(
+                self.config.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key])))
+            checkbox = ttk.Checkbutton(self.optional_flags_frame, text=value, variable=var)
+            checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+            self.optional_feature_vars[key] = var
+
+        # Create a frame for chat limit
+        self.chat_limit_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.chat_limit_label = ttk.Label(self.chat_limit_frame, text="Chat Limit", font=("Segoe UI", 12, "bold"))
+        self.chat_limit_label_explanation = ttk.Label(self.chat_limit_frame, text="Enter the length of chat messages history:")
+        self.chat_limit_entry = ttk.Entry(self.chat_limit_frame)
+        self.chat_limit_entry.insert(0, self.config.get("chat_limit", 5))
+
+        # Create a Save button to apply the configuration
+        self.save_config_button = ttk.Button(self.settings_frame, text="Save", command=self.save_config, takefocus=False)
+
+        self.settings_label.grid(row=0, column=0, columnspan=2)
+
+        self.weapon_frame.grid(row=1, column=0, padx=10, pady=3, sticky="w")
+        self.weapon_selection_label.grid(row=0, column=0, columnspan=2, sticky="w")
+        self.weapon_selection_explanation_label.grid(row=1, column=0, sticky="w")
+        self.weapon_combobox.grid(row=1, column=1, sticky="w")
+
+        self.port_frame.grid(row=1, column=1, padx=10, pady=3, sticky="w")
+        self.port_lable.grid(row=0, column=0, sticky="w")
+        self.port_explanation_lable.grid(row=1, column=0, sticky="w")
+        self.port_entry.grid(row=1, column=1, sticky="w")
+
+        self.table_frame.grid(row=2, column=0, padx=10, pady=3, sticky="w")
+        self.table_columns_lable.grid(row=0, column=0, columnspan=2, sticky="w")
+        self.table_columns_explanation_lable.grid(row=1, column=0, columnspan=2, sticky="w")
+
+        self.optional_flags_frame.grid(row=2, column=1, padx=10, pady=3, sticky="w")
+        self.optional_flag_label.grid(row=0, column=0, columnspan=2, sticky="w")
+        self.optional_flag_explanation_label.grid(row=1, column=0, columnspan=2, sticky="w")
+
+        self.chat_limit_frame.grid(row=3, column=0, padx=10, pady=3, sticky="w")
+        self.chat_limit_label.grid(row=0, column=0, sticky="w")
+        self.chat_limit_label_explanation.grid(row=1, column=0, sticky="w")
+        self.chat_limit_entry.grid(row=1, column=1, sticky="w")
+
+        self.save_config_button.grid(row=3, column=1, columnspan=3, pady=5)
+
+    def save_config(self):
+        # TODO save config
+        print("saving config")
+
     def load_image(self, path, x, y):
         img = Image.open(path)
         img = img.resize((x, y))
@@ -240,7 +361,7 @@ class GUI:
     def show_settings_frame(self):
         self.clear_frame()
         print("showing settings frame")
-        # TODO show settings frame
+        self.settings_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def clear_cash(self):
         # Path to the JSON cache file
