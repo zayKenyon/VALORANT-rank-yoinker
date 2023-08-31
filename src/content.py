@@ -20,7 +20,7 @@ class Content():
         previous = content["Seasons"][0]
         for season in content["Seasons"]:
             if season["IsActive"]:
-                self:log(f"retrieved previous season id: {previous['ID']}")
+                self.log(f"retrieved previous season id: {previous['ID']}")
                 return previous["ID"]
             # Only store the previous act.
             if (season["Type"] == "episode"):
@@ -38,14 +38,32 @@ class Content():
         self.log(f"retrieved agent dict: {agent_dict}")
         return agent_dict
 
-    def get_maps(self):
-        rMaps = requests.get("https://valorant-api.com/v1/maps").json()
+    def get_all_maps(self):
+        """
+        Requests data and assets of all maps.
+        :return: JSON of all map information.
+        """
+        return requests.get("https://valorant-api.com/v1/maps").json()
+
+    def get_map_urls(self, maps) -> dict:
         map_dict = {}
         map_dict.update({None: None})
-        for Vmap in rMaps["data"]:
+        for Vmap in maps["data"]:
             map_dict.update({Vmap['mapUrl'].lower(): Vmap['displayName']})
         self.log(f"retrieved map dict: {map_dict}")
         return map_dict
+
+    def get_map_splashes(self, val_maps) -> dict:
+        """
+        Iterates through all maps, pulling map names and splash screens.
+        :param val_maps: JSON of all maps.
+        :return: A dictionary of maps to splashes.
+        """
+        val_map_dict = {}
+        val_map_dict.update({None: None})
+        for val_map in val_maps["data"]:
+            val_map_dict.update({val_map['displayName']: val_map['splash']})
+        return val_map_dict
 
     def get_act_episode_from_act_id(self, act_id):
         final = {

@@ -20,6 +20,7 @@ gamemodes = {
     "deathmatch": "Deathmatch",
     "ggteam": "Escalation",
     "onefa": "Replication",
+    "hurm": "Team Deathmatch",
     "custom": "Custom",
     "snowball": "Snowball Fight",
     "": "Custom",
