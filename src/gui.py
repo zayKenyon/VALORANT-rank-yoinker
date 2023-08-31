@@ -1,8 +1,12 @@
+import os
+
 from PIL import Image, ImageTk
 import ttkbootstrap as ttk
 from io import BytesIO
 import tkinter as tk
 import requests
+import base64
+import json
 
 import urllib.parse
 import webbrowser
@@ -110,6 +114,7 @@ class GUI:
         self.settings_tab.grid(row=0, column=2)
 
     def create_live_game_frame(self):
+        # TODO calculate average rank and fetch according rank image
         self.ally_team_average_frame = ttk.Frame(self.live_game_frame, padding=3)
         self.enemy_team_average_frame = ttk.Frame(self.live_game_frame, padding=3)
 
@@ -181,11 +186,41 @@ class GUI:
         return ImageTk.PhotoImage(img)
 
     def load_agent_image(self, agent):
-        with requests.Session() as s:
-            response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
-            img = Image.open(BytesIO(response.content))
+        cache_file = r"..\assets\gui\cache\agents.json"
+
+        # check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                agents = json.load(f)
+
+        else:
+            agents = {}
+
+        if agent in agents:
+            # load image from cache
+            print("Loading image from cache")
+            base64_data = agents[agent]
+        else:
+            # fetch image from the web
+            print("Fetching image from web")
+            with requests.Session() as s:
+                response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
+                base64_data = base64.b64encode(response.content).decode("utf-8")
+                # Store the fetched image in the cache
+                agents[agent] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(agents, f)
+
+        try:
+            # decode and load the image
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
             img = img.resize((35, 35))
             return ImageTk.PhotoImage(img)
+        except Exception as e:
+            print(f"Error loading image: {str(e)}")
+
+        return None
 
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
@@ -210,8 +245,19 @@ class GUI:
         # TODO show settings frame
 
     def clear_cash(self):
-        # TODO clear cash
-        print("clearing cash")
+        # Path to the JSON cache file
+        cache_file = r"..\assets\gui\cache\agents.json"
+
+        try:
+            # Check if the cache file exists
+            if os.path.exists(cache_file):
+                # Delete the cache file
+                os.remove(cache_file)
+                print("Cache cleared successfully.")
+            else:
+                print("Cache file does not exist.")
+        except Exception as e:
+            print(f"Error clearing cache: {str(e)}")
 
     def force_refresh(self):
         # TODO force refresh
