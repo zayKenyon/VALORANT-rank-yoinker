@@ -7,7 +7,10 @@ import requests
 import urllib.parse
 import webbrowser
 
+from src.colors import Colors
 from src.constants import *
+
+colors = Colors(hide_names, {}, AGENTCOLORLIST)
 
 def on_label_click(event):
     label_text = labels[event.widget.row][event.widget.column]['text']
@@ -128,17 +131,17 @@ class GUI:
                                       content=[
                                           ["Party", "Agent", "Name", "Rank", "Preak Rank", "Previous Rank", "HS", "WR", "KD", "Level"],
 
-                                          ["", self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", "Platinum 2", "Diamond 2", "Platinum 1", "17", "50", "1.2", "125"],
-                                          ["", self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", "Gold 3", "Platinum 1", "Gold 2", "22", "45", "1.1", "37"],
-                                          ["", self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", "Platinum 2", "Diamond 3", "Platinum 1", "17", "72", "1.2", "45"],
-                                          ["", self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", "Platinum 2", "Immortal 1", "Platinum 1", "17", "50", "1.2", "321"],
-                                          ["", self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", "Gold 3", "Gold 1", "Gold 2", "22", "45", "1.1", "42"],
+                                          ["", self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", NUMBERTORANKS[19], NUMBERTORANKS[25],NUMBERTORANKS[23], colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(321)],
+                                          ["", self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", NUMBERTORANKS[9], NUMBERTORANKS[12], NUMBERTORANKS[11], "22", colors.get_wr_gradient(45), "1.1", colors.level_to_color(125)],
+                                          ["", self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", NUMBERTORANKS[15], NUMBERTORANKS[18], NUMBERTORANKS[16], colors.get_hs_gradient(17), colors.get_wr_gradient(72), "1.2", colors.level_to_color(72)],
+                                          ["", self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", NUMBERTORANKS[13], NUMBERTORANKS[16], NUMBERTORANKS[14], colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(51)],
+                                          ["", self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", NUMBERTORANKS[17], NUMBERTORANKS[19], NUMBERTORANKS[17], "22", colors.get_wr_gradient(45), "1.1", colors.level_to_color(42)],
                                           ["", "", "", "", "", "", "", "", "", ""],
-                                          ["", self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", "Platinum 2", "Ascendant 2", "Platinum 1", "17", "30", "1.2", "93"],
-                                          ["", self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", "Gold 3", "Platinum 1", "Gold 2", "22", "60", "1.1", "54"],
-                                          ["", self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", "Platinum 2", "Diamond 1", "Platinum 1", "17", "12", "1.2", "421"],
-                                          ["", self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", "Immortal 2", "Radiant", "Immortal 1", "17", "90", "2.3", "212"],
-                                          ["", self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", "Gold 3", "Platinum 1", "Gold 2", "22", "65", "1.1", "12"],
+                                          ["", self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", NUMBERTORANKS[17], NUMBERTORANKS[19], NUMBERTORANKS[15], colors.get_hs_gradient(17), colors.get_wr_gradient(30), "1.2", colors.level_to_color(421)],
+                                          ["", self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", NUMBERTORANKS[9], NUMBERTORANKS[16], NUMBERTORANKS[15], "22", colors.get_wr_gradient(60), "1.1", colors.level_to_color(212)],
+                                          ["", self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", NUMBERTORANKS[20], NUMBERTORANKS[23], NUMBERTORANKS[21], colors.get_hs_gradient(17), colors.get_wr_gradient(12), "1.2", colors.level_to_color(90)],
+                                          ["", self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", NUMBERTORANKS[15], NUMBERTORANKS[21], NUMBERTORANKS[20], colors.get_hs_gradient(17), colors.get_wr_gradient(90), "2.3", colors.level_to_color(72)],
+                                          ["", self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", NUMBERTORANKS[11], NUMBERTORANKS[13], NUMBERTORANKS[12], colors.get_hs_gradient(22), colors.get_wr_gradient(65), "1.1", colors.level_to_color(12)],
                                       ],
                                       takefocus=False)
 

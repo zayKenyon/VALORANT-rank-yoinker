@@ -41,15 +41,15 @@ class Colors:
 
     def level_to_color(self, level):
         if level >= 400:
-            return color(level, fore=(102, 212, 212))
+            return level, self.rgb_to_hex((102, 212, 212))
         elif level >= 300:
-            return color(level, fore=(207, 207, 76))
+            return level, self.rgb_to_hex((207, 207, 76))
         elif level >= 200:
-            return color(level, fore=(71, 71, 204))
+            return level, self.rgb_to_hex((71, 71, 204))
         elif level >= 100:
-            return color(level, fore=(241, 144, 54))
+            return level, self.rgb_to_hex((241, 144, 54))
         elif level < 100:
-            return color(level, fore=(211, 211, 211))
+            return level, self.rgb_to_hex((211, 211, 211))
 
     def get_agent_from_uuid(self, agentUUID):
         agent = str(self.agent_dict.get(agentUUID))
@@ -63,7 +63,7 @@ class Colors:
         try:
             number = int(number)
         except ValueError:
-            return color("N/a",fore=(46, 46, 46))
+            return "n/A", self.rgb_to_hex((46, 46, 46))
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)
@@ -89,13 +89,13 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return color(number, fore=f)
+                return number, self.rgb_to_hex(f)
 
     def get_wr_gradient(self, number):
         try:
             number = int(number)
         except ValueError:
-            return color("N/a",fore=(46, 46, 46))
+            return "n/A", self.rgb_to_hex((46, 46, 46))
         dark_red = (64, 15, 10)
         yellow = (140, 119, 11)
         green = (18, 204, 25)
@@ -121,8 +121,12 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return color(number, fore=f)
+                return number, self.rgb_to_hex(f)
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
         return ansi_escape.sub('', line)
+
+    def rgb_to_hex(self, rgb):
+        r,g,b = rgb
+        return '#{:02x}{:02x}{:02x}'.format(r, g, b)
