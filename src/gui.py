@@ -79,7 +79,7 @@ class GUI:
 
         self.tab_frame = ttk.Frame(self.frame, padding=5)
         self.create_tabs()
-        self.tab_frame.grid(row=0, column=0)
+        self.tab_frame.grid(row=0, column=0, sticky="w")
 
         self.live_game_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
         self.game_info_frame = ttk.Frame(self.live_game_frame)
@@ -127,6 +127,7 @@ class GUI:
         self.enemy_team_average_image.image = enemy_team_average_image
         self.enemy_team_average_image.configure(image=enemy_team_average_image)
 
+        # TODO add real data, get gui working while program is running
         self.player_table = LabelGrid(self.live_game_frame,
                                       content=[
                                           ["Party", "Agent", "Name", "Rank", "Preak Rank", "Previous Rank", "HS", "WR", "KD", "Level"],
@@ -186,17 +187,27 @@ class GUI:
             img = img.resize((35, 35))
             return ImageTk.PhotoImage(img)
 
+    def clear_frame(self):
+        """ hide all frames, apart from the tabs """
+        print("clearing frame")
+        for widget in self.frame.winfo_children():
+            if widget not in [self.tab_frame]:
+                widget.grid_forget()
+
     def show_live_game_frame(self):
-        # TODO show live game frame
+        self.clear_frame()
         print("showing live game frame")
+        self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def show_live_skins_frame(self):
-        # TODO show live skins frame
+        self.clear_frame()
         print("showing live skins frame")
+        # TODO show live skins frame
 
     def show_settings_frame(self):
-        # TODO show settings frame
+        self.clear_frame()
         print("showing settings frame")
+        # TODO show settings frame
 
     def clear_cash(self):
         # TODO clear cash
