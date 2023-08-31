@@ -161,9 +161,13 @@ DEFAULT_CONFIG = {
     "port": 1100,
     "weapon": "Vandal",
     "chat_limit": 5,
+    "calculation_range": 1,
     "table": {
         "party": True,
         "agent": True,
+        "top_agent": False,
+        "top_agent_map": False,
+        "top_role": False,
         "name": True,
         "skin": True,
         "rank": True,

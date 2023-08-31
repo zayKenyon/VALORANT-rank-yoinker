@@ -216,6 +216,9 @@ class GUI:
         table_options = {
             "party": "Party",
             "agent": "Agent",
+            "top_agent": "Top Agent",
+            "top_agent_map": "Top Agent for Map",
+            "top_role": "Top Role",
             "name": "Name",
             "skin": "Skin",
             "rank": "Rank",
@@ -225,9 +228,10 @@ class GUI:
             "previousrank": "Previous Rank",
             "headshot_percent": "Headshot Percentage",
             "winrate": "WinRate",
-            "kd": "K/D Ratio <!> Last Game Only <!>",
+            "kd": "K/D Ratio",
             "level": "Account Level"
         }
+        # TODO and feature ideas: top-agent for map, top-agent overall, top-role, range for calculations
 
         flag_options = {
             "last_played": "Last Played Stats",
@@ -299,6 +303,13 @@ class GUI:
         self.chat_limit_entry = ttk.Entry(self.chat_limit_frame)
         self.chat_limit_entry.insert(0, self.config.get("chat_limit", 5))
 
+        # Create a frame for calculation range
+        self.calculation_range_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.calculation_range_label = ttk.Label(self.calculation_range_frame, text="Calculation Range", font=("Segoe UI", 12, "bold"))
+        self.calculation_range_label_explanation = ttk.Label(self.calculation_range_frame, text="Backtracking of stats for KD, Top-Agent:\nSignificant time increase for higher values!")
+        self.calculation_range_entry = ttk.Entry(self.calculation_range_frame)
+        self.calculation_range_entry.insert(0, self.config.get("calculation_range", 1))
+
         # Create a Save button to apply the configuration
         self.continue_config_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
         self.save_config_button = ttk.Button(self.continue_config_frame, text="Save", command=self.save_config, takefocus=False)
@@ -329,7 +340,12 @@ class GUI:
         self.chat_limit_label_explanation.grid(row=1, column=0, sticky="w")
         self.chat_limit_entry.grid(row=1, column=1, sticky="w")
 
-        self.continue_config_frame.grid(row=3, column=1, columnspan=3, pady=5)
+        self.calculation_range_frame.grid(row=3, column=1, padx=10, pady=3, sticky="w")
+        self.calculation_range_label.grid(row=0, column=0, sticky="w")
+        self.calculation_range_label_explanation.grid(row=1, column=0, sticky="w")
+        self.calculation_range_entry.grid(row=1, column=1, sticky="w")
+
+        self.continue_config_frame.grid(row=4, column=0, columnspan=2, pady=5)
         self.save_config_button.grid(row=0, column=0, padx=5, pady=5)
         self.reset_config_button.grid(row=0, column=1, padx=5, pady=5)
 
@@ -348,9 +364,9 @@ class GUI:
     def reset_config(self):
         """ resets the configuration to default """
         self.config = DEFAULT_CONFIG.copy()
-        self.weapon_combobox.set(DEFAULT_CONFIG.get("weapon", "Vandal"))
+        self.weapon_combobox.set(DEFAULT_CONFIG["weapon"])
         self.port_entry.delete(0, "end")
-        self.port_entry.insert(0, DEFAULT_CONFIG.get("port", 1100))
+        self.port_entry.insert(0, DEFAULT_CONFIG["port"])
         self.chat_limit_entry.delete(0, "end")
         self.chat_limit_entry.insert(0, DEFAULT_CONFIG.get("chat_limit", 5))
         for key, var in self.table_column_vars.items():
