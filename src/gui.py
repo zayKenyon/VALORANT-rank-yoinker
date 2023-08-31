@@ -35,13 +35,13 @@ class LabelGrid(tk.Frame):
                 label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=3, padx=5, anchor="center")
             else:
                 label = tk.Label(self, font=("Segoe UI", 12), pady=3, padx=5, anchor="center")
-            label.row = row  # Store the row information as an attribute
-            label.column = column  # Store the column information as an attribute
+            label.row = row  # store the row information as an attribute to have clickable names
+            label.column = column  # store the column information as an attribute to have clickable names
 
-            if type(content).__name__ == "tuple":
+            if type(content).__name__ == "tuple":  # ability to color, using a tuple
                 content, clr = content
-                label['foreground'] = clr
-            if column == 1 and row != 0:
+                label['foreground'] = colors.rgb_to_hex(clr)
+            if column == 1 and row != 0:  # ability to click on the name to open tracker.gg
                 label['text'] = content
                 label.bind("<Button-1>", on_label_click)
             content_type = type(content).__name__
@@ -50,7 +50,7 @@ class LabelGrid(tk.Frame):
             elif content_type == 'PhotoImage':
                 label['image'] = content
 
-            labels[row].append(label)  # Append the label to the appropriate row list
+            labels[row].append(label)
 
         global labels
         labels = []
