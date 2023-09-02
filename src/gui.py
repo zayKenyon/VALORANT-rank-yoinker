@@ -120,6 +120,9 @@ class GUI:
         self.config = {}
         self.table_column_vars = {}
         self.optional_feature_vars = {}
+        self.weapon_amount_frame = ttk.LabelFrame()
+        self.weapon_amount_entry = ttk.Entry()
+        self.weapon_comboboxes = []
         self.create_settings_frame()
 
     def create_tabs(self):
@@ -258,14 +261,15 @@ class GUI:
 
         self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
 
-        # Create a frame for weapon selection
-        self.weapon_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        # Create a frame for the weapon amount
+        self.weapon_amount_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.weapon_amount_lable = ttk.Label(self.weapon_amount_frame, text="Weapons", font=("Segoe UI", 12, "bold"))
+        self.weapon_amount_explanation_lable = ttk.Label(self.weapon_amount_frame, text="Enter the amount of weapons to show:")
+        self.weapon_amount_refresh_button = ttk.Button(self.weapon_amount_frame, text="Refresh", command=self.refresh_weapon_amount, takefocus=False)
+        self.refresh_weapon_amount()
 
-        self.weapon_selection_label = ttk.Label(self.weapon_frame, text="Weapon Selection", font=("Segoe UI", 12, "bold"))
-        self.weapon_selection_explanation_label = ttk.Label(self.weapon_frame, text="Select a weapon to show skin for:")
-
-        self.weapon_combobox = ttk.Combobox(self.weapon_frame, values=WEAPONS)
-        self.weapon_combobox.set(self.config.get("weapon", "Vandal"))
+        self.weapon_amount_entry = ttk.Entry(self.weapon_amount_frame)
+        self.weapon_amount_entry.insert(0, "1")
 
         # Create a frame for table columns
         self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
@@ -317,12 +321,13 @@ class GUI:
 
         self.settings_label.grid(row=0, column=0, columnspan=2)
 
-        self.weapon_frame.grid(row=1, column=0, padx=10, pady=3, sticky="w")
-        self.weapon_selection_label.grid(row=0, column=0, columnspan=2, sticky="w")
-        self.weapon_selection_explanation_label.grid(row=1, column=0, sticky="w")
-        self.weapon_combobox.grid(row=1, column=1, sticky="w")
+        self.weapon_amount_frame.grid(row=1, column=1, padx=10, pady=3, sticky="w")
+        self.weapon_amount_lable.grid(row=0, column=0, sticky="w")
+        self.weapon_amount_explanation_lable.grid(row=1, column=0, sticky="w")
+        self.weapon_amount_entry.grid(row=1, column=1, sticky="w")
+        self.weapon_amount_refresh_button.grid(row=1, column=2, sticky="w")
 
-        self.port_frame.grid(row=1, column=1, padx=10, pady=3, sticky="w")
+        self.port_frame.grid(row=1, column=0, padx=10, pady=3, sticky="w")
         self.port_lable.grid(row=0, column=0, sticky="w")
         self.port_explanation_lable.grid(row=1, column=0, sticky="w")
         self.port_entry.grid(row=1, column=1, sticky="w")
@@ -351,7 +356,7 @@ class GUI:
 
     def save_config(self):
         """ saves the configuration to config.json """
-        self.config["weapon"] = self.weapon_combobox.get()
+        self.config["weapon"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
         self.config["port"] = self.port_entry.get()
         self.config["chat_limit"] = self.chat_limit_entry.get()
         self.config["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
@@ -364,7 +369,7 @@ class GUI:
     def reset_config(self):
         """ resets the configuration to default """
         self.config = DEFAULT_CONFIG.copy()
-        self.weapon_combobox.set(DEFAULT_CONFIG["weapon"])
+        # TODO reset comboboxes
         self.port_entry.delete(0, "end")
         self.port_entry.insert(0, DEFAULT_CONFIG["port"])
         self.chat_limit_entry.delete(0, "end")
@@ -455,6 +460,30 @@ class GUI:
     def force_refresh(self):
         # TODO force refresh
         print("force refreshing")
+
+    def refresh_weapon_amount(self):
+        # TODO refresh weapon amount
+        weapon_amount = self.weapon_amount_entry.get()
+
+        if weapon_amount:
+            weapon_amount = int(weapon_amount)
+
+            if weapon_amount > len(self.weapon_comboboxes):
+                # Add weapon comboboxes
+                for i in range(weapon_amount - len(self.weapon_comboboxes)):
+                    weapon_combobox = ttk.Combobox(self.weapon_amount_frame, values=WEAPONS)
+                    weapon_combobox.current(0)
+                    self.weapon_comboboxes.append(weapon_combobox)
+
+            elif weapon_amount < len(self.weapon_comboboxes):
+                # Remove weapon comboboxes
+                for i in range(len(self.weapon_comboboxes) - weapon_amount):
+                    self.weapon_comboboxes[-1].destroy()
+                    self.weapon_comboboxes.pop()
+
+            # Display weapon comboboxes
+            for i, weapon_combobox in enumerate(self.weapon_comboboxes):
+                weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
 
     def set_game_map(self, map):
         self.game_map_var.set(map)
