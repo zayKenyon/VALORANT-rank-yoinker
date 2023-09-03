@@ -95,17 +95,20 @@ class GUI:
 
         self.live_game_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
         self.game_info_frame = ttk.Frame(self.live_game_frame)
+        self.map_info_frame = ttk.Frame(self.live_game_frame)
 
         self.game_time_var = tk.StringVar()
         self.game_time_label = ttk.Label(self.game_info_frame, textvariable=self.game_time_var, font=("Segoe UI", 12))
         self.game_time_var.set("00:00")
 
-        self.game_map_var = tk.StringVar()
-        self.game_map_label = ttk.Label(self.game_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12))
-        self.game_map_var.set("Ascent")
+        game_map_image = self.load_map_image("7eaecc1b-4337-bbf6-6ab9-04b8f06b3319")
+
+        self.game_map_label = ttk.Label(self.map_info_frame)
+        self.game_map_label.image = game_map_image
+        self.game_map_label.configure(image=game_map_image)
 
         self.game_server_var = tk.StringVar()
-        self.game_server_label = ttk.Label(self.game_info_frame, textvariable=self.game_server_var, font=("Segoe UI", 12))
+        self.game_server_label = ttk.Label(self.map_info_frame, textvariable=self.game_server_var, font=("Segoe UI", 12))
         self.game_server_var.set("Frankfurt")
         self.game_server_label.configure(foreground=colors.rgb_to_hex((200, 200, 200)))
 
@@ -174,19 +177,20 @@ class GUI:
         # TODO add real data, get gui working while program is running
         self.player_table = LabelGrid(self.live_game_frame,
                                       content=[
-                                          ["Party", "Agent", "Name", "Rank", "Preak Rank", "Previous Rank", "HS", "WR", "KD", "Level"],
+                                          ["Party", "Agent", "Name", "Rank", "Peak Rank", "Prev. Rank", "HS", "WR", "KD", "Level"],
 
-                                          ["", self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", NUMBERTORANKS[19], NUMBERTORANKS[25],NUMBERTORANKS[23], colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(321)],
-                                          ["", self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", NUMBERTORANKS[9], NUMBERTORANKS[12], NUMBERTORANKS[11], "22", colors.get_wr_gradient(45), "1.1", colors.level_to_color(125)],
-                                          ["", self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", NUMBERTORANKS[15], NUMBERTORANKS[18], NUMBERTORANKS[16], colors.get_hs_gradient(17), colors.get_wr_gradient(72), "1.2", colors.level_to_color(72)],
-                                          ["", self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", NUMBERTORANKS[13], NUMBERTORANKS[16], NUMBERTORANKS[14], colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(51)],
-                                          ["", self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", NUMBERTORANKS[17], NUMBERTORANKS[19], NUMBERTORANKS[17], "22", colors.get_wr_gradient(45), "1.1", colors.level_to_color(42)],
+                                          ["", self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", self.load_rank_image(19), self.load_rank_image(25) ,self.load_rank_image(23), colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(321)],
+                                          ["", self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", self.load_rank_image(9), self.load_rank_image(12), self.load_rank_image(11), colors.get_hs_gradient(22), colors.get_wr_gradient(45), "1.1", colors.level_to_color(125)],
+                                          ["", self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", self.load_rank_image(15), self.load_rank_image(18), self.load_rank_image(16), colors.get_hs_gradient(17), colors.get_wr_gradient(72), "1.2", colors.level_to_color(72)],
+                                          ["", self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", self.load_rank_image(13), self.load_rank_image(16), self.load_rank_image(14), colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(51)],
+                                          ["", self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", self.load_rank_image(17), self.load_rank_image(19), self.load_rank_image(17), colors.get_hs_gradient(22), colors.get_wr_gradient(45), "1.1", colors.level_to_color(42)],
+                                          # TODO add a seperator
                                           ["", "", "", "", "", "", "", "", "", ""],
-                                          ["", self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", NUMBERTORANKS[17], NUMBERTORANKS[19], NUMBERTORANKS[15], colors.get_hs_gradient(17), colors.get_wr_gradient(30), "1.2", colors.level_to_color(421)],
-                                          ["", self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", NUMBERTORANKS[9], NUMBERTORANKS[16], NUMBERTORANKS[15], "22", colors.get_wr_gradient(60), "1.1", colors.level_to_color(212)],
-                                          ["", self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", NUMBERTORANKS[20], NUMBERTORANKS[23], NUMBERTORANKS[21], colors.get_hs_gradient(17), colors.get_wr_gradient(12), "1.2", colors.level_to_color(90)],
-                                          ["", self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", NUMBERTORANKS[15], NUMBERTORANKS[21], NUMBERTORANKS[20], colors.get_hs_gradient(17), colors.get_wr_gradient(90), "2.3", colors.level_to_color(72)],
-                                          ["", self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", NUMBERTORANKS[11], NUMBERTORANKS[13], NUMBERTORANKS[12], colors.get_hs_gradient(22), colors.get_wr_gradient(65), "1.1", colors.level_to_color(12)],
+                                          ["", self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", self.load_rank_image(17), self.load_rank_image(19), self.load_rank_image(15), colors.get_hs_gradient(17), colors.get_wr_gradient(30), "1.2", colors.level_to_color(421)],
+                                          ["", self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", self.load_rank_image(9), self.load_rank_image(16), self.load_rank_image(15), colors.get_hs_gradient(22), colors.get_wr_gradient(60), "1.1", colors.level_to_color(212)],
+                                          ["", self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", self.load_rank_image(20), self.load_rank_image(23), self.load_rank_image(21), colors.get_hs_gradient(17), colors.get_wr_gradient(12), "1.2", colors.level_to_color(90)],
+                                          ["", self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", self.load_rank_image(15), self.load_rank_image(21), self.load_rank_image(20), colors.get_hs_gradient(17), colors.get_wr_gradient(90), "2.3", colors.level_to_color(72)],
+                                          ["", self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", self.load_rank_image(11), self.load_rank_image(13), self.load_rank_image(12), colors.get_hs_gradient(22), colors.get_wr_gradient(65), "1.1", colors.level_to_color(12)],
                                       ],
                                       takefocus=False)
 
@@ -212,10 +216,12 @@ class GUI:
 
         self.game_info_frame.grid(row=0, column=1, columnspan=7, sticky="nsew")
         self.game_time_label.pack(side="left", expand=True)
-        self.game_map_label.pack(side="left", expand=True)
         self.game_mode_label.pack(side="left", expand=True)
         self.game_state_label.pack(side="left", expand=True)
+
+        self.map_info_frame.grid(row=3, column=1, columnspan=7, sticky="nsew")
         self.game_server_label.pack(side="left", expand=True)
+        self.game_map_label.pack(side="left", expand=True)
 
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
@@ -438,14 +444,14 @@ class GUI:
 
         if agent in agents:
             # load image from cache
-            print("Loading image from cache")
+            print("Loading Agent image from cache")
             base64_data = agents[agent]
             img_data = base64.b64decode(base64_data)
             img = Image.open(BytesIO(img_data))
             return ImageTk.PhotoImage(img)
 
         # fetch image from the web
-        print("Fetching image from web")
+        print("Fetching Agent image from web")
         with requests.Session() as s:
             response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
             img = Image.open(BytesIO(response.content))
@@ -457,6 +463,76 @@ class GUI:
             agents[agent] = base64_data
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(agents, f)
+
+            return ImageTk.PhotoImage(img)
+
+    def load_rank_image(self, rank):
+        cache_file = r"assets\gui\cache\ranks.json"
+
+        # check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                ranks = json.load(f)
+
+        else:
+            ranks = {}
+
+        if rank in ranks:
+            # load image from cache
+            print("Loading Rank image from cache")
+            base64_data = ranks[rank]
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
+            return ImageTk.PhotoImage(img)
+
+        # fetch image from the web
+        print("Fetching Rank image from web")
+        with requests.Session() as s:
+            response = s.get(f"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{rank}/smallicon.png")
+            img = Image.open(BytesIO(response.content))
+            img = img.resize((35, 35))
+            # Store the fetched image in the cache
+            img_bytesio = BytesIO()
+            img.save(img_bytesio, format="PNG")
+            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+            ranks[rank] = base64_data
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(ranks, f)
+
+            return ImageTk.PhotoImage(img)
+
+    def load_map_image(self, map):
+        cache_file = r"assets\gui\cache\maps.json"
+
+        # check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                maps = json.load(f)
+
+        else:
+            maps = {}
+
+        if map in maps:
+            # load image from cache
+            print("Loading Map image from cache")
+            base64_data = maps[map]
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
+            return ImageTk.PhotoImage(img)
+
+        # fetch image from the web
+        print("Fetching Map image from web")
+        with requests.Session() as s:
+            response = s.get(f"https://media.valorant-api.com/maps/{map}/splash.png")
+            img = Image.open(BytesIO(response.content))
+            img = img.resize((83, 35))
+            # Store the fetched image in the cache
+            img_bytesio = BytesIO()
+            img.save(img_bytesio, format="PNG")
+            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+            maps[map] = base64_data
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(maps, f)
 
             return ImageTk.PhotoImage(img)
 
@@ -537,8 +613,10 @@ class GUI:
         table_length = int(self.config.weapon_amount) + 2
         return [""] * table_length
 
-    def set_game_map(self, map):
-        self.game_map_var.set(map)
+    def set_game_map(self, map_id):
+        game_map_image = self.load_map_image(map_id)
+        self.game_map_label.image = game_map_image
+        self.game_map_label.configure(image=game_map_image)
 
     def set_game_mode(self, mode):
         self.game_mode_var.set(gamemodes.get(mode, "n/A"))
