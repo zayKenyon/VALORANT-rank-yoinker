@@ -101,11 +101,15 @@ class GUI:
         self.game_time_label = ttk.Label(self.game_info_frame, textvariable=self.game_time_var, font=("Segoe UI", 12))
         self.game_time_var.set("00:00")
 
-        game_map_image = self.load_map_image("7eaecc1b-4337-bbf6-6ab9-04b8f06b3319")
+        game_map_name, game_map_image = self.load_map("7eaecc1b-4337-bbf6-6ab9-04b8f06b3319")
 
-        self.game_map_label = ttk.Label(self.map_info_frame)
-        self.game_map_label.image = game_map_image
-        self.game_map_label.configure(image=game_map_image)
+        self.game_map_image_label = ttk.Label(self.map_info_frame)
+        self.game_map_image_label.image = game_map_image
+        self.game_map_image_label.configure(image=game_map_image)
+
+        self.game_map_var = tk.StringVar()
+        self.game_map_label = ttk.Label(self.map_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12))
+        self.game_map_var.set(game_map_name)
 
         self.game_server_var = tk.StringVar()
         self.game_server_label = ttk.Label(self.map_info_frame, textvariable=self.game_server_var, font=("Segoe UI", 12))
@@ -222,6 +226,7 @@ class GUI:
         self.map_info_frame.grid(row=3, column=1, columnspan=7, sticky="nsew")
         self.game_server_label.pack(side="left", expand=True)
         self.game_map_label.pack(side="left", expand=True)
+        self.game_map_image_label.pack(side="left", expand=True)
 
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
@@ -229,9 +234,7 @@ class GUI:
     def create_skin_frame(self):
         # TODO add real data, get gui working while program is running
         header = ["Agent", "Name"]
-        print(self.config.weapon)
         for weapon in self.config.weapon.split(", "):
-            print(weapon)
             header.append(weapon)
         # TODO add real data, get gui working while program is running
         self.player_skin_table = LabelGrid(self.skins_frame,
@@ -242,7 +245,7 @@ class GUI:
                                                [self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", "Prism II", "Ruination", "Elderflame", "Nebula"],
                                                [self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", "Sovereign", "Glitchpop", "Spline", "Sakura"],
                                                [self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", "Origin", "Spectrum", "VALORANT GO! Vol. 2", "Magepunk"],
-                                               self.seperator(),
+                                               self.skin_seperator(),
                                                [self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", "RGX 11z Pro", "Glitchpop", "Glitchpop", "Glitchpop"],
                                                [self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", "Origin", "Recon", "Sentinels of Light", "Magepunk"],
                                                [self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", "Sovereign", "Spline", "Spline", "Spline"],
@@ -502,40 +505,75 @@ class GUI:
 
             return ImageTk.PhotoImage(img)
 
-    def load_map_image(self, map):
-        cache_file = r"assets\gui\cache\maps.json"
+    def load_map(self, map_uuid):
 
-        # check if the cache file exists
-        if os.path.exists(cache_file):
-            with open(cache_file, "r", encoding="utf-8") as f:
-                maps = json.load(f)
+        def load_map_image():
+            cache_file = r"assets\gui\cache\map_images.json"
 
-        else:
-            maps = {}
+            # check if the cache file exists
+            if os.path.exists(cache_file):
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    map_images = json.load(f)
 
-        if map in maps:
-            # load image from cache
-            print("Loading Map image from cache")
-            base64_data = maps[map]
-            img_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(img_data))
-            return ImageTk.PhotoImage(img)
+            else:
+                map_images = {}
 
-        # fetch image from the web
-        print("Fetching Map image from web")
-        with requests.Session() as s:
-            response = s.get(f"https://media.valorant-api.com/maps/{map}/splash.png")
-            img = Image.open(BytesIO(response.content))
-            img = img.resize((83, 35))
-            # Store the fetched image in the cache
-            img_bytesio = BytesIO()
-            img.save(img_bytesio, format="PNG")
-            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-            maps[map] = base64_data
-            with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump(maps, f)
+            if map_uuid in map_images:
+                # load image from cache
+                print("Loading Map image from cache")
+                base64_data = map_images[map_uuid]
+                img_data = base64.b64decode(base64_data)
+                img = Image.open(BytesIO(img_data))
+                return ImageTk.PhotoImage(img)
 
-            return ImageTk.PhotoImage(img)
+            # fetch image from the web
+            print("Fetching Map image from web")
+            with requests.Session() as s:
+                response = s.get(f"https://media.valorant-api.com/maps/{map_uuid}/splash.png")
+                img = Image.open(BytesIO(response.content))
+                img = img.resize((187, 105))
+                img = img.crop((21, 30, 165, 65))
+
+                # Store the fetched image in the cache
+                img_bytesio = BytesIO()
+                img.save(img_bytesio, format="PNG")
+                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+                map_images[map_uuid] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(map_images, f)
+
+                return ImageTk.PhotoImage(img)
+
+        def load_map_name():
+            cache_file = r"assets\gui\cache\map_names.json"
+
+            # check if the cache file exists
+            if os.path.exists(cache_file):
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    map_names = json.load(f)
+
+            else:
+                map_names = {}
+
+            if map_uuid in map_names:
+                # load image from cache
+                print("Loading Map Name from cache")
+                map_name = map_names[map_uuid]
+
+            # fetch image from the web
+            print("Fetching Map Name from web")
+            with requests.Session() as s:
+                response = s.get(f"https://valorant-api.com/v1/maps/{map_uuid}").json()
+                map_name = response["data"]["displayName"]
+
+                # Store the fetched image in the cache
+                map_names[map_uuid] = map_name
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(map_names, f)
+
+                return map_name
+
+        return load_map_name(), load_map_image()
 
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
@@ -610,14 +648,15 @@ class GUI:
         # Update the grid of the weapon_combobox_frame in the settings_frame
         self.weapon_combobox_frame.grid(row=1, column=3, rowspan=4, sticky="new")
 
-    def seperator(self):
+    def skin_seperator(self):
         table_length = int(self.config.weapon_amount) + 2
         return [""] * table_length
 
-    def set_game_map(self, map_id):
-        game_map_image = self.load_map_image(map_id)
-        self.game_map_label.image = game_map_image
-        self.game_map_label.configure(image=game_map_image)
+    def set_game_map(self, map_uuid):
+        game_map_name, game_map_image = self.load_map(map_uuid)
+        self.game_map_var = game_map_name
+        self.game_map_image_label.image = game_map_image
+        self.game_map_image_label.configure(image=game_map_image)
 
     def set_game_mode(self, mode):
         self.game_mode_var.set(gamemodes.get(mode, "n/A"))
