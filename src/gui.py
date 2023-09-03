@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageEnhance
 from datetime import datetime
 import ttkbootstrap as ttk
 from io import BytesIO
@@ -103,12 +103,10 @@ class GUI:
 
         game_map_name, game_map_image = self.load_map("7eaecc1b-4337-bbf6-6ab9-04b8f06b3319")
 
-        self.game_map_image_label = ttk.Label(self.map_info_frame)
+        self.game_map_var = tk.StringVar()
+        self.game_map_image_label = ttk.Label(self.map_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12), compound="center")
         self.game_map_image_label.image = game_map_image
         self.game_map_image_label.configure(image=game_map_image)
-
-        self.game_map_var = tk.StringVar()
-        self.game_map_label = ttk.Label(self.map_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12))
         self.game_map_var.set(game_map_name)
 
         self.game_server_var = tk.StringVar()
@@ -225,7 +223,6 @@ class GUI:
 
         self.map_info_frame.grid(row=3, column=1, columnspan=7, sticky="nsew")
         self.game_server_label.pack(side="left", expand=True)
-        self.game_map_label.pack(side="left", expand=True)
         self.game_map_image_label.pack(side="left", expand=True)
 
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
@@ -533,6 +530,8 @@ class GUI:
                 img = Image.open(BytesIO(response.content))
                 img = img.resize((187, 105))
                 img = img.crop((21, 30, 165, 65))
+                enhancer = ImageEnhance.Brightness(img)
+                img = enhancer.enhance(0.75)
 
                 # Store the fetched image in the cache
                 img_bytesio = BytesIO()
