@@ -15,6 +15,7 @@ from src.colors import Colors
 from src.constants import *
 
 colors = Colors(hide_names, {}, AGENTCOLORLIST)
+name_column = None
 
 def on_label_click(event):
     label_text = labels[event.widget.row][event.widget.column]['text']
@@ -24,7 +25,6 @@ class LabelGrid(tk.Frame):
     """
     Creates a grid of labels that have their cells populated by content.
     """
-
     def __init__(self, master, content=([0, 0], [0, 0]), *args, **kwargs):
         tk.Frame.__init__(self, master, *args, **kwargs)
         self.content = content
@@ -34,7 +34,10 @@ class LabelGrid(tk.Frame):
 
     def _create_labels(self):
         def __put_content_in_label(row, column):
+            global name_column
             content = self.content[row][column]
+            if content == "Name":
+                name_column = column
             if row == 0:
                 label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=3, padx=5, anchor="center")
             else:
@@ -45,9 +48,10 @@ class LabelGrid(tk.Frame):
             if type(content).__name__ == "tuple":  # ability to color, using a tuple
                 content, clr = content
                 label['foreground'] = colors.rgb_to_hex(clr)
-            if column == 2 and row != 0:  # ability to click on the name to open tracker.gg
-                label['text'] = content
-                label.bind("<Button-1>", on_label_click)
+            if name_column:
+                if name_column == column and row != 0:  # ability to click on the name to open tracker.gg
+                    label['text'] = content
+                    label.bind("<Button-1>", on_label_click)
             content_type = type(content).__name__
             if content_type in ('str', 'int'):
                 label['text'] = content
