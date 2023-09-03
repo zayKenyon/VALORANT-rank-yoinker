@@ -597,19 +597,15 @@ class GUI:
         self.settings_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def clear_cash(self):
-        # Path to the JSON cache file
-        cache_file = r"assets\gui\cache\agents.json"
-
-        try:
-            # Check if the cache file exists
-            if os.path.exists(cache_file):
-                # Delete the cache file
-                os.remove(cache_file)
-                print("Cache cleared successfully.")
-            else:
-                print("Cache file does not exist.")
-        except Exception as e:
-            print(f"Error clearing cache: {str(e)}")
+        cash_folder = r"assets\gui\cache"
+        for file in os.listdir(cash_folder):
+            file_path = os.path.join(cash_folder, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
+        print("cleared cash")
 
     def force_refresh(self):
         # TODO force refresh
