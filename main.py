@@ -712,8 +712,10 @@ try:
                 # program_exit(1)
                 time.sleep(9)
             if server != "":
+                title = color(title[0], fore=title[1])
                 table.set_title(f"VALORANT status: {title} {colr('- ' + server, fore=(200, 200, 200))}")
             else:
+                title = color(title[0], fore=title[1])
                 table.set_title(f"VALORANT status: {title}")
             server = ""
             if title is not None:
