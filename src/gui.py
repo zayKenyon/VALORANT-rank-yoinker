@@ -467,6 +467,7 @@ class GUI:
             return ImageTk.PhotoImage(img)
 
     def load_rank_image(self, rank):
+        rank = str(rank)
         cache_file = r"assets\gui\cache\ranks.json"
 
         # check if the cache file exists
