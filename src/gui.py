@@ -262,14 +262,27 @@ class GUI:
         self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
 
         # Create a frame for the weapon amount
+        self.weapon_combobox_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
         self.weapon_amount_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.weapon_amount_lable = ttk.Label(self.weapon_amount_frame, text="Weapons", font=("Segoe UI", 12, "bold"))
         self.weapon_amount_explanation_lable = ttk.Label(self.weapon_amount_frame, text="Enter the amount of weapons to show:")
         self.weapon_amount_refresh_button = ttk.Button(self.weapon_amount_frame, text="Refresh", command=self.refresh_weapon_amount, takefocus=False)
+
+        # Load the weapon amount from the configuration
+        weapon_list = self.config.get("weapon", []).split(", ")
+        weapon_amount = self.config.get("weapon_amount", 1)
+        self.weapon_amount_entry.insert(0, str(weapon_amount))
+
+        # Create the weapon comboboxes based on the configuration
+        for weapon in weapon_list:
+            weapon_combobox = ttk.Combobox(self.weapon_combobox_frame, values=WEAPONS)
+            weapon_combobox.set(weapon)
+            self.weapon_comboboxes.append(weapon_combobox)
+
         self.refresh_weapon_amount()
 
         self.weapon_amount_entry = ttk.Entry(self.weapon_amount_frame)
-        self.weapon_amount_entry.insert(0, "1")
+        self.weapon_amount_entry.insert(0, self.config.get("weapon_amount", 1))
 
         # Create a frame for table columns
         self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
@@ -355,21 +368,29 @@ class GUI:
         self.reset_config_button.grid(row=0, column=1, padx=5, pady=5)
 
     def save_config(self):
-        """ saves the configuration to config.json """
+        """saves the configuration to config.json"""
         self.config["weapon"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
+        self.config["weapon_amount"] = self.weapon_amount_entry.get()
         self.config["port"] = self.port_entry.get()
         self.config["chat_limit"] = self.chat_limit_entry.get()
         self.config["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
         self.config["flags"] = {key: var.get() for key, var in self.optional_feature_vars.items()}
         self.config = DEFAULT_CONFIG | self.config
+
         with open("config.json", "w") as outfile:
             json.dump(self.config, outfile, indent=2)
+
         print("Config saved successfully")
 
     def reset_config(self):
         """ resets the configuration to default """
         self.config = DEFAULT_CONFIG.copy()
-        # TODO reset comboboxes
+        self.weapon_amount_entry.delete(0, "end")
+        self.weapon_amount_entry.insert(0, 1)
+        for weapon_combobox in self.weapon_comboboxes:
+            weapon_combobox.destroy()
+        self.weapon_comboboxes = []
+        self.refresh_weapon_amount()
         self.port_entry.delete(0, "end")
         self.port_entry.insert(0, DEFAULT_CONFIG["port"])
         self.chat_limit_entry.delete(0, "end")
@@ -465,25 +486,34 @@ class GUI:
         # TODO refresh weapon amount
         weapon_amount = self.weapon_amount_entry.get()
 
-        if weapon_amount:
-            weapon_amount = int(weapon_amount)
+        if not weapon_amount:
+            weapon_amount = 1
 
-            if weapon_amount > len(self.weapon_comboboxes):
-                # Add weapon comboboxes
-                for i in range(weapon_amount - len(self.weapon_comboboxes)):
-                    weapon_combobox = ttk.Combobox(self.weapon_amount_frame, values=WEAPONS)
-                    weapon_combobox.current(0)
-                    self.weapon_comboboxes.append(weapon_combobox)
+        weapon_amount = int(weapon_amount)
 
-            elif weapon_amount < len(self.weapon_comboboxes):
-                # Remove weapon comboboxes
-                for i in range(len(self.weapon_comboboxes) - weapon_amount):
-                    self.weapon_comboboxes[-1].destroy()
-                    self.weapon_comboboxes.pop()
+        if weapon_amount > len(self.weapon_comboboxes):
+            # Add weapon comboboxes
+            for i in range(weapon_amount - len(self.weapon_comboboxes)):
+                weapon_combobox = ttk.Combobox(self.weapon_combobox_frame, values=WEAPONS)
+                weapon_combobox.current(0)
+                self.weapon_comboboxes.append(weapon_combobox)
 
-            # Display weapon comboboxes
-            for i, weapon_combobox in enumerate(self.weapon_comboboxes):
-                weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+        elif weapon_amount < len(self.weapon_comboboxes):
+            # Remove weapon comboboxes
+            for i in range(len(self.weapon_comboboxes) - weapon_amount):
+                self.weapon_comboboxes[-1].destroy()
+                self.weapon_comboboxes.pop()
+
+        # Clear the existing grid
+        for widget in self.weapon_combobox_frame.winfo_children():
+            widget.grid_forget()
+
+        # Display weapon comboboxes in the new frame
+        for i, weapon_combobox in enumerate(self.weapon_comboboxes):
+            weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+
+        # Update the grid of the weapon_combobox_frame in the settings_frame
+        self.weapon_combobox_frame.grid(row=1, column=3, rowspan=4, sticky="nw")
 
     def set_game_map(self, map):
         self.game_map_var.set(map)

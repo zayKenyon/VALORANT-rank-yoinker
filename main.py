@@ -134,6 +134,9 @@ try:
 
     stats = Stats()
 
+    gui = GUI()
+    gui.frame.mainloop()
+
     if cfg.get_feature_flag("discord_rpc"):
         rpc = Rpc(map_urls, gamemodes, colors, log)
     else:
@@ -754,9 +757,6 @@ try:
         else:
             # time.sleep(cfg.cooldown)
             pass
-
-        gui = GUI()
-        gui.frame.mainloop()
 
 except KeyboardInterrupt:
     #lame implementation of fast ctrl+c exit
