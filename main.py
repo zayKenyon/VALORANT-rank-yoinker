@@ -134,7 +134,7 @@ try:
 
     stats = Stats()
 
-    gui = GUI()
+    gui = GUI(cfg)
     gui.frame.mainloop()
 
     if cfg.get_feature_flag("discord_rpc"):

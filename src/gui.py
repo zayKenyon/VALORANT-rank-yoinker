@@ -73,7 +73,9 @@ class LabelGrid(tk.Frame):
                 labels[i][j].grid(row=i, column=j)
 
 class GUI:
-    def __init__(self):
+    def __init__(self, cfg):
+        self.config = cfg
+
         self.frame = tk.Tk()
         self.frame.title(f"VALORANT rank yoinker v{version}")
 
@@ -120,8 +122,11 @@ class GUI:
         self.create_live_game_frame()
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
+        self.skins_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.player_skin_table = LabelGrid(self.skins_frame)
+        self.create_skin_frame()
+
         self.settings_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
-        self.config = {}
         self.table_column_vars = {}
         self.optional_feature_vars = {}
         self.weapon_amount_frame = ttk.LabelFrame()
@@ -134,17 +139,17 @@ class GUI:
                                         text="Agents",
                                         command=self.show_live_game_frame,
                                         takefocus=False)
-        self.live_skins_tab = ttk.Button(self.tab_frame,
-                                         text="Skins",
-                                         command=self.show_live_skins_frame,
-                                         takefocus=False)
+        self.skins_tab = ttk.Button(self.tab_frame,
+                                    text="Skins",
+                                    command=self.show_skins_frame,
+                                    takefocus=False)
         self.settings_tab = ttk.Button(self.tab_frame,
                                        text="Settings",
                                        command=self.show_settings_frame,
                                        takefocus=False)
 
         self.live_game_tab.grid(row=0, column=0)
-        self.live_skins_tab.grid(row=0, column=1)
+        self.skins_tab.grid(row=0, column=1)
         self.settings_tab.grid(row=0, column=2)
 
     def create_live_game_frame(self):
@@ -215,9 +220,32 @@ class GUI:
         self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
 
-    def create_skins_frame(self):
-        # TODO create skins frame
-        pass
+    def create_skin_frame(self):
+        # TODO add real data, get gui working while program is running
+        header = ["Agent", "Name"]
+        print(self.config.weapon)
+        for weapon in self.config.weapon.split(", "):
+            print(weapon)
+            header.append(weapon)
+        # TODO add real data, get gui working while program is running
+        self.player_skin_table = LabelGrid(self.skins_frame,
+                                           content=[
+                                               header,
+                                               [self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", "Ion", "Prime//2.0", "Luxe", "Sentinels of Light"],
+                                               [self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", "Winterwunderland", "Silvanus", "Gravitational Uranium Neuroblaster", "Singularity"],
+                                               [self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", "Prism II", "Ruination", "Elderflame", "Nebula"],
+                                               [self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", "Sovereign", "Glitchpop", "Spline", "Sakura"],
+                                               [self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", "Origin", "Spectrum", "VALORANT GO! Vol. 2", "Magepunk"],
+                                               self.seperator(),
+                                               [self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", "RGX 11z Pro", "Glitchpop", "Glitchpop", "Glitchpop"],
+                                               [self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", "Origin", "Recon", "Sentinels of Light", "Magepunk"],
+                                               [self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", "Sovereign", "Spline", "Spline", "Spline"],
+                                               [self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", "Prism III", "Silvanus", "Glitchpop", "Crimsonbeast"],
+                                               [self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", "Origin", "Recon", "Recon", "Protocol 781-A"],
+                                           ],
+                                           takefocus=False)
+
+        self.player_skin_table.grid(row=0, column=0, columnspan=9)
 
     def create_settings_frame(self):
         table_options = {
@@ -251,18 +279,6 @@ class GUI:
 
         default_config = DEFAULT_CONFIG.copy()
 
-        try:
-            with open("config.json", "r") as openfile:
-                user_config = default_config | json.load(openfile)
-        except FileNotFoundError:
-            print("Generating default configuration")
-            user_config = default_config
-        except json.JSONDecodeError:
-            print("config file maybe broken, using default instead")
-            user_config = default_config
-
-        self.config = user_config
-
         self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
 
         # Create a frame for the weapon amount
@@ -273,8 +289,8 @@ class GUI:
         self.weapon_amount_refresh_button = ttk.Button(self.weapon_amount_frame, text="Refresh", command=self.refresh_weapon_amount, takefocus=False)
 
         # Load the weapon amount from the configuration
-        weapon_list = self.config.get("weapon", []).split(", ")
-        weapon_amount = self.config.get("weapon_amount", 1)
+        weapon_list = self.config.weapon.split(", ")
+        weapon_amount = self.config.weapon_amount
         self.weapon_amount_entry.insert(0, str(weapon_amount))
 
         # Create the weapon comboboxes based on the configuration
@@ -286,14 +302,14 @@ class GUI:
         self.refresh_weapon_amount()
 
         self.weapon_amount_entry = ttk.Entry(self.weapon_amount_frame)
-        self.weapon_amount_entry.insert(0, self.config.get("weapon_amount", 1))
+        self.weapon_amount_entry.insert(0, self.config.weapon_amount)
 
         # Create a frame for table columns
         self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.table_columns_lable = ttk.Label(self.table_frame, text="Table Columns", font=("Segoe UI", 12, "bold"))
         self.table_columns_explanation_lable = ttk.Label(self.table_frame, text="Select table columns to display:")
         for i, (key, value) in enumerate(table_options.items()):
-            var = tk.BooleanVar(value=bool(self.config.get("table", default_config["table"]).get(key, default_config["table"][key])))
+            var = tk.BooleanVar(value=bool(self.config.get_table_flag(key)))
             checkbox = ttk.Checkbutton(self.table_frame, text=value, variable=var)
             checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
             self.table_column_vars[key] = var
@@ -304,15 +320,14 @@ class GUI:
         self.port_explanation_lable = ttk.Label(self.port_frame, text="Enter the port for the server to run:")
 
         self.port_entry = ttk.Entry(self.port_frame)
-        self.port_entry.insert(0, self.config.get("port", 1100))
+        self.port_entry.insert(0, self.config.port)
 
         # Create a frame for optional features
         self.optional_flags_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.optional_flag_label = ttk.Label(self.optional_flags_frame, text="Optional Features", font=("Segoe UI", 12, "bold"))
         self.optional_flag_explanation_label = ttk.Label(self.optional_flags_frame, text="Select optional features:")
         for i, (key, value) in enumerate(flag_options.items()):
-            var = tk.BooleanVar(value=bool(
-                self.config.get("flags", default_config["flags"]).get(key, default_config["flags"][key])))
+            var = tk.BooleanVar(value=bool(self.config.get_feature_flag(key)))
             checkbox = ttk.Checkbutton(self.optional_flags_frame, text=value, variable=var)
             checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
             self.optional_feature_vars[key] = var
@@ -322,14 +337,14 @@ class GUI:
         self.chat_limit_label = ttk.Label(self.chat_limit_frame, text="Chat Limit", font=("Segoe UI", 12, "bold"))
         self.chat_limit_label_explanation = ttk.Label(self.chat_limit_frame, text="Enter the length of chat messages history:")
         self.chat_limit_entry = ttk.Entry(self.chat_limit_frame)
-        self.chat_limit_entry.insert(0, self.config.get("chat_limit", 5))
+        self.chat_limit_entry.insert(0, self.config.chat_limit)
 
         # Create a frame for calculation range
         self.calculation_range_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
         self.calculation_range_label = ttk.Label(self.calculation_range_frame, text="Calculation Range", font=("Segoe UI", 12, "bold"))
         self.calculation_range_label_explanation = ttk.Label(self.calculation_range_frame, text="Backtracking of stats for KD, Top-Agent:\nSignificant time increase for higher values!")
         self.calculation_range_entry = ttk.Entry(self.calculation_range_frame)
-        self.calculation_range_entry.insert(0, self.config.get("calculation_range", 1))
+        self.calculation_range_entry.insert(0, self.config.calculation_range)
 
         # Create a Save button to apply the configuration
         self.continue_config_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
@@ -457,10 +472,9 @@ class GUI:
         print("showing live game frame")
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
-    def show_live_skins_frame(self):
+    def show_skins_frame(self):
         self.clear_frame()
-        print("showing live skins frame")
-        # TODO show live skins frame
+        self.skins_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def show_settings_frame(self):
         self.clear_frame()
@@ -517,7 +531,11 @@ class GUI:
             weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
 
         # Update the grid of the weapon_combobox_frame in the settings_frame
-        self.weapon_combobox_frame.grid(row=1, column=3, rowspan=4, sticky="nw")
+        self.weapon_combobox_frame.grid(row=1, column=3, rowspan=4, sticky="new")
+
+    def seperator(self):
+        table_length = int(self.config.weapon_amount) + 2
+        return [""] * table_length
 
     def set_game_map(self, map):
         self.game_map_var.set(map)
