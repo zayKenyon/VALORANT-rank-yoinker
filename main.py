@@ -134,8 +134,8 @@ try:
 
     stats = Stats()
 
-    gui = GUI(cfg)
-    gui.frame.mainloop()
+    # gui = GUI(cfg)
+    # gui.frame.mainloop()
 
     if cfg.get_feature_flag("discord_rpc"):
         rpc = Rpc(map_urls, gamemodes, colors, log)
@@ -427,7 +427,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              skin,
+                                              *["" for _ in cfg.weapons],
                                               rankName,
                                               rr,
                                               peakRank,
@@ -599,7 +599,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              "",
+                                              *["" for _ in cfg.weapons],
                                               rankName,
                                               rr,
                                               peakRank,
