@@ -38,7 +38,7 @@ class Config:
                             config[key] = DEFAULT_CONFIG[key]
 
                         self.log("Succesfully added missing keys")
-                        json.dump(config, w, indent=4)
+                        json.dump(config, w, indent=2)
     
         except (JSONDecodeError):
             self.log("invalid file")
@@ -70,7 +70,7 @@ class Config:
         self.log("color config prompt called")
         jsonToWrite = DEFAULT_CONFIG
         
-        json.dump(jsonToWrite, fileToWrite, indent=4)
+        json.dump(jsonToWrite, fileToWrite, indent=2)
         return jsonToWrite
 
     def weapon_checks(self, names):

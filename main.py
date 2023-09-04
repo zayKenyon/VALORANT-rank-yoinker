@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import asyncio
+import requests
 from colr import color
 from InquirerPy import inquirer
 
