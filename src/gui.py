@@ -405,8 +405,6 @@ class GUI:
         with open("config.json", "w") as outfile:
             json.dump(self.config, outfile, indent=2)
 
-        print("Config saved successfully")
-
     def reset_config(self):
         """ resets the configuration to default """
         self.config = DEFAULT_CONFIG.copy()
@@ -424,7 +422,6 @@ class GUI:
             var.set(DEFAULT_CONFIG.get("table", DEFAULT_CONFIG["table"]).get(key, DEFAULT_CONFIG["table"][key]))
         for key, var in self.optional_feature_vars.items():
             var.set(DEFAULT_CONFIG.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key]))
-        print("Config reset successfully")
 
     def load_image(self, path, x, y):
         img = Image.open(path)
@@ -444,14 +441,12 @@ class GUI:
 
         if agent in agents:
             # load image from cache
-            print("Loading Agent image from cache")
             base64_data = agents[agent]
             img_data = base64.b64decode(base64_data)
             img = Image.open(BytesIO(img_data))
             return ImageTk.PhotoImage(img)
 
         # fetch image from the web
-        print("Fetching Agent image from web")
         with requests.Session() as s:
             response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
             img = Image.open(BytesIO(response.content))
@@ -480,14 +475,12 @@ class GUI:
 
         if rank in ranks:
             # load image from cache
-            print("Loading Rank image from cache")
             base64_data = ranks[rank]
             img_data = base64.b64decode(base64_data)
             img = Image.open(BytesIO(img_data))
             return ImageTk.PhotoImage(img)
 
         # fetch image from the web
-        print("Fetching Rank image from web")
         with requests.Session() as s:
             response = s.get(f"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{rank}/smallicon.png")
             img = Image.open(BytesIO(response.content))
@@ -517,14 +510,12 @@ class GUI:
 
             if map_uuid in map_images:
                 # load image from cache
-                print("Loading Map image from cache")
                 base64_data = map_images[map_uuid]
                 img_data = base64.b64decode(base64_data)
                 img = Image.open(BytesIO(img_data))
                 return ImageTk.PhotoImage(img)
 
             # fetch image from the web
-            print("Fetching Map image from web")
             with requests.Session() as s:
                 response = s.get(f"https://media.valorant-api.com/maps/{map_uuid}/splash.png")
                 img = Image.open(BytesIO(response.content))
@@ -556,11 +547,9 @@ class GUI:
 
             if map_uuid in map_names:
                 # load image from cache
-                print("Loading Map Name from cache")
                 map_name = map_names[map_uuid]
 
             # fetch image from the web
-            print("Fetching Map Name from web")
             with requests.Session() as s:
                 response = s.get(f"https://valorant-api.com/v1/maps/{map_uuid}").json()
                 map_name = response["data"]["displayName"]
@@ -576,14 +565,12 @@ class GUI:
 
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
-        print("clearing frame")
         for widget in self.frame.winfo_children():
             if widget not in [self.tab_frame]:
                 widget.grid_forget()
 
     def show_live_game_frame(self):
         self.clear_frame()
-        print("showing live game frame")
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def show_skins_frame(self):
@@ -592,7 +579,6 @@ class GUI:
 
     def show_settings_frame(self):
         self.clear_frame()
-        print("showing settings frame")
         self.settings_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
     def clear_cash(self):
@@ -604,11 +590,10 @@ class GUI:
                     os.unlink(file_path)
             except Exception as e:
                 print(e)
-        print("cleared cash")
 
     def force_refresh(self):
         # TODO force refresh
-        print("force refreshing")
+        ...
 
     def refresh_weapon_amount(self):
         # TODO refresh weapon amount
