@@ -1,25 +1,50 @@
 from PIL import Image, ImageTk, ImageEnhance
 from datetime import datetime
-import ttkbootstrap as ttk
+from time import sleep
 from io import BytesIO
+
+import ttkbootstrap as ttk
 import tkinter as tk
-import requests
-import base64
-import json
-import os
 
 import urllib.parse
 import webbrowser
+import threading
+import requests
+import base64
+import queue
+import json
+import os
 
 from src.colors import Colors
 from src.constants import *
 
 colors = Colors(hide_names, {}, AGENTCOLORLIST)
 name_column = None
+t = None
+
+request_queue = queue.Queue()
+result_queue = queue.Queue()
+
+
+def submit_to_tkinter(callable, *args, **kwargs):
+    request_queue.put((callable, args, kwargs))
+
+
+def process_queue_batch():
+    while not request_queue.empty():
+        callable, args, kwargs = request_queue.get()
+        print("Processing something in queue")
+        retval = callable(*args, **kwargs)
+        result_queue.put(retval)
+
+    # Schedule the next batch processing after 2 seconds
+    threading.Timer(2.0, process_queue_batch).start()
+
 
 def on_label_click(event):
     label_text = labels[event.widget.row][event.widget.column]['text']
     webbrowser.open_new_tab(f"https://tracker.gg/valorant/profile/riot/{urllib.parse.quote(label_text)}/overview")
+
 
 class LabelGrid(tk.Frame):
     """
@@ -74,26 +99,27 @@ class LabelGrid(tk.Frame):
 
 class GUI:
     def __init__(self, cfg):
+        global t
         self.config = cfg
 
-        self.frame = tk.Tk()
-        self.frame.title(f"VALORANT rank yoinker v{version}")
+        t = tk.Tk()
+        t.title(f"VALORANT rank yoinker v{version}")
 
-        self.screen_width = self.frame.winfo_screenwidth()
-        self.screen_height = self.frame.winfo_screenheight()
+        self.screen_width = t.winfo_screenwidth()
+        self.screen_height = t.winfo_screenheight()
 
         self.start_time = datetime.now()
 
-        self.frame.geometry(f"{int(self.screen_width // 1.75)}x{int(self.screen_height // 1.7)}")
+        t.geometry(f"{int(self.screen_width // 1.75)}x{int(self.screen_height // 1.7)}")
 
-        self.frame.iconbitmap("assets/Logo.ico")
+        t.iconbitmap("assets/Logo.ico")
         self.style = ttk.Style(theme="darkly")
 
-        self.tab_frame = ttk.Frame(self.frame, padding=5)
+        self.tab_frame = ttk.Frame(t, padding=5)
         self.create_tabs()
         self.tab_frame.grid(row=0, column=0, sticky="w")
 
-        self.live_game_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.live_game_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
         self.game_info_frame = ttk.Frame(self.live_game_frame)
         self.map_info_frame = ttk.Frame(self.live_game_frame)
 
@@ -127,17 +153,27 @@ class GUI:
         self.create_live_game_frame()
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
-        self.skins_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.skins_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
         self.player_skin_table = LabelGrid(self.skins_frame)
         self.create_skin_frame()
 
-        self.settings_frame = ttk.Frame(self.frame, padding=5, relief="solid", borderwidth=1)
+        self.settings_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
         self.table_column_vars = {}
         self.optional_feature_vars = {}
         self.weapon_amount_frame = ttk.LabelFrame()
         self.weapon_amount_entry = ttk.Entry()
         self.weapon_comboboxes = []
         self.create_settings_frame()
+
+    def threadmain(self):
+        global t
+        t = tk.Tk()
+        t.configure(width=640, height=480)
+        b = tk.Button(text='test', name='button', command=exit)
+        b.place(x=0, y=0)
+
+        process_queue_batch()  # Start processing the queue in batches
+        t.mainloop()
 
     def create_tabs(self):
         self.live_game_tab = ttk.Button(self.tab_frame,
@@ -231,7 +267,7 @@ class GUI:
     def create_skin_frame(self):
         # TODO add real data, get gui working while program is running
         header = ["Agent", "Name"]
-        for weapon in self.config.weapon.split(", "):
+        for weapon in self.config.weapons:
             header.append(weapon)
         # TODO add real data, get gui working while program is running
         self.player_skin_table = LabelGrid(self.skins_frame,
@@ -295,7 +331,7 @@ class GUI:
         self.weapon_amount_refresh_button = ttk.Button(self.weapon_amount_frame, text="Refresh", command=self.refresh_weapon_amount, takefocus=False)
 
         # Load the weapon amount from the configuration
-        weapon_list = self.config.weapon.split(", ")
+        weapon_list = self.config.weapons
         weapon_amount = self.config.weapon_amount
         self.weapon_amount_entry.insert(0, str(weapon_amount))
 
@@ -394,7 +430,7 @@ class GUI:
 
     def save_config(self):
         """saves the configuration to config.json"""
-        self.config["weapon"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
+        self.config["weapons"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
         self.config["weapon_amount"] = self.weapon_amount_entry.get()
         self.config["port"] = self.port_entry.get()
         self.config["chat_limit"] = self.chat_limit_entry.get()
@@ -565,7 +601,7 @@ class GUI:
 
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
-        for widget in self.frame.winfo_children():
+        for widget in t.winfo_children():
             if widget not in [self.tab_frame]:
                 widget.grid_forget()
 
@@ -651,7 +687,6 @@ class GUI:
         self.player_table.content = table
         self.player_table._create_labels()
         self.player_table._display_labels()
-        self.frame.update()
 
     def refresh_game_time(self):
         diff = datetime.now() - self.start_time
