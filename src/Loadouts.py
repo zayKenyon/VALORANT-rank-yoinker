@@ -14,7 +14,7 @@ class Loadouts:
         self.Server = Server
         self.current_map = current_map
 
-    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, cfg, state="game"):
+    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
