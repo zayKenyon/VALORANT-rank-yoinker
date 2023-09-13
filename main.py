@@ -375,7 +375,7 @@ try:
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
-                        if agent == "" and len(Players) == 1:
+                        if agent[0] == "" and len(Players) == 1:
                             isRange = True
                         else:
                             agent = color(agent[0], fore=agent[1])
