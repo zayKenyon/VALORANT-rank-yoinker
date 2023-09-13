@@ -32,6 +32,15 @@ weapon_amount_question = lambda config: {
     "filter": lambda ans: int(ans)
 }
 
+weapon_amount_question = lambda config: {
+    "type": "number",
+    "name": "weapon_amount",
+    "message": "Please select the amount of weapons to display:",
+    "min_allowed": 0,
+    "max_allowed": 100,
+    "filter": lambda ans: int(ans)
+}
+
 weapon_question = lambda config, index: {
     "type": "fuzzy",
     "name": f"weapon",
@@ -91,4 +100,5 @@ basic_questions = lambda config: [
 
 advance_questions = lambda config: [
     port_question(config=config),
+    basic_questions(config=config)
 ]

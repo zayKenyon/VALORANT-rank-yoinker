@@ -4,11 +4,20 @@ from typing import Literal, get_args
 from rich.table import Table as RichTable
 from rich.console import Console as RichConsole
 
+from src.config import Config
+from src.logs import Logging
+
+
+Logging = Logging()
+log = Logging.log
+cfg = Config(log)
+
+
 TABLE_COLUMN_NAMES = Literal[
     "Party",
     "Agent",
     "Name",
-    "Skin",
+    *[weapon for weapon in cfg.weapons],
     "Rank",
     "RR",
     "Peak Rank",
@@ -29,7 +38,7 @@ class Table:
             True,  # Party
             True,  # Agent
             True,  # Name
-            bool(config.table.get("skin", True)),  # Skin
+            *([True for _ in cfg.weapons] if len(cfg.weapons) > 0 else [False]),  # Skin
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank

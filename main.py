@@ -248,7 +248,7 @@ try:
                     server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapons, valoApiSkins, names, state="game")
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
@@ -261,7 +261,6 @@ try:
                     partyIcons = {}
                     lastTeamBoolean = False
                     lastTeam = "Red"
-
 
                     already_played_with = []
                     stats_data = stats.read_data()
@@ -387,7 +386,7 @@ try:
                         # views = get_views(names[player["Subject"]])
 
                         # skin
-                        skin = loadouts[player["Subject"]]
+                        skins = loadouts[player["Subject"]]
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
@@ -697,7 +696,7 @@ try:
                             table.add_row_table([party_icon,
                                                 agent,
                                                 name,
-                                                "",
+                                                *["" for weapon in cfg.weapons],
                                                 rankName,
                                                 rr,
                                                 peakRank,
@@ -725,8 +724,9 @@ try:
 
                 if game_state == "MENUS":
                     table.set_runtime_col_flag('Party', False)
-                    table.set_runtime_col_flag('Agent',False)
-                    table.set_runtime_col_flag('Skin',False)
+                    table.set_runtime_col_flag('Agent', False)
+                    for weapon in cfg.weapons:
+                        table.set_runtime_col_flag(weapon, False)
 
                 if game_state == "INGAME":
                     if isRange:

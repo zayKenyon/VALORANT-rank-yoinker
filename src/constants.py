@@ -159,7 +159,7 @@ WEAPONS = [
 DEFAULT_CONFIG = {
     "cooldown": 10,
     "port": 1100,
-    "weapon": "Vandal",
+    "weapons": "Vandal, Phantom",
     "weapon_amount": 1,
     "chat_limit": 5,
     "calculation_range": 1,
