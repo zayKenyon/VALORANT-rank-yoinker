@@ -53,7 +53,7 @@ class Config:
 
             self.log(f"got cooldown with value '{self.cooldown}'")
 
-            weapons = [weapon.strip() for weapon in config["weapons"].split(",")]
+            weapons = [weapon.strip() for weapon in config["weapon"].split(",")]
             if not self.weapon_checks(weapons):
                 self.weapons = ["vandal", "phantom"] # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
                 self.log(f"Invalid weapon name in config, defaulting to vandal")

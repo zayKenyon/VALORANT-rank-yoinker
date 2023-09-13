@@ -135,8 +135,8 @@ try:
 
     stats = Stats()
 
-    # gui = GUI(cfg)
-    # gui.frame.mainloop()
+    #gui = GUI(cfg)
+    #gui.threadmain()
 
     if cfg.get_feature_flag("discord_rpc"):
         rpc = Rpc(map_urls, gamemodes, colors, log)
@@ -731,7 +731,7 @@ try:
                 if game_state == "INGAME":
                     if isRange:
                         table.set_runtime_col_flag('Party', False)
-                        table.set_runtime_col_flag('Agent',False)
+                        table.set_runtime_col_flag('Agent', False)
 
                 # We don't to show the RR column if the "aggregate_rank_rr" feature flag is True.
                 table.set_runtime_col_flag('RR', cfg.table.get("rr") and not cfg.get_feature_flag("aggregate_rank_rr"))

@@ -99,6 +99,7 @@ class LabelGrid(tk.Frame):
 
 class GUI:
     def __init__(self, cfg):
+        self.cfg = {}
         global t
         self.config = cfg
 
@@ -167,10 +168,7 @@ class GUI:
 
     def threadmain(self):
         global t
-        t = tk.Tk()
         t.configure(width=640, height=480)
-        b = tk.Button(text='test', name='button', command=exit)
-        b.place(x=0, y=0)
 
         process_queue_batch()  # Start processing the queue in batches
         t.mainloop()
@@ -430,16 +428,16 @@ class GUI:
 
     def save_config(self):
         """saves the configuration to config.json"""
-        self.config["weapons"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
-        self.config["weapon_amount"] = self.weapon_amount_entry.get()
-        self.config["port"] = self.port_entry.get()
-        self.config["chat_limit"] = self.chat_limit_entry.get()
-        self.config["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
-        self.config["flags"] = {key: var.get() for key, var in self.optional_feature_vars.items()}
-        self.config = DEFAULT_CONFIG | self.config
+        self.cfg["weapon"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
+        self.cfg["weapon_amount"] = self.weapon_amount_entry.get()
+        self.cfg["port"] = self.port_entry.get()
+        self.cfg["chat_limit"] = self.chat_limit_entry.get()
+        self.cfg["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
+        self.cfg["flags"] = {key: var.get() for key, var in self.optional_feature_vars.items()}
+        self.cfg = DEFAULT_CONFIG | self.cfg
 
         with open("config.json", "w") as outfile:
-            json.dump(self.config, outfile, indent=2)
+            json.dump(self.cfg, outfile, indent=2)
 
     def reset_config(self):
         """ resets the configuration to default """
