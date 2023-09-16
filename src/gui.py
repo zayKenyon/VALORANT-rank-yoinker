@@ -668,11 +668,20 @@ class GUI:
         self.game_state_label["text"] = mode
         self.game_state_label.configure(foreground=colors.rgb_to_hex(clr))
 
+        if mode == "In-Menus":
+            self.game_map_image_label.image = ""
+            self.game_map_image_label.configure(image="")
+            self.game_map_image_label.configure(text="")
+
     def update_player_table(self, data):
         players_data = data.get('players', {})
         table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'HS', 'WR', 'KD', 'Level']]
 
         for player_id, player_info in players_data.items():
+            if int(player_id) != float(player_id):
+                table_data.append(self.emtpy_row())
+                continue
+
             party_icon = player_info.get('party_icon', ('', (0, 0, 0)))
             agent = self.load_agent_image(player_info.get('agent', ''))
             name = player_info.get('name', '')
@@ -702,4 +711,4 @@ class GUI:
         game_map_name, game_map_image = self.load_map(map_id)
         self.game_map_image_label.image = game_map_image
         self.game_map_image_label.configure(image=game_map_image)
-
+        self.game_map_image_label.configure(text=game_map_name)

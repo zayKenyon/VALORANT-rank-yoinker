@@ -126,8 +126,9 @@ try:
     map_info = content.get_all_maps()
     map_urls = content.get_map_urls(map_info)
     map_splashes = content.get_map_splashes(map_info)
+    map_uuid = content.get_map_uuid(map_info)
 
-    current_map = coregame.get_current_map(map_urls, map_splashes)
+    current_map = coregame.get_current_map(map_urls, map_splashes, map_uuid)
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
@@ -370,6 +371,7 @@ try:
                             if lastTeamBoolean:
                                 # TODO add gui separator
                                 table.add_empty_row()
+                                gui_data["players"][idx - 0.5] = {}
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         if player["PlayerIdentity"]["HideAccountLevel"]:
@@ -449,7 +451,7 @@ try:
                                              agent,
                                              name,
                                              # views,
-                                             *["" for _ in cfg.weapons],
+                                             *skins,
                                              rankName,
                                              rr,
                                              peakRank,

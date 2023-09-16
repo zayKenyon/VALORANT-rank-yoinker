@@ -44,7 +44,7 @@ class Coregame:
         else:
             return None
 
-    def get_current_map(self, map_urls, map_splashes) -> dict:
+    def get_current_map(self, map_urls, map_splashes, map_uuid) -> dict:
         """
         Abstracts get_coregame_stats() to get the current map name and splash.
         :return: Dictionary of appropriate name and splash.
@@ -55,4 +55,5 @@ class Coregame:
             return 'N/A'
 
         current_map = map_urls.get(coregame_stats['MapID'].lower())
-        return {'name': current_map, 'splash': map_splashes[current_map]}
+        self.log(f"{coregame_stats}")
+        return {'name': current_map, 'splash': map_splashes[current_map], 'id': map_uuid[current_map]}
