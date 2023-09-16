@@ -26,8 +26,8 @@ class Config:
                 self.log("config opened")
                 config = json.load(file)
 
-                keys = list(config.keys())  # getting the keys in the file
-                default_keys = list(DEFAULT_CONFIG.keys()) # getting the keys in the self.default
+                keys = [k for k in config.keys()] # getting the keys in the file
+                default_keys = [k for k in DEFAULT_CONFIG.keys()] # getting the keys in the self.default
                 missingkeys = list(filter(lambda x: x not in keys, default_keys)) # comparing the keys in the file to the keys in the default and returning the missing keys
 
                 if len(missingkeys) > 0:

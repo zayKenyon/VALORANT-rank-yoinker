@@ -16,7 +16,7 @@ TABLE_COLUMN_NAMES = Literal[
     "Party",
     "Agent",
     "Name",
-    list(cfg.weapons),
+    *[weapon for weapon in cfg.weapons],
     "Rank",
     "RR",
     "Peak Rank",
@@ -41,7 +41,7 @@ class Table:
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
-            bool(config.table.get("previousrank", False)), # Previous Rank
+            bool(config.table.get("previousrank", False)),  # Previous Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             bool(
                 config.table.get("headshot_percent", True)
@@ -61,22 +61,18 @@ class Table:
         self.console = RichConsole(color_system="truecolor")
 
 
-        #only to get init value not used
+        # only to get init value not used
         self.overall_col_flags = [
             f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
         ]
         self.fields_to_display = [
             c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
         ]
-
-        # for field in fields_to_display:
-        #     self.rich_table.add_column(field, justify="center")
-        # self.set_collumns()
         self.rows = []
 
     def set_title(self, title):
         self.rich_table.title = self.ansi_to_console(title)
-    
+
     def set_caption(self, caption):
         self.rich_table.caption = self.ansi_to_console(caption)
 
@@ -90,7 +86,7 @@ class Table:
         # row = [c for c, i in zip(args, self.col_flags) if i]
         # row = [self.ansi_to_console(str(i)) for i in row]
         self.rows.append(zip(self.field_names_candidates, args))
-        
+
         # self.rich_table.add_row(*row)
 
     def add_empty_row(self):
@@ -123,7 +119,7 @@ class Table:
         self.rich_table.title_style = "bold"
         self.rich_table.caption_style = "italic rgb(50,505,50)"
         self.rich_table.caption_justify = "left"
-        
+
         pass
 
     def ansi_to_console(self, line):

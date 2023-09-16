@@ -675,7 +675,7 @@ class GUI:
 
     def update_player_table(self, data):
         players_data = data.get('players', {})
-        table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'HS', 'WR', 'KD', 'Level']]
+        table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'Leaderboard', 'HS', 'WR', 'KD', 'Level']]
 
         for player_id, player_info in players_data.items():
             if int(player_id) != float(player_id):
@@ -690,13 +690,14 @@ class GUI:
             prev_rank = self.load_rank_image(player_info.get('prev_rank', 0))
             peak_rank = self.load_rank_image(player_info.get('peak_rank', 0))
             peak_rank_ep = player_info.get('peak_rank_ep', ('', (0, 0, 0)))
-            kd = player_info.get('kd', 0.0)
+            leaderboard = player_info.get('leaderboard', 0)
             hs = player_info.get('hs', (0, [0, 0, 0]))
             wr = player_info.get('wr', (0, [0, 0, 0]))
+            kd = player_info.get('kd', 0.0)
             level = player_info.get('level', ('', (0, 0, 0)))
 
             # Append player data to the table_data
-            table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, hs, wr, kd, level])
+            table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, leaderboard, hs, wr, kd, level])
 
         print(table_data)
 
