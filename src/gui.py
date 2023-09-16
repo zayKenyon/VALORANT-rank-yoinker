@@ -1,6 +1,5 @@
 from PIL import Image, ImageTk, ImageEnhance
-from datetime import datetime
-from time import sleep
+from datetime import datetime, timedelta
 from io import BytesIO
 
 import ttkbootstrap as ttk
@@ -30,22 +29,6 @@ def submit_to_tkinter(callable, *args, **kwargs):
     request_queue.put((callable, args, kwargs))
 
 
-def process_queue_batch():
-    while not request_queue.empty():
-        callable, args, kwargs = request_queue.get()
-        print("Processing something in queue")
-        retval = callable(*args, **kwargs)
-        result_queue.put(retval)
-
-    # Schedule the next batch processing after 2 seconds
-    threading.Timer(2.0, process_queue_batch).start()
-
-
-def on_label_click(event):
-    label_text = labels[event.widget.row][event.widget.column]['text']
-    webbrowser.open_new_tab(f"https://tracker.gg/valorant/profile/riot/{urllib.parse.quote(label_text)}/overview")
-
-
 class LabelGrid(tk.Frame):
     """
     Creates a grid of labels that have their cells populated by content.
@@ -54,6 +37,7 @@ class LabelGrid(tk.Frame):
         tk.Frame.__init__(self, master, *args, **kwargs)
         self.content = content
         self.content_size = (len(content), len(content[0]))
+        self.labels = []
         self._create_labels()
         self._display_labels()
 
@@ -76,26 +60,39 @@ class LabelGrid(tk.Frame):
             if name_column:
                 if name_column == column and row != 0:  # ability to click on the name to open tracker.gg
                     label['text'] = content
-                    label.bind("<Button-1>", on_label_click)
+                    label.bind("<Button-1>", self.on_label_click)
             content_type = type(content).__name__
             if content_type in ('str', 'int'):
                 label['text'] = content
             elif content_type == 'PhotoImage':
                 label['image'] = content
 
-            labels[row].append(label)
+            self.labels[row].append(label)
 
-        global labels
-        labels = []
         for i in range(self.content_size[0]):
-            labels.append([])
+            self.labels.append([])
             for j in range(self.content_size[1]):
                 __put_content_in_label(i, j)
 
     def _display_labels(self):
         for i in range(self.content_size[0]):
             for j in range(self.content_size[1]):
-                labels[i][j].grid(row=i, column=j)
+                self.labels[i][j].grid(row=i, column=j)
+
+    def update_content(self, content):
+        for i in range(self.content_size[0]):
+            for j in range(self.content_size[1]):
+                self.labels[i][j].destroy()
+
+        self.content = content
+        self.content_size = (len(content), len(content[0]))
+        self.labels = []
+        self._create_labels()
+        self._display_labels()
+
+    def on_label_click(self, event):
+        label_text = self.labels[event.widget.row][event.widget.column]['text']
+        webbrowser.open_new_tab(f"https://tracker.gg/valorant/profile/riot/{urllib.parse.quote(label_text)}/overview")
 
 class GUI:
     def __init__(self, config):
@@ -126,30 +123,17 @@ class GUI:
         self.map_info_frame = ttk.Frame(self.live_game_frame)
 
         self.game_time_var = tk.StringVar()
-        self.game_time_label = ttk.Label(self.game_info_frame, textvariable=self.game_time_var, font=("Segoe UI", 12))
-        self.game_time_var.set("00:00")
+        self.game_time_label = ttk.Label(self.game_info_frame, text="0:00", font=("Segoe UI", 12))
 
-        game_map_name, game_map_image = self.load_map("7eaecc1b-4337-bbf6-6ab9-04b8f06b3319")
+        self.game_map_image_label = ttk.Label(self.map_info_frame, text="", font=("Segoe UI", 12), compound="center")
 
-        self.game_map_var = tk.StringVar()
-        self.game_map_image_label = ttk.Label(self.map_info_frame, textvariable=self.game_map_var, font=("Segoe UI", 12), compound="center")
-        self.game_map_image_label.image = game_map_image
-        self.game_map_image_label.configure(image=game_map_image)
-        self.game_map_var.set(game_map_name)
-
-        self.game_server_var = tk.StringVar()
-        self.game_server_label = ttk.Label(self.map_info_frame, textvariable=self.game_server_var, font=("Segoe UI", 12))
-        self.game_server_var.set("Frankfurt")
+        self.game_server_label = ttk.Label(self.map_info_frame, text="", font=("Segoe UI", 12))
         self.game_server_label.configure(foreground=colors.rgb_to_hex((200, 200, 200)))
 
-        self.game_mode_var = tk.StringVar()
-        self.game_mode_label = ttk.Label(self.game_info_frame, textvariable=self.game_mode_var, font=("Segoe UI", 12))
-        self.game_mode_var.set("Unrated")
+        # TODO add game_mode
+        self.game_mode_label = ttk.Label(self.game_info_frame, text="", font=("Segoe UI", 12))
 
-        self.game_state_var = tk.StringVar()
-        self.game_state_label = ttk.Label(self.game_info_frame, textvariable=self.game_state_var, font=("Segoe UI", 12))
-        self.game_state_var.set("In Game")
-        self.game_state_label.configure(foreground=colors.rgb_to_hex((241, 39, 39)))
+        self.game_state_label = ttk.Label(self.game_info_frame, text="Loading...", font=("Segoe UI", 12))
 
         self.player_table = LabelGrid(self.live_game_frame)
         self.create_live_game_frame()
@@ -167,12 +151,24 @@ class GUI:
         self.weapon_comboboxes = []
         self.create_settings_frame()
 
+    def process_queue_batch(self):
+        while not request_queue.empty():
+            callable, args, kwargs = request_queue.get()
+            print("Processing something in queue")
+            retval = callable(*args, **kwargs)
+            result_queue.put(retval)
+            print("Finished processing something in queue")
+
+        # Schedule the next batch processing after 2 seconds
+        self.update_game_time()
+        threading.Timer(1.0, self.process_queue_batch).start()
+
     def threadmain(self):
         global t
         t = tk.Tk()
         self.init_gui()
 
-        process_queue_batch()  # Start processing the queue in batches
+        self.process_queue_batch()  # Start processing the queue in batches
         t.mainloop()
 
     def create_tabs(self):
@@ -216,19 +212,6 @@ class GUI:
         self.player_table = LabelGrid(self.live_game_frame,
                                       content=[
                                           ["Party", "Agent", "Name", "Rank", "Peak Rank", "Prev. Rank", "HS", "WR", "KD", "Level"],
-
-                                          ["", self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", self.load_rank_image(19), self.load_rank_image(25) ,self.load_rank_image(23), colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(321)],
-                                          ["", self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", self.load_rank_image(9), self.load_rank_image(12), self.load_rank_image(11), colors.get_hs_gradient(22), colors.get_wr_gradient(45), "1.1", colors.level_to_color(125)],
-                                          ["", self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", self.load_rank_image(15), self.load_rank_image(18), self.load_rank_image(16), colors.get_hs_gradient(17), colors.get_wr_gradient(72), "1.2", colors.level_to_color(72)],
-                                          ["", self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", self.load_rank_image(13), self.load_rank_image(16), self.load_rank_image(14), colors.get_hs_gradient(17), colors.get_wr_gradient(50), "1.2", colors.level_to_color(51)],
-                                          ["", self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", self.load_rank_image(17), self.load_rank_image(19), self.load_rank_image(17), colors.get_hs_gradient(22), colors.get_wr_gradient(45), "1.1", colors.level_to_color(42)],
-                                          # TODO add a seperator
-                                          ["", "", "", "", "", "", "", "", "", ""],
-                                          ["", self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", self.load_rank_image(17), self.load_rank_image(19), self.load_rank_image(15), colors.get_hs_gradient(17), colors.get_wr_gradient(30), "1.2", colors.level_to_color(421)],
-                                          ["", self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", self.load_rank_image(9), self.load_rank_image(16), self.load_rank_image(15), colors.get_hs_gradient(22), colors.get_wr_gradient(60), "1.1", colors.level_to_color(212)],
-                                          ["", self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", self.load_rank_image(20), self.load_rank_image(23), self.load_rank_image(21), colors.get_hs_gradient(17), colors.get_wr_gradient(12), "1.2", colors.level_to_color(90)],
-                                          ["", self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", self.load_rank_image(15), self.load_rank_image(21), self.load_rank_image(20), colors.get_hs_gradient(17), colors.get_wr_gradient(90), "2.3", colors.level_to_color(72)],
-                                          ["", self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", self.load_rank_image(11), self.load_rank_image(13), self.load_rank_image(12), colors.get_hs_gradient(22), colors.get_wr_gradient(65), "1.1", colors.level_to_color(12)],
                                       ],
                                       takefocus=False)
 
@@ -460,6 +443,10 @@ class GUI:
             var.set(DEFAULT_CONFIG.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key]))
 
     def load_image(self, path, x, y):
+        # check if path exists
+        if not os.path.exists(path):
+            print(f"Could not find image at {path}")
+            return ""
         img = Image.open(path)
         img = img.resize((x, y))
         return ImageTk.PhotoImage(img)
@@ -668,27 +655,44 @@ class GUI:
         table_length = int(self.config.weapon_amount) + 2
         return [""] * table_length
 
-    def set_game_map(self, map_uuid):
-        game_map_name, game_map_image = self.load_map(map_uuid)
-        self.game_map_var = game_map_name
+    def update_game_server(self, server):
+        self.game_server_label["text"] = server
+
+    def update_game_state(self, mode, clr):
+        self.start_time = datetime.now()
+        self.game_state_label["text"] = mode
+        self.game_state_label.configure(foreground=colors.rgb_to_hex(clr))
+
+    def update_player_table(self, data):
+        players_data = data.get('players', {})
+        table_data = [['Party', 'Agent', 'Name', 'Rank', 'Peak Rank', 'Prev. Rank', 'HS', 'WR', 'KD', 'Level']]
+
+        for player_id, player_info in players_data.items():
+            party_icon = player_info.get('party_icon', ('', (0, 0, 0)))
+            kd = player_info.get('kd', 0.0)
+            level = player_info.get('level', ('', (0, 0, 0)))
+            agent = player_info.get('agent', '')
+            name = player_info.get('name', '')
+            rank = player_info.get('rank', ('', (0, 0, 0)))
+            peak_rank = player_info.get('peak_rank', ('', (0, 0, 0)))
+            prev_rank = player_info.get('previous_rank', ('', (0, 0, 0)))
+            hs = player_info.get('hs', (0, [0, 0, 0]))
+            wr = player_info.get('wr', (0, [0, 0, 0]))
+
+            # Append player data to the table_data
+            table_data.append(
+                [party_icon, agent, name, rank, peak_rank, prev_rank, hs, wr, kd, level])
+
+        print(table_data)
+        self.player_table.update_content(table_data)
+
+    def update_game_time(self):
+        passed_time = datetime.now() - self.start_time
+        passed_time = str(passed_time).split(".")[0][2:]
+        self.game_time_label["text"] = passed_time
+
+    def update_map(self, map_id):
+        game_map_name, game_map_image = self.load_map(map_id)
         self.game_map_image_label.image = game_map_image
         self.game_map_image_label.configure(image=game_map_image)
 
-    def set_game_mode(self, mode):
-        self.game_mode_var.set(gamemodes.get(mode, "n/A"))
-
-    def set_game_state(self, state):
-        self.start_time = datetime.now()
-        game_state = GAMESATEDICT.get(state, None)
-        self.game_state_var.set(game_state[0])
-        self.game_state_label.configure(foreground=game_state[1])
-
-    def set_player_table(self, table):
-        self.player_table.content = table
-        self.player_table._create_labels()
-        self.player_table._display_labels()
-
-    def refresh_game_time(self):
-        diff = datetime.now() - self.start_time
-        past_time = divmod(diff.days * 86400 + diff.seconds, 60)
-        self.game_time_var.set(f"{past_time[0]}:{past_time[1]}")

@@ -79,14 +79,14 @@ GAMEPODS = requests.get("https://valorant-api.com/internal/locres/en-US").json()
 
 symbol = "■"
 PARTYICONLIST = [
-    color(symbol, fore=(227, 67, 67)),
-    color(symbol, fore=(216, 67, 227)),
-    color(symbol, fore=(67, 70, 227)),
-    color(symbol, fore=(67, 227, 208)),
-    color(symbol, fore=(94, 227, 67)),
-    color(symbol, fore=(226, 237, 57)),
-    color(symbol, fore=(212, 82, 207)),
-    symbol
+    (symbol, (227, 67, 67)),
+    (symbol, (216, 67, 227)),
+    (symbol, (67, 70, 227)),
+    (symbol, (67, 227, 208)),
+    (symbol, (94, 227, 67)),
+    (symbol, (226, 237, 57)),
+    (symbol, (212, 82, 207)),
+    (symbol, (255, 255, 255)),
 ]
 
 GAMESATEDICT = {
@@ -157,10 +157,11 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
+    "gui": True,
     "cooldown": 10,
     "port": 1100,
     "weapon": "Vandal, Phantom",
-    "weapon_amount": 1,
+    "weapon_amount": 2,
     "chat_limit": 5,
     "calculation_range": 1,
     "table": {

@@ -15,6 +15,8 @@ class Loadouts:
         self.current_map = current_map
 
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
+        output = {}
+
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
@@ -27,6 +29,7 @@ class Loadouts:
             team_id = pregame_stats['Teams'][0]['TeamID']
             PlayerInventorys = self.Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
         for player in range(len(players)):
+            output.update({players[player]["Subject"]: {}})
             if team_id == "Red":
                 invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
             else:
@@ -37,6 +40,11 @@ class Loadouts:
 
             weaponLists[players[player]["Subject"]] = {}
             for weapon in valApiWeapons["data"]:
+                output[players[player]["Subject"]] = {}
+                output[players[player]["Subject"]].update({"Player": players[player]})
+                output[players[player]["Subject"]].update({"Name": names[players[player]["Subject"]]})
+                output[players[player]["Subject"]].update({"Weapons": weapon})
+
                 if weapon["displayName"].lower() not in [weapon.lower() for weapon in weaponChoose]:
                     continue
                 skin_id = \
@@ -55,6 +63,9 @@ class Loadouts:
 
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         self.Server.send_message(json.dumps(final_json))
+
+        with open('data.json', 'w') as f:
+            json.dump(final_json, f)
         return weaponLists
 
     #this will convert valorant loadouts to json with player names
