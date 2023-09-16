@@ -1,16 +1,8 @@
-
-
-
-
 class Pregame:
     def __init__(self, Requests, log):
         self.log = log
-
         self.Requests = Requests
-
         self.response = ""
-
-
 
     def get_pregame_match_id(self):
         global response
@@ -23,7 +15,6 @@ class Pregame:
             return match_id
         except (KeyError, TypeError):
             self.log(f"cannot find pregame match id: {response}")
-            # print(f"No match id found. {response}")
             try:
                 self.response = self.Requests.fetch(url_type="glz", endpoint=f"/pregame/v1/players/{self.Requests.puuid}", method="get")
                 match_id = self.response['MatchID']
@@ -38,5 +29,4 @@ class Pregame:
         match_id = self.get_pregame_match_id()
         if match_id != 0:
             return self.Requests.fetch("glz", f"/pregame/v1/matches/{match_id}", "get")
-        else:
-            return None
+        return None

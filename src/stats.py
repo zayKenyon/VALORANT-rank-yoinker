@@ -1,5 +1,4 @@
 import os
-import time
 import json
 
 class Stats:
@@ -24,13 +23,10 @@ class Stats:
                 updated_data.update({puuid: [data[puuid]]})
             else:
                 updated_data[puuid].append(data[puuid])
-        
-        # updated_data.update(data)
-        # print(updated_data)
 
         with open(os.path.join(os.getenv('APPDATA'), "vry/stats.json"), "w") as f:
             json.dump(updated_data, f)
-    
+
     def read_data(self):
         try:
             with open(os.path.join(os.getenv('APPDATA'), "vry/stats.json"), "r") as f:
@@ -43,20 +39,15 @@ class Stats:
         if s < 60:
             if s == 1:
                 return f"{s} second"
-            else:
-                return f"{s} seconds"
-        elif s < 3600:
+            return f"{s} seconds"
+        if s < 3600:
             if s // 60 == 1:
                 return f"{s // 60} minute"
-            else:
-                return f"{s // 60} minutes"
-        elif s < 86400:
+            return f"{s // 60} minutes"
+        if s < 86400:
             if s // 3600 == 1:
                 return f"{s // 3600} hours"
-            else:
-                return f"{s // 3600} hours"
-        else:
-            if s // 86400 == 1:
-                return f"{s // 86400} days"
-            else:
-                return f"{s // 86400} days"
+            return f"{s // 3600} hours"
+        if s // 86400 == 1:
+            return f"{s // 86400} days"
+        return f"{s // 86400} days"

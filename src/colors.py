@@ -32,7 +32,6 @@ class Colors:
             Teamcolor = orig_name, (221, 224, 41)
         return Teamcolor
 
-
     def get_rgb_color_from_skin(self, skin_id, valoApiSkins):
         for skin in valoApiSkins.json()["data"]:
             if skin_id == skin["uuid"]:
@@ -41,14 +40,15 @@ class Colors:
     def level_to_color(self, level):
         if level >= 400:
             return level, (102, 212, 212)
-        elif level >= 300:
+        if level >= 300:
             return level, (207, 207, 76)
-        elif level >= 200:
+        if level >= 200:
             return level, (71, 71, 204)
-        elif level >= 100:
+        if level >= 100:
             return level, (241, 144, 54)
-        elif level < 100:
+        if level < 100:
             return level, (211, 211, 211)
+        return level, (255, 255, 255)
 
     def get_agent_from_uuid(self, agentUUID):
         agent = str(self.agent_dict.get(agentUUID))
@@ -124,5 +124,5 @@ class Colors:
         return ansi_escape.sub('', line)
 
     def rgb_to_hex(self, rgb):
-        r,g,b = rgb
+        r, g, b = rgb
         return '#{:02x}{:02x}{:02x}'.format(r, g, b)

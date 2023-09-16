@@ -1,9 +1,10 @@
 import threading
 import traceback
 import urllib3
-import os
-import sys
 import time
+import sys
+import os
+
 import asyncio
 import requests
 from colr import color
@@ -63,7 +64,7 @@ try:
     log = Logging.log
 
     # OS Logging + quit if OS unsupported
-    if get_os()[1] == False:
+    if not get_os()[1]:
         print(f"Unsupported operating system: {get_os()[0]}\n")
         log(f"Unsupported operating system: {get_os()[0]}\n")
         program_exit(0)
@@ -94,7 +95,6 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 
-
     ErrorSRC = Error(log)
 
     Requests = Requests(version, log, ErrorSRC)
@@ -112,14 +112,12 @@ try:
 
     presences = Presences(Requests, log)
 
-
     menu = Menu(Requests, log, presences)
     pregame = Pregame(Requests, log)
     coregame = Coregame(Requests, log)
 
     Server = Server(log, ErrorSRC)
     Server.start_server()
-
 
     agent_dict = content.get_all_agents()
 
@@ -146,14 +144,9 @@ try:
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog,
-             rpc)
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_forever()
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
 
     log(f"VALORANT rank yoinker v{version}")
-
 
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
@@ -164,9 +157,7 @@ try:
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
     chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
 
-
     richConsole = RichConsole()
-
 
     firstTime = True
     firstPrint = True
@@ -176,14 +167,6 @@ try:
         table.reset_runtime_col_flags()
 
         try:
-
-
-            # loop = asyncio.get_event_loop()
-            # loop.run_until_complete(Wss.conntect_to_websocket())
-            # if firstTime:
-            #     loop = asyncio.new_event_loop()
-            #     asyncio.set_event_loop(loop)
-            #     game_state = loop.run_until_complete(Wss.conntect_to_websocket(game_state))
             if firstTime:
                 run = True
                 while run:
@@ -211,18 +194,14 @@ try:
                 log(f"new game state: {game_state}")
                 loop.close()
             firstTime = False
-            # loop = asyncio.new_event_loop()
-            # asyncio.set_event_loop(loop)
-            # loop.run_until_complete()
         except TypeError:
             raise Exception("Game has not started yet!")
-        # if cfg.cooldown == 0 or game_state != lastGameState:
         if True:
             log(f"getting new {game_state} scoreboard")
             lastGameState = game_state
 
             if (not firstPrint) and cfg.get_feature_flag("pre_cls"):
-                    os.system('cls')
+                os.system('cls')
 
             is_leaderboard_needed = False
 
@@ -254,12 +233,10 @@ try:
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapons, valoApiSkins, names, state="game")
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
-                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
@@ -282,11 +259,10 @@ try:
                                 curr_player_stat = stats_data[player["Subject"]][-1]
                                 i = 1
                                 while curr_player_stat["match_id"] == coregame.match_id and len(stats_data[player["Subject"]]) > i:
-                                    i+=1
-                                # if curr_player_stat["match_id"] == coregame.match_id and len(stats_data[player["Subject"]]) > 1:
+                                    i += 1
                                     curr_player_stat = stats_data[player["Subject"]][-i]
                                 if curr_player_stat["match_id"] != coregame.match_id:
-                                    #checking for party memebers and self players
+                                    # checking for party members and self players
                                     times = 0
                                     m_set = ()
                                     for m in stats_data[player["Subject"]]:
@@ -295,24 +271,24 @@ try:
                                             m_set += (m["match_id"],)
                                     if player["PlayerIdentity"]["Incognito"] == False:
                                         already_played_with.append(
-                                                {
-                                                    "times": times,
-                                                    "name": curr_player_stat["name"],
-                                                    "agent": curr_player_stat["agent"],
-                                                    "time_diff": time.time() - curr_player_stat["epoch"]
-                                                })
+                                            {
+                                                "times": times,
+                                                "name": curr_player_stat["name"],
+                                                "agent": curr_player_stat["agent"],
+                                                "time_diff": time.time() - curr_player_stat["epoch"]
+                                            })
                                     else:
                                         if player["TeamID"] == allyTeam:
                                             team_string = "your"
                                         else:
                                             team_string = "enemy"
                                         already_played_with.append(
-                                                {
-                                                    "times": times,
-                                                    "name": agent_dict[player["CharacterID"].lower()] + " on " + team_string + " team",
-                                                    "agent": curr_player_stat["agent"],
-                                                    "time_diff": time.time() - curr_player_stat["epoch"]
-                                                })
+                                            {
+                                                "times": times,
+                                                "name": agent_dict[player["CharacterID"].lower()] + " on " + team_string + " team",
+                                                "agent": curr_player_stat["agent"],
+                                                "time_diff": time.time() - curr_player_stat["epoch"]
+                                            })
 
                         party_icon = ''
 
@@ -336,13 +312,6 @@ try:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
-                        # rankStatus = playerRank[1]
-                        #useless code since rate limit is handled in the requestsV
-                        # while not rankStatus:
-                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                        #     time.sleep(10)
-                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                        #     rankStatus = playerRank[1]
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
@@ -395,9 +364,6 @@ try:
 
                         # NAME
                         name = Namecolor
-
-                        # VIEWS
-                        # views = get_views(names[player["Subject"]])
 
                         # skin
                         # TODO add gui skins
@@ -492,12 +458,8 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                #temporary until other regions gets fixed?
-                # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
-                                            #   state="pregame")
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     partyMembers = menu.get_party_members(Requests.puuid, presence)
@@ -564,7 +526,7 @@ try:
                         gui_data["players"][idx].update({"name": NameColor})
                         NameColor = color(NameColor[0], fore=NameColor[1])
                         if player["PlayerIdentity"]["HideAccountLevel"]:
-                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
+                            if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels is False:
                                 PLcolor = colors.level_to_color(player_level)
                             else:
                                 PLcolor = ""
@@ -665,8 +627,6 @@ try:
                 names = namesClass.get_names_from_puuids(Players)
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     seen = []
                     for idx, player in enumerate(Players):
@@ -683,15 +643,6 @@ try:
                                 if cfg.get_feature_flag("discord_rpc"):
                                     rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
                                     rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
-
-                            # rankStatus = playerRank[1]
-                            #useless code since rate limit is handled in the requestsV
-                            # while not rankStatus:
-                            #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                            #     time.sleep(10)
-                            #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                            #     rankStatus = playerRank[1]
-                            # playerRank = playerRank["rank"]
 
                             ppstats = pstats.get_stats(player["Subject"])
                             hs = ppstats["hs"]
@@ -814,14 +765,6 @@ try:
                 table.display()
                 firstPrint = False
 
-                # print(f"VALORANT rank yoinker v{version}")
-                # chatlog(f"VALORANT rank yoinker v{version}")
-                                        #                 {
-                                        #     "times": sum(stats_data[player["Subject"]]),
-                                        #     "name": curr_player_stat["name"],
-                                        #     "agent": curr_player_stat["agent"],
-                                        #     "time_diff": time.time() - curr_player_stat["time"]
-                                        # })
                 if cfg.get_feature_flag("last_played"):
                     if len(already_played_with) > 0:
                         print("\n")
@@ -831,12 +774,9 @@ try:
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
-        else:
-            # time.sleep(cfg.cooldown)
-            pass
 
 except KeyboardInterrupt:
-    #lame implementation of fast ctrl+c exit
+    # lame implementation of fast ctrl+c exit
     os._exit(0)
 except:
     log(traceback.format_exc())

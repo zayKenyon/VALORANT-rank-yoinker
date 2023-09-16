@@ -1,6 +1,5 @@
 from typing import Literal, get_args
 
-# from prettytable import PrettyTable
 from rich.table import Table as RichTable
 from rich.console import Console as RichConsole
 
@@ -17,7 +16,7 @@ TABLE_COLUMN_NAMES = Literal[
     "Party",
     "Agent",
     "Name",
-    *[weapon for weapon in cfg.weapons],
+    list(cfg.weapons),
     "Rank",
     "RR",
     "Peak Rank",

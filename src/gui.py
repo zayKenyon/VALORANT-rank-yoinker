@@ -424,7 +424,7 @@ class GUI:
         """ resets the configuration to default """
         self.config = DEFAULT_CONFIG.copy()
         self.weapon_amount_entry.delete(0, "end")
-        self.weapon_amount_entry.insert(0, 1)
+        self.weapon_amount_entry.insert(0, "1")
         for weapon_combobox in self.weapon_comboboxes:
             weapon_combobox.destroy()
         self.weapon_comboboxes = []

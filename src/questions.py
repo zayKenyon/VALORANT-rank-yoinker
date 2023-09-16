@@ -32,14 +32,6 @@ weapon_amount_question = lambda config: {
     "filter": lambda ans: int(ans)
 }
 
-weapon_amount_question = lambda config: {
-    "type": "number",
-    "name": "weapon_amount",
-    "message": "Please select the amount of weapons to display:",
-    "min_allowed": 0,
-    "max_allowed": 100,
-    "filter": lambda ans: int(ans)
-}
 
 weapon_question = lambda config, index: {
     "type": "fuzzy",
@@ -48,50 +40,49 @@ weapon_question = lambda config, index: {
     "choices": WEAPONS
 }
 
-
 table_question = lambda config: {
-        "type": "checkbox",
-        "name": "table",
-        "message": "Please select table columns to display:",
-        "choices": [
-            Choice(k, name=v, enabled=config.get("table",DEFAULT_CONFIG["table"]).get(k, DEFAULT_CONFIG["table"][k]))
-            for k, v in TABLE_OPTS.items()
-        ],
-        "filter": lambda table: {k: k in table for k in TABLE_OPTS.keys()},
-        "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
-    }
+    "type": "checkbox",
+    "name": "table",
+    "message": "Please select table columns to display:",
+    "choices": [
+        Choice(k, name=v, enabled=config.get("table",DEFAULT_CONFIG["table"]).get(k, DEFAULT_CONFIG["table"][k]))
+        for k, v in TABLE_OPTS.items()
+    ],
+    "filter": lambda table: {k: k in table for k in TABLE_OPTS.keys()},
+    "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
+}
 
 port_question = lambda config: {
-        "type": "number",
-        "name": "port",
-        "message": "Please enter port for server to run:",
-        "default": config.get("port", 1100),
-        "min_allowed":0,
-        "max_allowed": 65535,
-        "filter": lambda ans: int(ans)
-    }
+    "type": "number",
+    "name": "port",
+    "message": "Please enter port for server to run:",
+    "default": config.get("port", 1100),
+    "min_allowed":0,
+    "max_allowed": 65535,
+    "filter": lambda ans: int(ans)
+}
 
 flags_question = lambda config: {
-        "type": "checkbox",
-        "name": "flags",
-        "message": "Please select optional features:",
-        "choices": [
-            Choice(k, name=v, enabled=config.get("flags",DEFAULT_CONFIG["flags"]).get(k, DEFAULT_CONFIG["flags"][k]))
-            for k, v in FLAGS_OPTS.items()
-        ],
-        "filter": lambda flags: {k: k in flags for k in FLAGS_OPTS.keys()},
-        "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
-    }
+    "type": "checkbox",
+    "name": "flags",
+    "message": "Please select optional features:",
+    "choices": [
+        Choice(k, name=v, enabled=config.get("flags",DEFAULT_CONFIG["flags"]).get(k, DEFAULT_CONFIG["flags"][k]))
+        for k, v in FLAGS_OPTS.items()
+    ],
+    "filter": lambda flags: {k: k in flags for k in FLAGS_OPTS.keys()},
+    "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
+}
 
 chat_limit_question = lambda config: {
-        "type": "number",
-        "name": "chat_limit",
-        "message": "Please enter the length of the chat messages history:",
-        "default": config.get("chat_limit", 5),
-        "min_allowed":0,
-        "max_allowed": 100,
-        "filter": lambda ans: int(ans)
-    }
+    "type": "number",
+    "name": "chat_limit",
+    "message": "Please enter the length of the chat messages history:",
+    "default": config.get("chat_limit", 5),
+    "min_allowed":0,
+    "max_allowed": 100,
+    "filter": lambda ans: int(ans)
+}
 
 basic_questions = lambda config: [
     table_question(config=config),
