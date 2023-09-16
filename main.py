@@ -353,8 +353,8 @@ try:
                         if PLcolor != "":
                             gui_data["players"][idx].update({"level": PLcolor})
                             PLcolor = color(PLcolor[0], fore=PLcolor[1])
+
                         # AGENT
-                        # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
                         if agent[0] == "" and len(Players) == 1:
                             isRange = True
@@ -366,8 +366,13 @@ try:
                         name = Namecolor
 
                         # skin
-                        # TODO add gui skins
                         skins = loadouts[player["Subject"]]
+                        for item, (name, clr) in skins.items():
+                            if clr is None:
+                                skins[item] = (name, (255, 255, 255))
+
+                        gui_data["players"][idx].update({"skins": skins})
+                        skins = [color(name, fore=clr) for name, clr in skins.values()]
 
                         # RANK
                         gui_data["players"][idx].update({"rank": playerRank["rank"]})
@@ -380,7 +385,7 @@ try:
                         rr = playerRank["rr"]
                         gui_data["players"][idx].update({"rr": rr})
 
-                        #short peak rank string
+                        # short peak rank string
                         peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         gui_data["players"][idx].update({"peak_rank_ep": f"e{playerRank['peakrankep']}a{playerRank['peakrankact']}"})
                         if not cfg.get_feature_flag("peak_rank_act"):
@@ -445,6 +450,7 @@ try:
                     gui_data = dict(sorted(gui_data.items()))
                     submit_to_tkinter(gui.update_player_table, gui_data)
                     submit_to_tkinter(gui.update_map, current_map["id"])
+                    submit_to_tkinter(gui.update_player_skin_table, gui_data)
             elif game_state == "PREGAME":
                 gui_data = {"leaderboard": False, "players": {}}
                 already_played_with = []

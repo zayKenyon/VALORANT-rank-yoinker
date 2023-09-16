@@ -55,7 +55,7 @@ class Loadouts:
                     rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                     skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
 
-                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = color(skin_name, fore=rgb_color)
+                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (skin_name, rgb_color)
 
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         self.Server.send_message(json.dumps(final_json))
@@ -64,7 +64,7 @@ class Loadouts:
             json.dump(final_json, f)
         return weaponLists
 
-    #this will convert valorant loadouts to json with player names
+    # this will convert valorant loadouts to json with player names
     def convertLoadoutToJsonArray(self, PlayerInventorys, players, state, names):
         # get agent dict from main in future
         # names = self.namesClass.get_names_from_puuids(players)

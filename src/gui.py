@@ -33,6 +33,7 @@ class LabelGrid(tk.Frame):
     """
     Creates a grid of labels that have their cells populated by content.
     """
+
     def __init__(self, master, content=(["", ""], ["", ""]), *args, **kwargs):
         tk.Frame.__init__(self, master, *args, **kwargs)
         self.content = content
@@ -249,22 +250,7 @@ class GUI:
         for weapon in self.config.weapons:
             header.append(weapon)
         # TODO add real data, get gui working while program is running
-        self.player_skin_table = LabelGrid(self.skins_frame,
-                                           content=[
-                                               header,
-                                               [self.load_agent_image("eb93336a-449b-9c1b-0a54-a891f7921d69"), "SomeLongName#12345", "Ion", "Prime//2.0", "Luxe", "Sentinels of Light"],
-                                               [self.load_agent_image("569fdd95-4d10-43ab-ca70-79becc718b46"), "Short#000", "Winterwunderland", "Silvanus", "Gravitational Uranium Neuroblaster", "Singularity"],
-                                               [self.load_agent_image("add6443a-41bd-e414-f6ad-e58d267f4e95"), "MiddleName#0000", "Prism II", "Ruination", "Elderflame", "Nebula"],
-                                               [self.load_agent_image("95b78ed7-4637-86d9-7e41-71ba8c293152"), "Ranadad#210", "Sovereign", "Glitchpop", "Spline", "Sakura"],
-                                               [self.load_agent_image("9f0d8ba9-4140-b941-57d3-a7ad57c6b417"), "EzWin#420", "Origin", "Spectrum", "VALORANT GO! Vol. 2", "Magepunk"],
-                                               self.skin_seperator(),
-                                               [self.load_agent_image("320b2a48-4d9b-a075-30f1-1f93a9b638fa"), "UnicodeNameッ#012", "RGX 11z Pro", "Glitchpop", "Glitchpop", "Glitchpop"],
-                                               [self.load_agent_image("e370fa57-4757-3604-3648-499e1f642d3f"), "BB#231", "Origin", "Recon", "Sentinels of Light", "Magepunk"],
-                                               [self.load_agent_image("1e58de9c-4950-5125-93e9-a0aee9f98746"), "TRacker#2223", "Sovereign", "Spline", "Spline", "Spline"],
-                                               [self.load_agent_image("41fb69c1-4189-7b37-f117-bcaf1e96f1bf"), "Randd#ezy", "Prism III", "Silvanus", "Glitchpop", "Crimsonbeast"],
-                                               [self.load_agent_image("7f94d92c-4234-0a36-9646-3a87eb8b5c89"), "TwinTower#plane", "Origin", "Recon", "Recon", "Protocol 781-A"],
-                                           ],
-                                           takefocus=False)
+        self.player_skin_table = LabelGrid(self.skins_frame, takefocus=False)
 
         self.player_skin_table.grid(row=0, column=0, columnspan=9)
 
@@ -646,7 +632,7 @@ class GUI:
         for widget in self.weapon_combobox_frame.winfo_children():
             widget.grid_forget()
 
-        # Display weapon comboboxes in the new frame
+        # Display weapon combo boxes in the new frame
         for i, weapon_combobox in enumerate(self.weapon_comboboxes):
             weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
 
@@ -703,9 +689,29 @@ class GUI:
 
         self.player_table.update_content(table_data)
 
+    def update_player_skin_table(self, data):
+        players_skin_data = data.get('players', {})
+        table_data = [['Agent', 'Name'] + self.config.weapons]
+
+        for player_id, player_info in players_skin_data.items():
+            if int(player_id) != float(player_id):
+                table_data.append(self.emtpy_row())
+                continue
+
+            agent = self.load_agent_image(player_info.get('agent', ''))
+            name = player_info.get('name', '')
+            skins = player_info.get('skins', {})
+
+            print(skins)
+
+            # Append player data to the table_data
+            table_data.append([agent, name] + [skins.get(weapon, '') for weapon in self.config.weapons])
+
+        self.player_skin_table.update_content(table_data)
+
     def update_game_time(self):
         passed_time = datetime.now() - self.start_time
-        passed_time = str(passed_time).split(".")[0][2:]
+        passed_time = str(passed_time).split(".", maxsplit=1)[0]
         self.game_time_label["text"] = passed_time
 
     def update_map(self, map_id):
