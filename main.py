@@ -226,6 +226,7 @@ try:
             is_leaderboard_needed = False
 
             if game_state == "INGAME":
+                gui_data = {"leaderboard": False, "players": {}}
                 coregame_stats = coregame.get_coregame_stats()
                 if coregame_stats == None:
                     continue
@@ -237,7 +238,8 @@ try:
 
                 players_data = {}
                 players_data.update({"ignore": partyMembersList})
-                for player in Players:
+                for idx, player in enumerate(Players):
+                    gui_data["players"][idx] = {}
                     if player["Subject"] == Requests.puuid:
                         if cfg.get_feature_flag("discord_rpc"):
                             rpc.set_data({"agent": player["CharacterID"]})
@@ -270,7 +272,7 @@ try:
                     for p in Players:
                         if p["Subject"] == Requests.puuid:
                             allyTeam = p["TeamID"]
-                    for player in Players:
+                    for idx, player in enumerate(Players):
                         status.update(f"Loading players... [{playersLoaded}/{len(Players)}]")
                         playersLoaded += 1
 
@@ -320,10 +322,12 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    party_icon = color(party_icon[0], fore=party_icon[1])
                                     partyCount += 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
+                                    party_icon = color(party_icon[0], fore=party_icon[1])
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
 
@@ -341,7 +345,9 @@ try:
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
+                        gui_data["players"][idx].update({"hs": hs})
                         kd = ppstats["kd"]
+                        gui_data["players"][idx].update({"kd": kd})
 
                         player_level = player["PlayerIdentity"].get("AccountLevel")
 
@@ -358,9 +364,11 @@ try:
                                                                    player["Subject"],
                                                                    Requests.puuid,
                                                                    party_members=partyMembersList)
+                        gui_data["players"][idx].update({"name": Namecolor})
                         Namecolor = color(Namecolor[0], fore=Namecolor[1])
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
+                                # TODO add gui separator
                                 table.add_empty_row()
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
@@ -372,6 +380,7 @@ try:
                         else:
                             PLcolor = colors.level_to_color(player_level)
                         if PLcolor != "":
+                            gui_data["players"][idx].update({"level": PLcolor})
                             PLcolor = color(PLcolor[0], fore=PLcolor[1])
                         # AGENT
                         # agent = str(agent_dict.get(player["CharacterID"].lower()))
@@ -379,6 +388,7 @@ try:
                         if agent[0] == "" and len(Players) == 1:
                             isRange = True
                         else:
+                            gui_data["players"][idx].update({"agent": player["CharacterID"].lower()})
                             agent = color(agent[0], fore=agent[1])
 
                         # NAME
@@ -388,9 +398,11 @@ try:
                         # views = get_views(names[player["Subject"]])
 
                         # skin
+                        # TODO add gui skins
                         skins = loadouts[player["Subject"]]
 
                         # RANK
+                        gui_data["players"][idx].update({"rank": playerRank["rank"]})
                         rankName = NUMBERTORANKS[playerRank["rank"]]
                         rankName = color(rankName[0], fore=rankName[1])
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
@@ -398,48 +410,57 @@ try:
 
                         # RANK RATING
                         rr = playerRank["rr"]
+                        gui_data["players"][idx].update({"rr": rr})
 
                         #short peak rank string
                         peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        gui_data["players"][idx].update({"peak_rank_ep": f"e{playerRank['peakrankep']}a{playerRank['peakrankact']}"})
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
                         # PEAK RANK
+                        gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]]
                         peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                         # PREVIOUS RANK
+                        gui_data["players"][idx].update({"prev_rank": previousPlayerRank["rank"]})
                         previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
                         previousRank = color(previousRank[0], fore=previousRank[1])
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
+                        gui_data["players"][idx].update({"leaderboard": leaderboard})
 
                         hs = colors.get_hs_gradient(hs)
+                        gui_data["players"][idx].update({"hs": hs})
                         hs = color(hs[0], fore=hs[1])
                         wr = colors.get_wr_gradient(playerRank["wr"])
+                        gui_data["players"][idx].update({"wr": wr})
                         wr = color(wr[0], fore=wr[1]) + f" ({playerRank['numberofgames']})"
 
-                        if(int(leaderboard)>0):
+                        if int(leaderboard) > 0:
+                            gui_data["leaderboard"] = True
                             is_leaderboard_needed = True
 
                         # LEVEL
                         level = PLcolor
                         table.add_row_table([party_icon,
-                                              agent,
-                                              name,
-                                              # views,
-                                              *["" for _ in cfg.weapons],
-                                              rankName,
-                                              rr,
-                                              peakRank,
-                                              previousRank,
-                                              leaderboard,
-                                              hs,
-                                              wr,
-                                              kd,
-                                              level
-                                              ])
+                                             agent,
+                                             name,
+                                             # views,
+                                             *["" for _ in cfg.weapons],
+                                             rankName,
+                                             rr,
+                                             peakRank,
+                                             previousRank,
+                                             leaderboard,
+                                             hs,
+                                             wr,
+                                             kd,
+                                             level
+                                             ])
+
                         stats.save_data(
                             {
                                 player["Subject"]: {
@@ -453,8 +474,11 @@ try:
                                 }
                             }
                         )
-                        # bar()
+                    gui_data = dict(sorted(gui_data.items()))
+                    submit_to_tkinter(gui.update_player_table, gui_data)
+                    submit_to_tkinter(gui.update_map, current_map["id"])
             elif game_state == "PREGAME":
+                gui_data = {"leaderboard": False, "players": {}}
                 already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
                 if pregame_stats == None:
@@ -480,7 +504,8 @@ try:
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
                     partyIcons = {}
-                    for player in Players:
+                    for idx, player in enumerate(Players):
+                        gui_data["players"][idx] = {}
                         status.update(f"Loading players... [{playersLoaded}/{len(Players)}]")
                         playersLoaded += 1
                         party_icon = ''
@@ -492,9 +517,11 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    gui_data["players"][idx].update({"party_icon": party_icon})
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
+                                    gui_data["players"][idx].update({"party_icon": party_icon})
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
@@ -514,7 +541,9 @@ try:
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
+                        gui_data["players"][idx].update({"hs": hs})
                         kd = ppstats["kd"]
+                        gui_data["players"][idx].update({"kd": kd})
 
                         player_level = player["PlayerIdentity"].get("AccountLevel")
                         if player["PlayerIdentity"]["Incognito"]:
@@ -530,6 +559,7 @@ try:
                                                                    player["Subject"],
                                                                    Requests.puuid,
                                                                    party_members=partyMembersList)
+                        gui_data["players"][idx].update({"name": NameColor})
                         NameColor = color(NameColor[0], fore=NameColor[1])
                         if player["PlayerIdentity"]["HideAccountLevel"]:
                             if player["Subject"] == Requests.puuid or player["Subject"] in partyMembersList or hide_levels == False:
@@ -539,6 +569,7 @@ try:
                         else:
                             PLcolor = colors.level_to_color(player_level)
                         if PLcolor != "":
+                            gui_data["players"][idx].update({"level": PLcolor})
                             PLcolor = color(PLcolor[0], fore=PLcolor[1])
                         if player["CharacterSelectionState"] == "locked":
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())),
@@ -549,6 +580,7 @@ try:
                         else:
                             agent_color = color(str(agent_dict.get(player["CharacterID"].lower())), fore=(54, 53, 51))
 
+                        gui_data["players"][idx].update({"agent": player["CharacterID"].lower()})
                         # AGENT
                         agent = agent_color
 
@@ -563,6 +595,7 @@ try:
                         # skin = loadouts[player["Subject"]]
 
                         # RANK
+                        gui_data["players"][idx].update({"rank": playerRank["rank"]})
                         rankName = NUMBERTORANKS[playerRank["rank"]]
                         rankName = color(rankName[0], fore=rankName[1])
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
@@ -570,49 +603,58 @@ try:
 
                         # RANK RATING
                         rr = playerRank["rr"]
+                        gui_data["players"][idx].update({"rr": rr})
 
                         #short peak rank string
                         peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        gui_data["players"][idx].update({"peak_rank_ep": f"e{playerRank['peakrankep']}a{playerRank['peakrankact']}"})
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
+                        gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]]
                         peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                         # PREVIOUS RANK
+                        gui_data["players"][idx].update({"prev_rank": previousPlayerRank["rank"]})
                         previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
                         previousRank = color(previousRank[0], fore=previousRank[1])
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
+                        gui_data["players"][idx].update({"leaderboard": leaderboard})
 
                         hs = colors.get_hs_gradient(hs)
+                        gui_data["players"][idx].update({"hs": hs})
                         hs = color(hs[0], fore=hs[1])
                         wr = colors.get_wr_gradient(playerRank["wr"])
+                        gui_data["players"][idx].update({"wr": wr})
                         wr = color(wr[0], fore=wr[1]) + f" ({playerRank['numberofgames']})"
 
-                        if(int(leaderboard)>0):
+                        if int(leaderboard) > 0:
+                            gui_data["leaderboard"] = True
                             is_leaderboard_needed = True
 
                         # LEVEL
                         level = PLcolor
 
                         table.add_row_table([party_icon,
-                                              agent,
-                                              name,
-                                              # views,
-                                              *["" for _ in cfg.weapons],
-                                              rankName,
-                                              rr,
-                                              peakRank,
-                                              previousRank,
-                                              leaderboard,
-                                              hs,
-                                              wr,
-                                              kd,
-                                              level,
-                                              ])
-                        # bar()
+                                             agent,
+                                             name,
+                                             # views,
+                                             *["" for _ in cfg.weapons],
+                                             rankName,
+                                             rr,
+                                             peakRank,
+                                             previousRank,
+                                             leaderboard,
+                                             hs,
+                                             wr,
+                                             kd,
+                                             level,
+                                             ])
+                    submit_to_tkinter(gui.update_player_table, gui_data)
+
             if game_state == "MENUS":
                 gui_data = {"leaderboard": False,
                             "players": {}}
@@ -651,6 +693,7 @@ try:
 
                             ppstats = pstats.get_stats(player["Subject"])
                             hs = ppstats["hs"]
+                            gui_data["players"][idx].update({"hs": hs})
                             kd = ppstats["kd"]
                             gui_data["players"][idx].update({"kd": kd})
 
@@ -665,12 +708,12 @@ try:
 
                             # NAME
                             name = names[player["Subject"]]
-                            gui_data["players"][idx].update({"name": name})
+                            gui_data["players"][idx].update({"name": (name, (76, 151, 237))})
                             name = color(name, fore=(76, 151, 237))
 
                             # RANK
+                            gui_data["players"][idx].update({"rank": playerRank["rank"]})
                             rankName = NUMBERTORANKS[playerRank["rank"]]
-                            gui_data["players"][idx].update({"rank": rankName})
                             rankName = color(rankName[0], fore=rankName[1])
                             if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
                                 rankName += f" ({playerRank['rr']})"
@@ -681,17 +724,18 @@ try:
 
                             #short peak rank string
                             peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                            gui_data["players"][idx].update({"peak_rank_ep": f"e{playerRank['peakrankep']}a{playerRank['peakrankact']}"})
                             if not cfg.get_feature_flag("peak_rank_act"):
                                 peakRankAct = ""
 
                             # PEAK RANK
+                            gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
                             peakRank = NUMBERTORANKS[playerRank["peakrank"]]
-                            gui_data["players"][idx].update({"peak_rank": peakRank})
                             peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
                             # PREVIOUS RANK
+                            gui_data["players"][idx].update({"prev_rank": previousPlayerRank["rank"]})
                             previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
-                            gui_data["players"][idx].update({"previous_rank": previousRank})
                             previousRank = color(previousRank[0], fore=previousRank[1])
 
                             # LEADERBOARD

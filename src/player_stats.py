@@ -51,7 +51,6 @@ class PlayerStats:
                 "hs": "N/a"
             }
 
-
             if total_hits == 0: # No hits
                 return final
             hs = int((total_headshots/total_hits)*100)

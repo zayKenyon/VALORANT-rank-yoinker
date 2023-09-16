@@ -33,7 +33,7 @@ class LabelGrid(tk.Frame):
     """
     Creates a grid of labels that have their cells populated by content.
     """
-    def __init__(self, master, content=([0, 0], [0, 0]), *args, **kwargs):
+    def __init__(self, master, content=(["", ""], ["", ""]), *args, **kwargs):
         tk.Frame.__init__(self, master, *args, **kwargs)
         self.content = content
         self.content_size = (len(content), len(content[0]))
@@ -62,7 +62,7 @@ class LabelGrid(tk.Frame):
                     label['text'] = content
                     label.bind("<Button-1>", self.on_label_click)
             content_type = type(content).__name__
-            if content_type in ('str', 'int'):
+            if content_type in ('str', 'int', 'float'):
                 label['text'] = content
             elif content_type == 'PhotoImage':
                 label['image'] = content
@@ -209,11 +209,7 @@ class GUI:
         self.enemy_team_average_image.configure(image=enemy_team_average_image)
 
         # TODO add real data, get gui working while program is running
-        self.player_table = LabelGrid(self.live_game_frame,
-                                      content=[
-                                          ["Party", "Agent", "Name", "Rank", "Peak Rank", "Prev. Rank", "HS", "WR", "KD", "Level"],
-                                      ],
-                                      takefocus=False)
+        self.player_table = LabelGrid(self.live_game_frame, takefocus=False)
 
         force_refresh_image = self.load_image(r"assets\gui\Refresh.png", 20, 20)
         clear_cash_image = self.load_image(r"assets\gui\Trash.png", 20, 20)
@@ -452,6 +448,8 @@ class GUI:
         return ImageTk.PhotoImage(img)
 
     def load_agent_image(self, agent):
+        if agent == "":
+            return ""
         cache_file = r"assets\gui\cache\agents.json"
 
         # check if the cache file exists
@@ -485,6 +483,8 @@ class GUI:
             return ImageTk.PhotoImage(img)
 
     def load_rank_image(self, rank):
+        if rank == "":
+            return ""
         rank = str(rank)
         cache_file = r"assets\gui\cache\ranks.json"
 
@@ -519,13 +519,15 @@ class GUI:
             return ImageTk.PhotoImage(img)
 
     def load_map(self, map_uuid):
+        if map_uuid == "":
+            return ""
 
         def load_map_image():
             cache_file = r"assets\gui\cache\map_images.json"
 
             # check if the cache file exists
             if os.path.exists(cache_file):
-                with open(cache_file, "r", encoding="utf-8") as f:
+                with open(cache_file, "r") as f:
                     map_images = json.load(f)
 
             else:
@@ -655,6 +657,9 @@ class GUI:
         table_length = int(self.config.weapon_amount) + 2
         return [""] * table_length
 
+    def emtpy_row(self):
+        return [" "] * sum(1 for value in self.config.table.values() if value)
+
     def update_game_server(self, server):
         self.game_server_label["text"] = server
 
@@ -665,25 +670,27 @@ class GUI:
 
     def update_player_table(self, data):
         players_data = data.get('players', {})
-        table_data = [['Party', 'Agent', 'Name', 'Rank', 'Peak Rank', 'Prev. Rank', 'HS', 'WR', 'KD', 'Level']]
+        table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'HS', 'WR', 'KD', 'Level']]
 
         for player_id, player_info in players_data.items():
             party_icon = player_info.get('party_icon', ('', (0, 0, 0)))
-            kd = player_info.get('kd', 0.0)
-            level = player_info.get('level', ('', (0, 0, 0)))
-            agent = player_info.get('agent', '')
+            agent = self.load_agent_image(player_info.get('agent', ''))
             name = player_info.get('name', '')
-            rank = player_info.get('rank', ('', (0, 0, 0)))
-            peak_rank = player_info.get('peak_rank', ('', (0, 0, 0)))
-            prev_rank = player_info.get('previous_rank', ('', (0, 0, 0)))
+            rank = self.load_rank_image(player_info.get('rank', 0))
+            rr = player_info.get('rr', 0)
+            prev_rank = self.load_rank_image(player_info.get('prev_rank', 0))
+            peak_rank = self.load_rank_image(player_info.get('peak_rank', 0))
+            peak_rank_ep = player_info.get('peak_rank_ep', ('', (0, 0, 0)))
+            kd = player_info.get('kd', 0.0)
             hs = player_info.get('hs', (0, [0, 0, 0]))
             wr = player_info.get('wr', (0, [0, 0, 0]))
+            level = player_info.get('level', ('', (0, 0, 0)))
 
             # Append player data to the table_data
-            table_data.append(
-                [party_icon, agent, name, rank, peak_rank, prev_rank, hs, wr, kd, level])
+            table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, hs, wr, kd, level])
 
         print(table_data)
+
         self.player_table.update_content(table_data)
 
     def update_game_time(self):
