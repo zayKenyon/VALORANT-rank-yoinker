@@ -98,12 +98,13 @@ class LabelGrid(tk.Frame):
                 labels[i][j].grid(row=i, column=j)
 
 class GUI:
-    def __init__(self, cfg):
+    def __init__(self, config):
+        self.config = config
         self.cfg = {}
-        global t
-        self.config = cfg
 
-        t = tk.Tk()
+    def init_gui(self):
+        global t
+
         t.title(f"VALORANT rank yoinker v{version}")
 
         self.screen_width = t.winfo_screenwidth()
@@ -168,7 +169,8 @@ class GUI:
 
     def threadmain(self):
         global t
-        t.configure(width=640, height=480)
+        t = tk.Tk()
+        self.init_gui()
 
         process_queue_batch()  # Start processing the queue in batches
         t.mainloop()

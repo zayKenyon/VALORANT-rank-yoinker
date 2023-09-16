@@ -1,3 +1,4 @@
+import threading
 import traceback
 import urllib3
 import os
@@ -135,8 +136,9 @@ try:
 
     stats = Stats()
 
-    #gui = GUI(cfg)
-    #gui.threadmain()
+    gui = GUI(cfg)
+    threadmain = gui.threadmain
+    threading.Thread(target=threadmain).start()
 
     if cfg.get_feature_flag("discord_rpc"):
         rpc = Rpc(map_urls, gamemodes, colors, log)
