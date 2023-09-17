@@ -53,7 +53,6 @@ class Loadouts:
                 weaponLists[player_id][weapon]["image"] = skin_image
                 weaponLists[player_id][weapon]["buddy"] = skin_buddy
 
-        print(weaponLists)
         return weaponLists
 
     # this will convert valorant loadouts to json with player names

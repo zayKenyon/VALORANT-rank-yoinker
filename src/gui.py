@@ -441,76 +441,58 @@ class GUI:
         img = img.resize((x, y))
         return ImageTk.PhotoImage(img)
 
+    def load_and_cache_image(self, image_url, cache_file, max_height=None, crop_coords=None, brightness_factor=None):
+        # Check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+        else:
+            cached_data = {}
+
+        if image_url in cached_data:
+            # Load image from cache
+            base64_data = cached_data[image_url]
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
+        else:
+            # Fetch image from the web
+            with requests.Session() as s:
+                response = s.get(image_url)
+                img = Image.open(BytesIO(response.content))
+                if max_height:
+                    # Resize the image while maintaining aspect ratio
+                    width, height = img.size
+                    new_width = int((max_height / height) * width)
+                    img = img.resize((new_width, max_height), Image.ANTIALIAS)
+                if crop_coords:
+                    # Crop the image
+                    img = img.crop(crop_coords)
+                if brightness_factor:
+                    # Adjust the brightness
+                    enhancer = ImageEnhance.Brightness(img)
+                    img = enhancer.enhance(brightness_factor)
+
+                # Store the fetched image in the cache
+                img_bytesio = BytesIO()
+                img.save(img_bytesio, format="PNG")
+                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+                cached_data[image_url] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(cached_data, f)
+
+        return img
+
     def load_agent_image(self, agent):
         if agent == "":
             return ""
         cache_file = r"assets\gui\cache\agents.json"
-
-        # check if the cache file exists
-        if os.path.exists(cache_file):
-            with open(cache_file, "r", encoding="utf-8") as f:
-                agents = json.load(f)
-
-        else:
-            agents = {}
-
-        if agent in agents:
-            # load image from cache
-            base64_data = agents[agent]
-            img_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(img_data))
-            return ImageTk.PhotoImage(img)
-
-        # fetch image from the web
-        with requests.Session() as s:
-            response = s.get(f"https://media.valorant-api.com/agents/{agent}/displayicon.png")
-            img = Image.open(BytesIO(response.content))
-            img = img.resize((35, 35))
-            # Store the fetched image in the cache
-            img_bytesio = BytesIO()
-            img.save(img_bytesio, format="PNG")
-            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-            agents[agent] = base64_data
-            with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump(agents, f)
-
-            return ImageTk.PhotoImage(img)
+        return ImageTk.PhotoImage(self.load_and_cache_image(f"https://media.valorant-api.com/agents/{agent}/displayicon.png", cache_file, 35))
 
     def load_rank_image(self, rank):
         if rank == "":
             return ""
-        rank = str(rank)
         cache_file = r"assets\gui\cache\ranks.json"
-
-        # check if the cache file exists
-        if os.path.exists(cache_file):
-            with open(cache_file, "r", encoding="utf-8") as f:
-                ranks = json.load(f)
-
-        else:
-            ranks = {}
-
-        if rank in ranks:
-            # load image from cache
-            base64_data = ranks[rank]
-            img_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(img_data))
-            return ImageTk.PhotoImage(img)
-
-        # fetch image from the web
-        with requests.Session() as s:
-            response = s.get(f"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{rank}/smallicon.png")
-            img = Image.open(BytesIO(response.content))
-            img = img.resize((35, 35))
-            # Store the fetched image in the cache
-            img_bytesio = BytesIO()
-            img.save(img_bytesio, format="PNG")
-            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-            ranks[rank] = base64_data
-            with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump(ranks, f)
-
-            return ImageTk.PhotoImage(img)
+        return ImageTk.PhotoImage(self.load_and_cache_image(f"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{rank}/smallicon.png", cache_file, 35))
 
     def compare_player_level(self, player_level):
         max_level_appearance = None
@@ -528,187 +510,79 @@ class GUI:
             return ""
         cache_file = r"assets\gui\cache\levels.json"
 
-        # check if the cache file exists
-        if os.path.exists(cache_file):
-            with open(cache_file, "r", encoding="utf-8") as f:
-                levels = json.load(f)
+        # Define the URL for the player level image based on player_level (you may need to implement your logic here)
+        player_level_image_url = self.compare_player_level(player_level)
 
-        else:
-            levels = {}
+        # Load and cache the player level image using the generic function
+        loaded_player_level_image = ImageTk.PhotoImage(self.load_and_cache_image(player_level_image_url, cache_file))
 
-        if player_level in levels:
-            # load image from cache
-            base64_data = levels[player_level]
-            img_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(img_data))
-            return ImageTk.PhotoImage(img)
-
-        # fetch image from the web
-        with requests.Session() as s:
-            response = s.get(self.compare_player_level(player_level))
-            img = Image.open(BytesIO(response.content))
-            img = img.resize((76, 32))
-            # Store the fetched image in the cache
-            img_bytesio = BytesIO()
-            img.save(img_bytesio, format="PNG")
-            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-            levels[player_level] = base64_data
-            with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump(levels, f)
-
-            return player_level, ImageTk.PhotoImage(img)
+        return player_level, loaded_player_level_image
 
     def load_map(self, map_uuid):
         if map_uuid == "":
             return ""
 
+        # Define the cache file for map images
+        map_image_cache_file = r"assets\gui\cache\map_images.json"
+
+        # Define the cache file for map names
+        map_name_cache_file = r"assets\gui\cache\map_names.json"
+
         def load_map_image():
-            cache_file = r"assets\gui\cache\map_images.json"
+            # Define the URL for the map image
+            map_image_url = f"https://media.valorant-api.com/maps/{map_uuid}/splash.png"
 
-            # check if the cache file exists
-            if os.path.exists(cache_file):
-                with open(cache_file, "r") as f:
-                    map_images = json.load(f)
-
-            else:
-                map_images = {}
-
-            if map_uuid in map_images:
-                # load image from cache
-                base64_data = map_images[map_uuid]
-                img_data = base64.b64decode(base64_data)
-                img = Image.open(BytesIO(img_data))
-                return ImageTk.PhotoImage(img)
-
-            # fetch image from the web
-            with requests.Session() as s:
-                response = s.get(f"https://media.valorant-api.com/maps/{map_uuid}/splash.png")
-                img = Image.open(BytesIO(response.content))
-                img = img.resize((187, 105))
-                img = img.crop((21, 30, 165, 65))
-                enhancer = ImageEnhance.Brightness(img)
-                img = enhancer.enhance(0.75)
-
-                # Store the fetched image in the cache
-                img_bytesio = BytesIO()
-                img.save(img_bytesio, format="PNG")
-                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-                map_images[map_uuid] = base64_data
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(map_images, f)
-
-                return ImageTk.PhotoImage(img)
+            # Load and cache the map image using the generic function
+            return ImageTk.PhotoImage(self.load_and_cache_image(map_image_url, map_image_cache_file, max_height=105,
+                                                                crop_coords=(21, 30, 165, 65), brightness_factor=0.75))
 
         def load_map_name():
-            cache_file = r"assets\gui\cache\map_names.json"
-
-            # check if the cache file exists
-            if os.path.exists(cache_file):
-                with open(cache_file, "r", encoding="utf-8") as f:
+            # Check if the cache file for map names exists
+            if os.path.exists(map_name_cache_file):
+                with open(map_name_cache_file, "r", encoding="utf-8") as f:
                     map_names = json.load(f)
-
             else:
                 map_names = {}
 
             if map_uuid in map_names:
-                # load image from cache
+                # Load the map name from cache
                 map_name = map_names[map_uuid]
+            else:
+                # Fetch the map name from the web
+                with requests.Session() as s:
+                    response = s.get(f"https://valorant-api.com/v1/maps/{map_uuid}").json()
+                    map_name = response["data"]["displayName"]
 
-            # fetch image from the web
-            with requests.Session() as s:
-                response = s.get(f"https://valorant-api.com/v1/maps/{map_uuid}").json()
-                map_name = response["data"]["displayName"]
+                    # Store the fetched map name in the cache
+                    map_names[map_uuid] = map_name
+                    with open(map_name_cache_file, "w", encoding="utf-8") as f:
+                        json.dump(map_names, f)
 
-                # Store the fetched image in the cache
-                map_names[map_uuid] = map_name
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(map_names, f)
+            return map_name
 
-                return map_name
-
+        # Load map name and map image
         return load_map_name(), load_map_image()
 
     def load_skin_image(self, skin_data):
-        print(skin_data)
         skin_image_url = skin_data.get("image", "")
         skin_buddy_url = skin_data.get("buddy", "")
 
-        def resize_image_with_max_height(image, max_height):
-            if image is None:
-                return
-            width, height = image.size
-            print(width, height)
-            if height > max_height:
-                # Calculate the new width while maintaining the aspect ratio
-                new_width = int((max_height / height) * width)
-                # Resize the image
-
-                print(new_width, max_height)
-                return new_width, max_height
+        # Define the cache file for skin images
+        skin_image_cache_file = r"assets\gui\cache\skins.json"
 
         def get_skin_image():
-            # check if skin image in cache
-            cache_file = r"assets\gui\cache\skins.json"
-            if os.path.exists(cache_file):
-                with open(cache_file, "r", encoding="utf-8") as f:
-                    skins = json.load(f)
-
-            else:
-                skins = {}
-
-            if skin_image_url in skins:
-                # load image from cache
-                base64_data = skins[skin_image_url]
-                img_data = base64.b64decode(base64_data)
-                img = Image.open(BytesIO(img_data))
-                return img
-
-            # fetch image from the web
-            with requests.Session() as s:
-                response = s.get(skin_image_url)
-                img = Image.open(BytesIO(response.content))
-                img = img.resize(resize_image_with_max_height(img, 35))
-                # Store the fetched image in the cache
-                img_bytesio = BytesIO()
-                img.save(img_bytesio, format="PNG")
-                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-                skins[skin_image_url] = base64_data
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(skins, f)
-                return img
+            # Load and cache the skin image using the generic function
+            return self.load_and_cache_image(skin_image_url, skin_image_cache_file, max_height=35)
 
         def get_buddy_image():
             if skin_buddy_url is None:
-                return
-            # check if skin buddy in cache
-            cache_file = r"assets\gui\cache\buddies.json"
-            if os.path.exists(cache_file):
-                with open(cache_file, "r", encoding="utf-8") as f:
-                    buddies = json.load(f)
+                return None
 
-            else:
-                buddies = {}
+            # Define the cache file for buddy images
+            buddy_image_cache_file = r"assets\gui\cache\buddies.json"
 
-            if skin_buddy_url in buddies:
-                # load image from cache
-                base64_data = buddies[skin_buddy_url]
-                img_data = base64.b64decode(base64_data)
-                img = Image.open(BytesIO(img_data))
-                return img
-
-            # fetch image from the web
-            with requests.Session() as s:
-                response = s.get(skin_buddy_url)
-                img = Image.open(BytesIO(response.content))
-                img = img.resize(resize_image_with_max_height(img, 35))
-                # Store the fetched image in the cache
-                img_bytesio = BytesIO()
-                img.save(img_bytesio, format="PNG")
-                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
-                buddies[skin_buddy_url] = base64_data
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    json.dump(buddies, f)
-                return img
+            # Load and cache the buddy image using the generic function
+            return self.load_and_cache_image(skin_buddy_url, buddy_image_cache_file, max_height=35)
 
         def merge_images(skin_image, buddy_image):
             if buddy_image is None:
@@ -723,7 +597,6 @@ class GUI:
             # Paste the resized buddy image in the bottom left corner of the skin image
             skin_image.paste(buddy_image, (0, skin_image.size[1] - buddy_image.size[1]), buddy_image)
             return skin_image
-
 
         skin_image = get_skin_image()
         buddy_image = get_buddy_image()
