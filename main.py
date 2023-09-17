@@ -120,6 +120,7 @@ try:
     Server.start_server()
 
     agent_dict = content.get_all_agents()
+    level_data = content.get_level_data()
 
     map_info = content.get_all_maps()
     map_urls = content.get_map_urls(map_info)
@@ -135,7 +136,7 @@ try:
 
     stats = Stats()
 
-    gui = GUI(cfg)
+    gui = GUI(cfg, level_data)
     threadmain = gui.threadmain
     threading.Thread(target=threadmain).start()
 

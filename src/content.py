@@ -86,3 +86,11 @@ class Content:
                 final["episode"] = int(season["Name"][-1])
                 break
         return final
+
+    def get_level_data(self):
+        with requests.Session() as s:
+            r = s.get("https://valorant-api.com/v1/levelborders")
+            data = r.json()
+
+        level_data = [(entry["startingLevel"], entry["levelNumberAppearance"]) for entry in data["data"]]
+        return level_data

@@ -85,7 +85,7 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return number, f
+                return number, tuple(f)
 
     def get_wr_gradient(self, number):
         try:
@@ -117,7 +117,7 @@ class Colors:
                         f.append(int(gradients[gradient][0][rgb] - offset * number / gradient[1]))
                     else:
                         f.append(int(offset * number / gradient[1] + gradients[gradient][0][rgb]))
-                return number, f
+                return number, tuple(f)
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')

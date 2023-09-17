@@ -19,6 +19,7 @@ from src.constants import *
 
 colors = Colors(hide_names, {}, AGENTCOLORLIST)
 name_column = None
+level_column = None
 t = None
 
 request_queue = queue.Queue()
@@ -44,10 +45,12 @@ class LabelGrid(tk.Frame):
 
     def _create_labels(self):
         def __put_content_in_label(row, column):
-            global name_column
+            global name_column, level_column
             content = self.content[row][column]
             if content == "Name":
                 name_column = column
+            if content == "Level":
+                level_column = column
             if row == 0:
                 label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=3, padx=5, anchor="center")
             else:
@@ -57,11 +60,18 @@ class LabelGrid(tk.Frame):
 
             if type(content).__name__ == "tuple":  # ability to color, using a tuple
                 content, clr = content
-                label['foreground'] = colors.rgb_to_hex(clr)
+                print(content, type(content).__name__, clr, type(clr).__name__)
+                if type(clr).__name__ == "tuple":
+                    label['foreground'] = colors.rgb_to_hex(clr)
+                if type(clr).__name__ == "PhotoImage":
+                    label['compound'] = "center"
+                    label['image'] = clr
+
             if name_column:
                 if name_column == column and row != 0:  # ability to click on the name to open tracker.gg
                     label['text'] = content
                     label.bind("<Button-1>", self.on_label_click)
+
             content_type = type(content).__name__
             if content_type in ('str', 'int', 'float'):
                 label['text'] = content
@@ -96,7 +106,8 @@ class LabelGrid(tk.Frame):
         webbrowser.open_new_tab(f"https://tracker.gg/valorant/profile/riot/{urllib.parse.quote(label_text)}/overview")
 
 class GUI:
-    def __init__(self, config):
+    def __init__(self, config, leve_data):
+        self.level_data = leve_data
         self.config = config
         self.cfg = {}
 
@@ -504,6 +515,52 @@ class GUI:
 
             return ImageTk.PhotoImage(img)
 
+    def compare_player_level(self, player_level):
+        max_level_appearance = None
+
+        for level, appearance in self.level_data:
+            if player_level >= level:
+                max_level_appearance = appearance
+            else:
+                break
+
+        return max_level_appearance
+
+    def load_player_level_image(self, player_level):
+        if player_level == "":
+            return ""
+        cache_file = r"assets\gui\cache\levels.json"
+
+        # check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                levels = json.load(f)
+
+        else:
+            levels = {}
+
+        if player_level in levels:
+            # load image from cache
+            base64_data = levels[player_level]
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
+            return ImageTk.PhotoImage(img)
+
+        # fetch image from the web
+        with requests.Session() as s:
+            response = s.get(self.compare_player_level(player_level))
+            img = Image.open(BytesIO(response.content))
+            img = img.resize((76, 32))
+            # Store the fetched image in the cache
+            img_bytesio = BytesIO()
+            img.save(img_bytesio, format="PNG")
+            base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+            levels[player_level] = base64_data
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(levels, f)
+
+            return player_level, ImageTk.PhotoImage(img)
+
     def load_map(self, map_uuid):
         if map_uuid == "":
             return ""
@@ -677,10 +734,10 @@ class GUI:
             peak_rank = self.load_rank_image(player_info.get('peak_rank', 0))
             peak_rank_ep = player_info.get('peak_rank_ep', ('', (0, 0, 0)))
             leaderboard = player_info.get('leaderboard', 0)
-            hs = player_info.get('hs', (0, [0, 0, 0]))
-            wr = player_info.get('wr', (0, [0, 0, 0]))
+            hs = player_info.get('hs', (0, (0, 0, 0)))
+            wr = player_info.get('wr', (0, (0, 0, 0)))
             kd = player_info.get('kd', 0.0)
-            level = player_info.get('level', ('', (0, 0, 0)))
+            level = self.load_player_level_image(player_info.get('level', ('', (0, 0, 0)))[0])
 
             # Append player data to the table_data
             table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, leaderboard, hs, wr, kd, level])
