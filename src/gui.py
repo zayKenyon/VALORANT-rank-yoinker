@@ -206,18 +206,9 @@ class GUI:
         self.ally_team_average_label = ttk.Label(self.ally_team_average_frame, text="Ally Team Average", font=("Segoe UI", 12))
         self.enemy_team_average_label = ttk.Label(self.enemy_team_average_frame, text="Enemy Team Average", font=("Segoe UI", 12))
 
-        ally_team_average_image = self.load_image(r"assets\Logo.png", 35, 35)
-        enemy_team_average_image = self.load_image(r"assets\Logo.png", 35, 35)
-
         self.ally_team_average_image = ttk.Label(self.ally_team_average_frame)
-        self.ally_team_average_image.image = ally_team_average_image
-        self.ally_team_average_image.configure(image=ally_team_average_image)
-
         self.enemy_team_average_image = ttk.Label(self.enemy_team_average_frame)
-        self.enemy_team_average_image.image = enemy_team_average_image
-        self.enemy_team_average_image.configure(image=enemy_team_average_image)
 
-        # TODO add real data, get gui working while program is running
         self.player_table = LabelGrid(self.live_game_frame, takefocus=False)
 
         force_refresh_image = self.load_image(r"assets\gui\Refresh.png", 20, 20)
@@ -253,11 +244,9 @@ class GUI:
         self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
 
     def create_skin_frame(self):
-        # TODO add real data, get gui working while program is running
         header = ["Agent", "Name"]
         for weapon in self.config.weapons:
             header.append(weapon)
-        # TODO add real data, get gui working while program is running
         self.player_skin_table = LabelGrid(self.skins_frame, takefocus=False)
 
         self.player_skin_table.grid(row=0, column=0, columnspan=9)
@@ -687,10 +676,30 @@ class GUI:
             self.game_map_image_label.image = ""
             self.game_map_image_label.configure(image="")
             self.game_map_image_label.configure(text="")
+            self.game_mode_label["text"] = ""
+
+            table_data = [['Agent', 'Name'] + self.config.weapons]
+            self.player_skin_table.update_content([table_data])
+            self.enemy_team_average_frame.grid_forget()
+
+        if mode == "In-Game":
+            self.enemy_team_average_frame.grid(row=0, column=8, sticky="e")
 
     def update_player_table(self, data):
         players_data = data.get('players', {})
         table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'Leaderboard', 'HS', 'WR', 'KD', 'Level']]
+
+        ally_average_rank = data.get('ally_avg_rank', [])
+        ally_average_rank = int(sum(ally_average_rank) / len(ally_average_rank) if ally_average_rank else 0)
+        ally_average_rank_image = self.load_rank_image(ally_average_rank)
+        self.ally_team_average_image.image = ally_average_rank_image
+        self.ally_team_average_image.configure(image=ally_average_rank_image)
+
+        enemy_average_rank = data.get('enemy_avg_rank', [])
+        enemy_average_rank = int(sum(enemy_average_rank) / len(enemy_average_rank) if enemy_average_rank else 0)
+        enemy_team_average_image = self.load_rank_image(enemy_average_rank)
+        self.enemy_team_average_image.image = enemy_team_average_image
+        self.enemy_team_average_image.configure(image=enemy_team_average_image)
 
         for player_id, player_info in players_data.items():
             if int(player_id) != float(player_id):

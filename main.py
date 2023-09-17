@@ -207,7 +207,7 @@ try:
             is_leaderboard_needed = False
 
             if game_state == "INGAME":
-                gui_data = {"leaderboard": False, "players": {}}
+                gui_data = {"leaderboard": False, "players": {}, "ally_avg_rank": [], "enemy_avg_rank": []}
                 coregame_stats = coregame.get_coregame_stats()
                 if coregame_stats == None:
                     continue
@@ -300,11 +300,13 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    gui_data["players"][idx].update({"party_icon": party_icon})
                                     party_icon = color(party_icon[0], fore=party_icon[1])
                                     partyCount += 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
+                                    gui_data["players"][idx].update({"party_icon": party_icon})
                                     party_icon = color(party_icon[0], fore=party_icon[1])
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
@@ -366,12 +368,13 @@ try:
                         name = Namecolor
 
                         # SKINS
-                        skins = loadouts[player["Subject"]]
-                        gui_data["players"][idx].update({"skins": skins.copy()})
-                        for weapon, weapon_info in skins.items():
+                        skins_dict = loadouts[player["Subject"]]
+                        gui_data["players"][idx].update({"skins": skins_dict.copy()})
+                        for weapon, weapon_info in skins_dict.items():
                             skin_color = weapon_info["color"] if weapon_info["color"] else (255, 255, 255)
                             skin_name = weapon_info["name"]
-                            skins.update({weapon: color(skin_name, fore=skin_color)})
+                            skins_dict.update({weapon: color(skin_name, fore=skin_color)})
+                            skins = list(skins_dict.copy().values())
 
                         # RANK
                         gui_data["players"][idx].update({"rank": playerRank["rank"]})
@@ -392,6 +395,12 @@ try:
 
                         # PEAK RANK
                         gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
+
+                        if player["TeamID"] == allyTeam:
+                            gui_data["ally_avg_rank"].append(playerRank["peakrank"])
+                        else:
+                            gui_data["enemy_avg_rank"].append(playerRank["peakrank"])
+
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]]
                         peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
@@ -445,12 +454,11 @@ try:
                                 }
                             }
                         )
-                    gui_data = dict(sorted(gui_data.items()))
+                    # gui_data = dict(sorted(gui_data.items()))
                     submit_to_tkinter(gui.update_player_table, gui_data)
-                    submit_to_tkinter(gui.update_map, current_map["id"])
                     submit_to_tkinter(gui.update_player_skin_table, gui_data)
             elif game_state == "PREGAME":
-                gui_data = {"leaderboard": False, "players": {}}
+                gui_data = {"leaderboard": False, "players": {}, "ally_avg_rank": [], "enemy_avg_rank": []}
                 already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
                 if pregame_stats == None:
@@ -486,10 +494,12 @@ try:
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
                                     gui_data["players"][idx].update({"party_icon": party_icon})
+                                    party_icon = color(party_icon[0], fore=party_icon[1])
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                                     gui_data["players"][idx].update({"party_icon": party_icon})
+                                    party_icon = color(party_icon[0], fore=party_icon[1])
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
@@ -565,6 +575,8 @@ try:
                             peakRankAct = ""
                         # PEAK RANK
                         gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
+                        gui_data["ally_avg_rank"].append(playerRank["peakrank"])
+
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]]
                         peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
@@ -607,10 +619,8 @@ try:
                                              level,
                                              ])
                     submit_to_tkinter(gui.update_player_table, gui_data)
-
             if game_state == "MENUS":
-                gui_data = {"leaderboard": False,
-                            "players": {}}
+                gui_data = {"leaderboard": False, "players": {}, "ally_avg_rank": [], "enemy_avg_rank": []}
                 already_played_with = []
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
@@ -672,6 +682,7 @@ try:
 
                             # PEAK RANK
                             gui_data["players"][idx].update({"peak_rank": playerRank["peakrank"]})
+                            gui_data["ally_avg_rank"].append(playerRank["peakrank"])
                             peakRank = NUMBERTORANKS[playerRank["peakrank"]]
                             peakRank = color(peakRank[0], fore=peakRank[1]) + peakRankAct
 
