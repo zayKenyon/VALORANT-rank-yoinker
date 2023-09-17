@@ -36,7 +36,7 @@ class Loadouts:
                     break
 
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
-        # self.Server.send_message(json.dumps(final_json))
+        self.Server.send_message(json.dumps(final_json))
 
         for player_id in final_json["Players"]:
             player_weapons = final_json["Players"][player_id]["Weapons"]

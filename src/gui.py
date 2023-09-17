@@ -35,8 +35,10 @@ class LabelGrid(tk.Frame):
     Creates a grid of labels that have their cells populated by content.
     """
 
-    def __init__(self, master, content=(["", ""], ["", ""]), *args, **kwargs):
+    def __init__(self, master, content=(["", ""], ["", ""]), pad_y=3, pad_x=5, *args, **kwargs):
         tk.Frame.__init__(self, master, *args, **kwargs)
+        self.pad_y = pad_y
+        self.pad_x = pad_x
         self.content = content
         self.content_size = (len(content), len(content[0]))
         self.labels = []
@@ -52,9 +54,9 @@ class LabelGrid(tk.Frame):
             if content == "Level":
                 level_column = column
             if row == 0:
-                label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=3, padx=5, anchor="center")
+                label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=self.pad_y, padx=self.pad_x, anchor="center")
             else:
-                label = tk.Label(self, font=("Segoe UI", 12), pady=3, padx=5, anchor="center")
+                label = tk.Label(self, font=("Segoe UI", 12), pady=self.pad_y, padx=self.pad_x, anchor="center")
             label.row = row  # store the row information as an attribute to have clickable names
             label.column = column  # store the column information as an attribute to have clickable names
 
@@ -151,7 +153,7 @@ class GUI:
         self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
 
         self.skins_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
-        self.player_skin_table = LabelGrid(self.skins_frame)
+        self.player_skin_table = LabelGrid(self.skins_frame, pad_y=10, pad_x=5)
         self.create_skin_frame()
 
         self.settings_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
@@ -247,7 +249,7 @@ class GUI:
         header = ["Agent", "Name"]
         for weapon in self.config.weapons:
             header.append(weapon)
-        self.player_skin_table = LabelGrid(self.skins_frame, takefocus=False)
+        self.player_skin_table = LabelGrid(self.skins_frame, takefocus=False, pad_y=10, pad_x=5)
 
         self.player_skin_table.grid(row=0, column=0, columnspan=9)
 
@@ -452,7 +454,7 @@ class GUI:
                     # Resize the image while maintaining aspect ratio
                     width, height = img.size
                     new_width = int((max_height / height) * width)
-                    img = img.resize((new_width, max_height), Image.ANTIALIAS)
+                    img = img.resize((new_width, max_height))
                 if crop_coords:
                     # Crop the image
                     img = img.crop(crop_coords)
