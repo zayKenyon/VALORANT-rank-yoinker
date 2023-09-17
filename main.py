@@ -233,7 +233,7 @@ try:
                     server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapons, valoApiSkins, names, state="game")
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapons, valoApiSkins, names)
                 isRange = False
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
@@ -341,7 +341,6 @@ try:
                             if lastTeamBoolean:
                                 # TODO add gui separator
                                 table.add_empty_row()
-                                gui_data["players"][idx - 0.5] = {}
                         lastTeam = player['TeamID']
                         lastTeamBoolean = True
                         if player["PlayerIdentity"]["HideAccountLevel"]:
@@ -366,14 +365,13 @@ try:
                         # NAME
                         name = Namecolor
 
-                        # skin
+                        # SKINS
                         skins = loadouts[player["Subject"]]
-                        for item, (name, clr) in skins.items():
-                            if clr is None:
-                                skins[item] = (name, (255, 255, 255))
-
-                        gui_data["players"][idx].update({"skins": skins})
-                        skins = [color(name, fore=clr) for name, clr in skins.values()]
+                        gui_data["players"][idx].update({"skins": skins.copy()})
+                        for weapon, weapon_info in skins.items():
+                            skin_color = weapon_info["color"] if weapon_info["color"] else (255, 255, 255)
+                            skin_name = weapon_info["name"]
+                            skins.update({weapon: color(skin_name, fore=skin_color)})
 
                         # RANK
                         gui_data["players"][idx].update({"rank": playerRank["rank"]})

@@ -60,7 +60,6 @@ class LabelGrid(tk.Frame):
 
             if type(content).__name__ == "tuple":  # ability to color, using a tuple
                 content, clr = content
-                print(content, type(content).__name__, clr, type(clr).__name__)
                 if type(clr).__name__ == "tuple":
                     label['foreground'] = colors.rgb_to_hex(clr)
                 if type(clr).__name__ == "PhotoImage":
@@ -166,10 +165,8 @@ class GUI:
     def process_queue_batch(self):
         while not request_queue.empty():
             callable, args, kwargs = request_queue.get()
-            print("Processing something in queue")
             retval = callable(*args, **kwargs)
             result_queue.put(retval)
-            print("Finished processing something in queue")
 
         # Schedule the next batch processing after 2 seconds
         self.update_game_time()
@@ -631,6 +628,108 @@ class GUI:
 
         return load_map_name(), load_map_image()
 
+    def load_skin_image(self, skin_data):
+        print(skin_data)
+        skin_image_url = skin_data.get("image", "")
+        skin_buddy_url = skin_data.get("buddy", "")
+
+        def resize_image_with_max_height(image, max_height):
+            if image is None:
+                return
+            width, height = image.size
+            print(width, height)
+            if height > max_height:
+                # Calculate the new width while maintaining the aspect ratio
+                new_width = int((max_height / height) * width)
+                # Resize the image
+
+                print(new_width, max_height)
+                return new_width, max_height
+
+        def get_skin_image():
+            # check if skin image in cache
+            cache_file = r"assets\gui\cache\skins.json"
+            if os.path.exists(cache_file):
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    skins = json.load(f)
+
+            else:
+                skins = {}
+
+            if skin_image_url in skins:
+                # load image from cache
+                base64_data = skins[skin_image_url]
+                img_data = base64.b64decode(base64_data)
+                img = Image.open(BytesIO(img_data))
+                return img
+
+            # fetch image from the web
+            with requests.Session() as s:
+                response = s.get(skin_image_url)
+                img = Image.open(BytesIO(response.content))
+                img = img.resize(resize_image_with_max_height(img, 35))
+                # Store the fetched image in the cache
+                img_bytesio = BytesIO()
+                img.save(img_bytesio, format="PNG")
+                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+                skins[skin_image_url] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(skins, f)
+                return img
+
+        def get_buddy_image():
+            if skin_buddy_url is None:
+                return
+            # check if skin buddy in cache
+            cache_file = r"assets\gui\cache\buddies.json"
+            if os.path.exists(cache_file):
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    buddies = json.load(f)
+
+            else:
+                buddies = {}
+
+            if skin_buddy_url in buddies:
+                # load image from cache
+                base64_data = buddies[skin_buddy_url]
+                img_data = base64.b64decode(base64_data)
+                img = Image.open(BytesIO(img_data))
+                return img
+
+            # fetch image from the web
+            with requests.Session() as s:
+                response = s.get(skin_buddy_url)
+                img = Image.open(BytesIO(response.content))
+                img = img.resize(resize_image_with_max_height(img, 35))
+                # Store the fetched image in the cache
+                img_bytesio = BytesIO()
+                img.save(img_bytesio, format="PNG")
+                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+                buddies[skin_buddy_url] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(buddies, f)
+                return img
+
+        def merge_images(skin_image, buddy_image):
+            if buddy_image is None:
+                return skin_image
+
+            # Resize the buddy image while maintaining aspect ratio to fit within the maximum height (35)
+            max_height = 35
+            width, height = buddy_image.size
+            new_width = int((max_height / height) * width)
+            buddy_image = buddy_image.resize((new_width, max_height), Image.ANTIALIAS)
+
+            # Paste the resized buddy image in the bottom left corner of the skin image
+            skin_image.paste(buddy_image, (0, skin_image.size[1] - buddy_image.size[1]), buddy_image)
+            return skin_image
+
+
+        skin_image = get_skin_image()
+        buddy_image = get_buddy_image()
+        merged_images = merge_images(skin_image, buddy_image)
+        return ImageTk.PhotoImage(merged_images)
+
     def clear_frame(self):
         """ hide all frames, apart from the tabs """
         for widget in t.winfo_children():
@@ -742,8 +841,6 @@ class GUI:
             # Append player data to the table_data
             table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, leaderboard, hs, wr, kd, level])
 
-        print(table_data)
-
         self.player_table.update_content(table_data)
 
     def update_player_skin_table(self, data):
@@ -751,18 +848,12 @@ class GUI:
         table_data = [['Agent', 'Name'] + self.config.weapons]
 
         for player_id, player_info in players_skin_data.items():
-            if int(player_id) != float(player_id):
-                table_data.append(self.emtpy_row())
-                continue
-
             agent = self.load_agent_image(player_info.get('agent', ''))
             name = player_info.get('name', '')
             skins = player_info.get('skins', {})
 
-            print(skins)
-
             # Append player data to the table_data
-            table_data.append([agent, name] + [skins.get(weapon, '') for weapon in self.config.weapons])
+            table_data.append([agent, name] + [self.load_skin_image(skins.get(weapon, {})) for weapon in self.config.weapons])
 
         self.player_skin_table.update_content(table_data)
 

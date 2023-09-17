@@ -33,7 +33,7 @@ class Ws:
         self.player_data = player_data
 
     async def recconect_to_websocket(self, initial_game_state):
-        #wont actually recconect :)
+        # wont actually recconect :)
         local_headers = {}
         local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
         url = f"wss://127.0.0.1:{self.lockfile['port']}"

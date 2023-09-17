@@ -14,54 +14,46 @@ class Loadouts:
         self.current_map = current_map
 
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
-        output = {}
-
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
-        if state == "game":
-            team_id = "Blue"
-            PlayerInventorys = self.Requests.fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
-        elif state == "pregame":
-            pregame_stats = players
-            players = players["AllyTeam"]["Players"]
-            team_id = pregame_stats['Teams'][0]['TeamID']
-            PlayerInventorys = self.Requests.fetch("glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
-        for player in range(len(players)):
-            output.update({players[player]["Subject"]: {}})
-            if team_id == "Red":
-                invindex = player + len(players) - len(PlayerInventorys["Loadouts"])
-            else:
-                invindex = player
-            inv = PlayerInventorys["Loadouts"][invindex]
-            if state == "game":
-                inv = inv["Loadout"]
+        PlayerInventorys = self.Requests.fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
+        for idx, player in enumerate(players):
+            inv = PlayerInventorys["Loadouts"][idx]["Loadout"]
+            weaponLists[player["Subject"]] = {}
 
-            weaponLists[players[player]["Subject"]] = {}
+            # console skin color
             for weapon in valApiWeapons["data"]:
-                output[players[player]["Subject"]] = {}
-                output[players[player]["Subject"]].update({"Player": players[player]})
-                output[players[player]["Subject"]].update({"Name": names[players[player]["Subject"]]})
-                output[players[player]["Subject"]].update({"Weapons": weapon})
-
                 if weapon["displayName"].lower() not in [weapon.lower() for weapon in weaponChoose]:
                     continue
-                skin_id = \
-                inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
-
+                weaponLists[player["Subject"]][weapon["displayName"]] = {}
+                skin_id = inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
                 for skin in valoApiSkins.json()["data"]:
                     if skin_id.lower() != skin["uuid"].lower():
                         continue
-                    rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
-                    skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
-
-                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (skin_name, rgb_color)
+                    skin_rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
+                    weaponLists[player["Subject"]][weapon["displayName"]]["color"] = skin_rgb_color
+                    break
 
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
-        self.Server.send_message(json.dumps(final_json))
+        # self.Server.send_message(json.dumps(final_json))
 
-        with open('data.json', 'w') as f:
-            json.dump(final_json, f)
+        for player_id in final_json["Players"]:
+            player_weapons = final_json["Players"][player_id]["Weapons"]
+            for weapon_id in player_weapons:
+                weapon = player_weapons[weapon_id]["weapon"]
+                if weapon not in weaponChoose:
+                    continue
+
+                skin_name = " ".join(player_weapons[weapon_id]["skinDisplayName"].split(" ")[0:-1])
+                skin_image = player_weapons[weapon_id]["skinDisplayIcon"]
+                skin_buddy = player_weapons[weapon_id]["buddy_displayIcon"] if "buddy_displayIcon" in player_weapons[weapon_id] else None
+
+                weaponLists[player_id][weapon]["name"] = skin_name
+                weaponLists[player_id][weapon]["image"] = skin_image
+                weaponLists[player_id][weapon]["buddy"] = skin_buddy
+
+        print(weaponLists)
         return weaponLists
 
     # this will convert valorant loadouts to json with player names
