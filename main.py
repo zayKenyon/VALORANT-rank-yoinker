@@ -422,7 +422,6 @@ try:
                         table.add_row_table([party_icon,
                                              agent,
                                              name,
-                                             # views,
                                              *skins,
                                              rankName,
                                              rr,
@@ -501,14 +500,6 @@ try:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc_player_rank = NUMBERTORANKS[playerRank["rank"]]
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(color(rpc_player_rank[0], rpc_player_rank[1])) + " | " + str(playerRank["rr"]) + "rr"})
-                        # rankStatus = playerRank[1]
-                        #useless code since rate limit is handled in the requestsV
-                        # while not rankStatus:
-                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                        #     time.sleep(10)
-                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                        #     rankStatus = playerRank[1]
-                        # playerRank = playerRank[0]
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
@@ -557,13 +548,6 @@ try:
 
                         # NAME
                         name = NameColor
-
-                        # VIEWS
-                        # views = get_views(names[player["Subject"]])
-
-                        #temporary until other regions gets fixed?
-                        # skin
-                        # skin = loadouts[player["Subject"]]
 
                         # RANK
                         gui_data["players"][idx].update({"rank": playerRank["rank"]})
