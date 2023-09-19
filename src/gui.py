@@ -433,6 +433,10 @@ class GUI:
         return ImageTk.PhotoImage(img)
 
     def load_and_cache_image(self, image_url, cache_file, max_height=None, crop_coords=None, brightness_factor=None):
+        # Check if the cache folder exists
+        if not os.path.exists(r"assets\gui\cache"):
+            os.makedirs(r"assets\gui\cache")
+
         # Check if the cache file exists
         if os.path.exists(cache_file):
             with open(cache_file, "r", encoding="utf-8") as f:
