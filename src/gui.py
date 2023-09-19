@@ -587,7 +587,7 @@ class GUI:
             max_height = 35
             width, height = buddy_image.size
             new_width = int((max_height / height) * width)
-            buddy_image = buddy_image.resize((new_width, max_height), Image.ANTIALIAS)
+            buddy_image = buddy_image.resize((new_width, max_height))
 
             # Paste the resized buddy image in the bottom left corner of the skin image
             skin_image.paste(buddy_image, (0, skin_image.size[1] - buddy_image.size[1]), buddy_image)
