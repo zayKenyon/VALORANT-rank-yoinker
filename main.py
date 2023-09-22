@@ -77,12 +77,12 @@ try:
                 message="Do you want to run vRY now?", default=True
             ).execute()
             if run_app:
-                os.system('mode 150,35')
+                os.system('mode 175,35')
                 os.system('cls')
             else:
                 os._exit(0)
         else:
-            os.system('mode 150,35')
+            os.system('mode 175,35')
             os.system('cls')
     except Exception as e:
         print("Something went wrong while running configurator!")
@@ -248,7 +248,7 @@ try:
                     server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
+                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapons, valoApiSkins, names, cfg, state="game")
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
@@ -378,7 +378,7 @@ try:
                         # views = get_views(names[player["Subject"]])
 
                         # skin
-                        skin = loadouts[player["Subject"]]
+                        skins = loadouts[player["Subject"]]
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
@@ -415,7 +415,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              skin,
+                                              *[skins[weapon] for weapon in cfg.weapons],
                                               rankName,
                                               rr,
                                               peakRank,
@@ -574,7 +574,7 @@ try:
                                               agent,
                                               name,
                                               # views,
-                                              "",
+                                              *["" for _ in cfg.weapons],
                                               rankName,
                                               rr,
                                               peakRank,
@@ -664,7 +664,7 @@ try:
                             table.add_row_table([party_icon,
                                                 agent,
                                                 name,
-                                                "",
+                                                *["" for weapon in cfg.weapons],
                                                 rankName,
                                                 rr,
                                                 peakRank,
@@ -690,8 +690,10 @@ try:
 
                 if game_state == "MENUS":
                     table.set_runtime_col_flag('Party', False)
-                    table.set_runtime_col_flag('Agent',False)
-                    table.set_runtime_col_flag('Skin',False)
+                    table.set_runtime_col_flag('Agent', False)
+                    for weapon in cfg.weapons:
+                        table.set_runtime_col_flag(weapon, False)
+
 
                 if game_state == "INGAME":
                     if isRange:

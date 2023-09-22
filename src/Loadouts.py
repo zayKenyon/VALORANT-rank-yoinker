@@ -14,7 +14,7 @@ class Loadouts:
         self.Server = Server
         self.current_map = current_map
 
-    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
+    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, cfg, state="game"):
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
@@ -34,18 +34,25 @@ class Loadouts:
             inv = PlayerInventorys["Loadouts"][invindex]
             if state == "game":
                 inv = inv["Loadout"]
+
+            weaponLists[players[player]["Subject"]] = {}
             for weapon in valApiWeapons["data"]:
-                if weapon["displayName"].lower() == weaponChoose.lower():
-                    skin_id = \
-                        inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
-                            "ID"]
-                    for skin in valoApiSkins.json()["data"]:
-                        if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
-                            # if rgb_color is not None:
-                            weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
-                            # else:
-                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+                if weapon["displayName"].lower() not in [weapon.lower() for weapon in weaponChoose]:
+                    continue
+                skin_id = \
+                inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"]["ID"]
+
+                for skin in valoApiSkins.json()["data"]:
+                    if skin_id.lower() != skin["uuid"].lower():
+                        continue
+                    rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
+                    # if rgb_color is not None:
+                    skin_name = " ".join(skin["displayName"].split(" ")[0:-1])
+
+                    weaponLists[players[player]["Subject"]][weapon["displayName"]] = (color(skin_name, fore=rgb_color))
+                    # else:
+                    #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
         self.Server.send_message(json.dumps(final_json))
         return weaponLists
