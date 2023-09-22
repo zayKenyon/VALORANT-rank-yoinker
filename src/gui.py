@@ -1,0 +1,757 @@
+from PIL import Image, ImageTk, ImageEnhance
+from datetime import datetime, timedelta
+from io import BytesIO
+
+import ttkbootstrap as ttk
+import tkinter as tk
+
+import urllib.parse
+import webbrowser
+import threading
+import requests
+import base64
+import queue
+import json
+import os
+
+from src.colors import Colors
+from src.constants import *
+
+colors = Colors(hide_names, {}, AGENTCOLORLIST)
+name_column = None
+level_column = None
+t = None
+
+request_queue = queue.Queue()
+result_queue = queue.Queue()
+
+
+def submit_to_tkinter(callable, *args, **kwargs):
+    request_queue.put((callable, args, kwargs))
+
+
+class LabelGrid(tk.Frame):
+    """
+    Creates a grid of labels that have their cells populated by content.
+    """
+
+    def __init__(self, master, content=(["", ""], ["", ""]), pad_y=3, pad_x=5, *args, **kwargs):
+        tk.Frame.__init__(self, master, *args, **kwargs)
+        self.pad_y = pad_y
+        self.pad_x = pad_x
+        self.content = content
+        self.content_size = (len(content), len(content[0]))
+        self.labels = []
+        self._create_labels()
+        self._display_labels()
+
+    def _create_labels(self):
+        def __put_content_in_label(row, column):
+            global name_column, level_column
+            content = self.content[row][column]
+            if content == "Name":
+                name_column = column
+            if content == "Level":
+                level_column = column
+            if row == 0:
+                label = tk.Label(self, font=("Segoe UI", 12, "bold", "underline"), pady=self.pad_y, padx=self.pad_x, anchor="center")
+            else:
+                label = tk.Label(self, font=("Segoe UI", 12), pady=self.pad_y, padx=self.pad_x, anchor="center")
+            label.row = row  # store the row information as an attribute to have clickable names
+            label.column = column  # store the column information as an attribute to have clickable names
+
+            if type(content).__name__ == "tuple":  # ability to color, using a tuple
+                content, clr = content
+                if type(clr).__name__ == "tuple":
+                    label['foreground'] = colors.rgb_to_hex(clr)
+                if type(clr).__name__ == "PhotoImage":
+                    label['compound'] = "center"
+                    label['image'] = clr
+
+            if name_column:
+                if name_column == column and row != 0:  # ability to click on the name to open tracker.gg
+                    label['text'] = content
+                    label.bind("<Button-1>", self.on_label_click)
+
+            content_type = type(content).__name__
+            if content_type in ('str', 'int', 'float'):
+                label['text'] = content
+            elif content_type == 'PhotoImage':
+                label['image'] = content
+
+            self.labels[row].append(label)
+
+        for i in range(self.content_size[0]):
+            self.labels.append([])
+            for j in range(self.content_size[1]):
+                __put_content_in_label(i, j)
+
+    def _display_labels(self):
+        for i in range(self.content_size[0]):
+            for j in range(self.content_size[1]):
+                self.labels[i][j].grid(row=i, column=j)
+
+    def update_content(self, content):
+        for i in range(self.content_size[0]):
+            for j in range(self.content_size[1]):
+                self.labels[i][j].destroy()
+
+        self.content = content
+        self.content_size = (len(content), len(content[0]))
+        self.labels = []
+        self._create_labels()
+        self._display_labels()
+
+    def on_label_click(self, event):
+        label_text = self.labels[event.widget.row][event.widget.column]['text']
+        webbrowser.open_new_tab(f"https://tracker.gg/valorant/profile/riot/{urllib.parse.quote(label_text)}/overview")
+
+class GUI:
+    def __init__(self, config, leve_data):
+        self.level_data = leve_data
+        self.config = config
+        self.cfg = {}
+
+    def init_gui(self):
+        global t
+
+        t.title(f"VALORANT rank yoinker v{version}")
+
+        self.screen_width = t.winfo_screenwidth()
+        self.screen_height = t.winfo_screenheight()
+
+        self.start_time = datetime.now()
+
+        t.geometry(f"{int(self.screen_width // 1.75)}x{int(self.screen_height // 1.7)}")
+
+        t.iconbitmap("assets/Logo.ico")
+        self.style = ttk.Style(theme="darkly")
+
+        self.tab_frame = ttk.Frame(t, padding=5)
+        self.create_tabs()
+        self.tab_frame.grid(row=0, column=0, sticky="w")
+
+        self.live_game_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
+        self.game_info_frame = ttk.Frame(self.live_game_frame)
+        self.map_info_frame = ttk.Frame(self.live_game_frame)
+
+        self.game_time_var = tk.StringVar()
+        self.game_time_label = ttk.Label(self.game_info_frame, text="0:00", font=("Segoe UI", 12))
+
+        self.game_map_image_label = ttk.Label(self.map_info_frame, text="", font=("Segoe UI", 12), compound="center")
+
+        self.game_server_label = ttk.Label(self.map_info_frame, text="", font=("Segoe UI", 12))
+        self.game_server_label.configure(foreground=colors.rgb_to_hex((200, 200, 200)))
+
+        # TODO add game_mode
+        self.game_mode_label = ttk.Label(self.game_info_frame, text="", font=("Segoe UI", 12))
+
+        self.game_state_label = ttk.Label(self.game_info_frame, text="Loading...", font=("Segoe UI", 12))
+
+        self.player_table = LabelGrid(self.live_game_frame)
+        self.create_live_game_frame()
+        self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
+
+        self.skins_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
+        self.player_skin_table = LabelGrid(self.skins_frame, pad_y=10, pad_x=5)
+        self.create_skin_frame()
+
+        self.settings_frame = ttk.Frame(t, padding=5, relief="solid", borderwidth=1)
+        self.table_column_vars = {}
+        self.optional_feature_vars = {}
+        self.weapon_amount_frame = ttk.LabelFrame()
+        self.weapon_amount_entry = ttk.Entry()
+        self.weapon_comboboxes = []
+        self.create_settings_frame()
+
+    def process_queue_batch(self):
+        while not request_queue.empty():
+            callable, args, kwargs = request_queue.get()
+            retval = callable(*args, **kwargs)
+            result_queue.put(retval)
+
+        # Schedule the next batch processing after 2 seconds
+        self.update_game_time()
+        threading.Timer(1.0, self.process_queue_batch).start()
+
+    def threadmain(self):
+        global t
+        t = tk.Tk()
+        self.init_gui()
+
+        self.process_queue_batch()  # Start processing the queue in batches
+        t.mainloop()
+
+    def create_tabs(self):
+        self.live_game_tab = ttk.Button(self.tab_frame,
+                                        text="Agents",
+                                        command=self.show_live_game_frame,
+                                        takefocus=False)
+        self.skins_tab = ttk.Button(self.tab_frame,
+                                    text="Skins",
+                                    command=self.show_skins_frame,
+                                    takefocus=False)
+        self.settings_tab = ttk.Button(self.tab_frame,
+                                       text="Settings",
+                                       command=self.show_settings_frame,
+                                       takefocus=False)
+
+        self.live_game_tab.grid(row=0, column=0)
+        self.skins_tab.grid(row=0, column=1)
+        self.settings_tab.grid(row=0, column=2)
+
+    def create_live_game_frame(self):
+        # TODO calculate average rank and fetch according rank image
+        self.ally_team_average_frame = ttk.Frame(self.live_game_frame, padding=3)
+        self.enemy_team_average_frame = ttk.Frame(self.live_game_frame, padding=3)
+
+        self.ally_team_average_label = ttk.Label(self.ally_team_average_frame, text="Ally Team Average", font=("Segoe UI", 12))
+        self.enemy_team_average_label = ttk.Label(self.enemy_team_average_frame, text="Enemy Team Average", font=("Segoe UI", 12))
+
+        self.ally_team_average_image = ttk.Label(self.ally_team_average_frame)
+        self.enemy_team_average_image = ttk.Label(self.enemy_team_average_frame)
+
+        self.player_table = LabelGrid(self.live_game_frame, takefocus=False)
+
+        force_refresh_image = self.load_image(r"assets\gui\Refresh.png", 20, 20)
+        clear_cash_image = self.load_image(r"assets\gui\Trash.png", 20, 20)
+
+        self.force_refresh_button = ttk.Button(self.live_game_frame, takefocus=False, command=self.force_refresh)
+        self.force_refresh_button.image = force_refresh_image
+        self.force_refresh_button.configure(image=force_refresh_image)
+
+        self.clear_cash_button = ttk.Button(self.live_game_frame, takefocus=False, command=self.clear_cash)
+        self.clear_cash_button.image = clear_cash_image
+        self.clear_cash_button.configure(image=clear_cash_image)
+
+        self.ally_team_average_frame.grid(row=0, column=0, sticky="w")
+        self.enemy_team_average_frame.grid(row=0, column=8, sticky="e")
+        self.ally_team_average_label.grid(row=0, column=0)
+        self.ally_team_average_image.grid(row=1, column=0)
+        self.enemy_team_average_label.grid(row=0, column=0)
+        self.enemy_team_average_image.grid(row=1, column=0)
+
+        self.player_table.grid(row=2, column=0, columnspan=9)
+
+        self.game_info_frame.grid(row=0, column=1, columnspan=7, sticky="nsew")
+        self.game_time_label.pack(side="left", expand=True)
+        self.game_mode_label.pack(side="left", expand=True)
+        self.game_state_label.pack(side="left", expand=True)
+
+        self.map_info_frame.grid(row=3, column=1, columnspan=7, sticky="nsew")
+        self.game_server_label.pack(side="left", expand=True)
+        self.game_map_image_label.pack(side="left", expand=True)
+
+        self.force_refresh_button.grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        self.clear_cash_button.grid(row=3, column=8, sticky="e", padx=5, pady=5)
+
+    def create_skin_frame(self):
+        header = ["Agent", "Name"]
+        for weapon in self.config.weapons:
+            header.append(weapon)
+        self.player_skin_table = LabelGrid(self.skins_frame, takefocus=False, pad_y=10, pad_x=5)
+
+        self.player_skin_table.grid(row=0, column=0, columnspan=9)
+
+    def create_settings_frame(self):
+        table_options = {
+            "party": "Party",
+            "agent": "Agent",
+            "top_agent": "Top Agent",
+            "top_agent_map": "Top Agent for Map",
+            "top_role": "Top Role",
+            "name": "Name",
+            "skin": "Skin",
+            "rank": "Rank",
+            "rr": "Ranked Rating",
+            "leaderboard": "Leaderboard Position",
+            "peakrank": "Peak Rank",
+            "previousrank": "Previous Rank",
+            "headshot_percent": "Headshot Percentage",
+            "winrate": "WinRate",
+            "kd": "K/D Ratio",
+            "level": "Account Level"
+        }
+        # TODO and feature ideas: top-agent for map, top-agent overall, top-role, range for calculations
+
+        flag_options = {
+            "last_played": "Last Played Stats",
+            "auto_hide_leaderboard": "Auto Hide Leaderboard Column",
+            "game_chat": "Print Game Chat",
+            "peak_rank_act": "Peak Rank Act",
+            "discord_rpc": "Discord Rich Presence",
+            "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
+        }
+
+        default_config = DEFAULT_CONFIG.copy()
+
+        self.settings_label = ttk.Label(self.settings_frame, text="Settings", font=("Segoe UI", 14, "bold"))
+
+        # Create a frame for the weapon amount
+        self.weapon_combobox_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
+        self.weapon_amount_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.weapon_amount_lable = ttk.Label(self.weapon_amount_frame, text="Weapons", font=("Segoe UI", 12, "bold"))
+        self.weapon_amount_explanation_lable = ttk.Label(self.weapon_amount_frame, text="Enter the amount of weapons to show:")
+        self.weapon_amount_refresh_button = ttk.Button(self.weapon_amount_frame, text="Refresh", command=self.refresh_weapon_amount, takefocus=False)
+
+        # Load the weapon amount from the configuration
+        weapon_list = self.config.weapons
+        weapon_amount = self.config.weapon_amount
+        self.weapon_amount_entry.insert(0, str(weapon_amount))
+
+        # Create the weapon comboboxes based on the configuration
+        for weapon in weapon_list:
+            weapon_combobox = ttk.Combobox(self.weapon_combobox_frame, values=WEAPONS)
+            weapon_combobox.set(weapon)
+            self.weapon_comboboxes.append(weapon_combobox)
+
+        self.refresh_weapon_amount()
+
+        self.weapon_amount_entry = ttk.Entry(self.weapon_amount_frame)
+        self.weapon_amount_entry.insert(0, self.config.weapon_amount)
+
+        # Create a frame for table columns
+        self.table_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.table_columns_lable = ttk.Label(self.table_frame, text="Table Columns", font=("Segoe UI", 12, "bold"))
+        self.table_columns_explanation_lable = ttk.Label(self.table_frame, text="Select table columns to display:")
+        for i, (key, value) in enumerate(table_options.items()):
+            var = tk.BooleanVar(value=bool(self.config.get_table_flag(key)))
+            checkbox = ttk.Checkbutton(self.table_frame, text=value, variable=var)
+            checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+            self.table_column_vars[key] = var
+
+        # Create a frame for server port
+        self.port_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.port_lable = ttk.Label(self.port_frame, text="Server Port", font=("Segoe UI", 12, "bold"))
+        self.port_explanation_lable = ttk.Label(self.port_frame, text="Enter the port for the server to run:")
+
+        self.port_entry = ttk.Entry(self.port_frame)
+        self.port_entry.insert(0, self.config.port)
+
+        # Create a frame for optional features
+        self.optional_flags_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.optional_flag_label = ttk.Label(self.optional_flags_frame, text="Optional Features", font=("Segoe UI", 12, "bold"))
+        self.optional_flag_explanation_label = ttk.Label(self.optional_flags_frame, text="Select optional features:")
+        for i, (key, value) in enumerate(flag_options.items()):
+            var = tk.BooleanVar(value=bool(self.config.get_feature_flag(key)))
+            checkbox = ttk.Checkbutton(self.optional_flags_frame, text=value, variable=var)
+            checkbox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+            self.optional_feature_vars[key] = var
+
+        # Create a frame for chat limit
+        self.chat_limit_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.chat_limit_label = ttk.Label(self.chat_limit_frame, text="Chat Limit", font=("Segoe UI", 12, "bold"))
+        self.chat_limit_label_explanation = ttk.Label(self.chat_limit_frame, text="Enter the length of chat messages history:")
+        self.chat_limit_entry = ttk.Entry(self.chat_limit_frame)
+        self.chat_limit_entry.insert(0, self.config.chat_limit)
+
+        # Create a frame for calculation range
+        self.calculation_range_frame = ttk.LabelFrame(self.settings_frame, borderwidth=0, relief="flat")
+        self.calculation_range_label = ttk.Label(self.calculation_range_frame, text="Calculation Range", font=("Segoe UI", 12, "bold"))
+        self.calculation_range_label_explanation = ttk.Label(self.calculation_range_frame, text="Backtracking of stats for KD, Top-Agent:\nSignificant time increase for higher values!")
+        self.calculation_range_entry = ttk.Entry(self.calculation_range_frame)
+        self.calculation_range_entry.insert(0, self.config.calculation_range)
+
+        # Create a Save button to apply the configuration
+        self.continue_config_frame = ttk.Frame(self.settings_frame, borderwidth=0, relief="flat")
+        self.save_config_button = ttk.Button(self.continue_config_frame, text="Save", command=self.save_config, takefocus=False)
+        self.reset_config_button = ttk.Button(self.continue_config_frame, text="Reset", command=self.reset_config, takefocus=False)
+
+        self.settings_label.grid(row=0, column=0, columnspan=2)
+
+        self.weapon_amount_frame.grid(row=1, column=1, padx=10, pady=3, sticky="w")
+        self.weapon_amount_lable.grid(row=0, column=0, sticky="w")
+        self.weapon_amount_explanation_lable.grid(row=1, column=0, sticky="w")
+        self.weapon_amount_entry.grid(row=1, column=1, sticky="w")
+        self.weapon_amount_refresh_button.grid(row=1, column=2, sticky="w")
+
+        self.port_frame.grid(row=1, column=0, padx=10, pady=3, sticky="w")
+        self.port_lable.grid(row=0, column=0, sticky="w")
+        self.port_explanation_lable.grid(row=1, column=0, sticky="w")
+        self.port_entry.grid(row=1, column=1, sticky="w")
+
+        self.table_frame.grid(row=2, column=0, padx=10, pady=3, sticky="w")
+        self.table_columns_lable.grid(row=0, column=0, columnspan=2, sticky="w")
+        self.table_columns_explanation_lable.grid(row=1, column=0, columnspan=2, sticky="w")
+
+        self.optional_flags_frame.grid(row=2, column=1, padx=10, pady=3, sticky="w")
+        self.optional_flag_label.grid(row=0, column=0, columnspan=2, sticky="w")
+        self.optional_flag_explanation_label.grid(row=1, column=0, columnspan=2, sticky="w")
+
+        self.chat_limit_frame.grid(row=3, column=0, padx=10, pady=3, sticky="w")
+        self.chat_limit_label.grid(row=0, column=0, sticky="w")
+        self.chat_limit_label_explanation.grid(row=1, column=0, sticky="w")
+        self.chat_limit_entry.grid(row=1, column=1, sticky="w")
+
+        self.calculation_range_frame.grid(row=3, column=1, padx=10, pady=3, sticky="w")
+        self.calculation_range_label.grid(row=0, column=0, sticky="w")
+        self.calculation_range_label_explanation.grid(row=1, column=0, sticky="w")
+        self.calculation_range_entry.grid(row=1, column=1, sticky="w")
+
+        self.continue_config_frame.grid(row=4, column=0, columnspan=2, pady=5)
+        self.save_config_button.grid(row=0, column=0, padx=5, pady=5)
+        self.reset_config_button.grid(row=0, column=1, padx=5, pady=5)
+
+    def save_config(self):
+        """saves the configuration to config.json"""
+        self.cfg["weapon"] = ", ".join([weapon_combobox.get() for weapon_combobox in self.weapon_comboboxes])
+        self.cfg["weapon_amount"] = self.weapon_amount_entry.get()
+        self.cfg["port"] = self.port_entry.get()
+        self.cfg["chat_limit"] = self.chat_limit_entry.get()
+        self.cfg["table"] = {key: var.get() for key, var in self.table_column_vars.items()}
+        self.cfg["flags"] = {key: var.get() for key, var in self.optional_feature_vars.items()}
+        self.cfg = DEFAULT_CONFIG | self.cfg
+
+        with open("config.json", "w") as outfile:
+            json.dump(self.cfg, outfile, indent=2)
+
+    def reset_config(self):
+        """ resets the configuration to default """
+        self.config = DEFAULT_CONFIG.copy()
+        self.weapon_amount_entry.delete(0, "end")
+        self.weapon_amount_entry.insert(0, "1")
+        for weapon_combobox in self.weapon_comboboxes:
+            weapon_combobox.destroy()
+        self.weapon_comboboxes = []
+        self.refresh_weapon_amount()
+        self.port_entry.delete(0, "end")
+        self.port_entry.insert(0, DEFAULT_CONFIG["port"])
+        self.chat_limit_entry.delete(0, "end")
+        self.chat_limit_entry.insert(0, DEFAULT_CONFIG.get("chat_limit", 5))
+        for key, var in self.table_column_vars.items():
+            var.set(DEFAULT_CONFIG.get("table", DEFAULT_CONFIG["table"]).get(key, DEFAULT_CONFIG["table"][key]))
+        for key, var in self.optional_feature_vars.items():
+            var.set(DEFAULT_CONFIG.get("flags", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["flags"][key]))
+
+    def load_image(self, path, x, y):
+        # check if path exists
+        if not os.path.exists(path):
+            print(f"Could not find image at {path}")
+            return ""
+        img = Image.open(path)
+        img = img.resize((x, y))
+        return ImageTk.PhotoImage(img)
+
+    def load_and_cache_image(self, image_url, cache_file, max_height=None, crop_coords=None, brightness_factor=None):
+        # Check if the cache folder exists
+        if not os.path.exists(r"assets\gui\cache"):
+            os.makedirs(r"assets\gui\cache")
+
+        # Check if the cache file exists
+        if os.path.exists(cache_file):
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+        else:
+            cached_data = {}
+
+        if image_url in cached_data:
+            # Load image from cache
+            base64_data = cached_data[image_url]
+            img_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(img_data))
+        else:
+            # Fetch image from the web
+            with requests.Session() as s:
+                response = s.get(image_url)
+                img = Image.open(BytesIO(response.content))
+                if max_height:
+                    # Resize the image while maintaining aspect ratio
+                    width, height = img.size
+                    new_width = int((max_height / height) * width)
+                    img = img.resize((new_width, max_height))
+                if crop_coords:
+                    # Crop the image
+                    img = img.crop(crop_coords)
+                if brightness_factor:
+                    # Adjust the brightness
+                    enhancer = ImageEnhance.Brightness(img)
+                    img = enhancer.enhance(brightness_factor)
+
+                # Store the fetched image in the cache
+                img_bytesio = BytesIO()
+                img.save(img_bytesio, format="PNG")
+                base64_data = base64.b64encode(img_bytesio.getvalue()).decode("utf-8")
+                cached_data[image_url] = base64_data
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(cached_data, f)
+
+        return img
+
+    def load_agent_image(self, agent):
+        if agent == "":
+            return ""
+        cache_file = r"assets\gui\cache\agents.json"
+        return ImageTk.PhotoImage(self.load_and_cache_image(f"https://media.valorant-api.com/agents/{agent}/displayicon.png", cache_file, 35))
+
+    def load_rank_image(self, rank):
+        if rank == "":
+            return ""
+        cache_file = r"assets\gui\cache\ranks.json"
+        return ImageTk.PhotoImage(self.load_and_cache_image(f"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{rank}/smallicon.png", cache_file, 35))
+
+    def compare_player_level(self, player_level):
+        max_level_appearance = None
+
+        for level, appearance in self.level_data:
+            if player_level >= level:
+                max_level_appearance = appearance
+            else:
+                break
+
+        return max_level_appearance
+
+    def load_player_level_image(self, player_level):
+        if player_level == "":
+            return ""
+        cache_file = r"assets\gui\cache\levels.json"
+
+        # Define the URL for the player level image based on player_level (you may need to implement your logic here)
+        player_level_image_url = self.compare_player_level(player_level)
+
+        # Load and cache the player level image using the generic function
+        loaded_player_level_image = ImageTk.PhotoImage(self.load_and_cache_image(player_level_image_url, cache_file))
+
+        return player_level, loaded_player_level_image
+
+    def load_map(self, map_uuid):
+        if map_uuid == "":
+            return ""
+
+        # Define the cache file for map images
+        map_image_cache_file = r"assets\gui\cache\map_images.json"
+
+        # Define the cache file for map names
+        map_name_cache_file = r"assets\gui\cache\map_names.json"
+
+        def load_map_image():
+            # Define the URL for the map image
+            map_image_url = f"https://media.valorant-api.com/maps/{map_uuid}/splash.png"
+
+            # Load and cache the map image using the generic function
+            return ImageTk.PhotoImage(self.load_and_cache_image(map_image_url, map_image_cache_file, max_height=105,
+                                                                crop_coords=(21, 30, 165, 65), brightness_factor=0.75))
+
+        def load_map_name():
+            # Check if the cache file for map names exists
+            if os.path.exists(map_name_cache_file):
+                with open(map_name_cache_file, "r", encoding="utf-8") as f:
+                    map_names = json.load(f)
+            else:
+                map_names = {}
+
+            if map_uuid in map_names:
+                # Load the map name from cache
+                map_name = map_names[map_uuid]
+            else:
+                # Fetch the map name from the web
+                with requests.Session() as s:
+                    response = s.get(f"https://valorant-api.com/v1/maps/{map_uuid}").json()
+                    map_name = response["data"]["displayName"]
+
+                    # Store the fetched map name in the cache
+                    map_names[map_uuid] = map_name
+                    with open(map_name_cache_file, "w", encoding="utf-8") as f:
+                        json.dump(map_names, f)
+
+            return map_name
+
+        # Load map name and map image
+        return load_map_name(), load_map_image()
+
+    def load_skin_image(self, skin_data):
+        skin_image_url = skin_data.get("image", "")
+        skin_buddy_url = skin_data.get("buddy", "")
+
+        # Define the cache file for skin images
+        skin_image_cache_file = r"assets\gui\cache\skins.json"
+
+        def get_skin_image():
+            # Load and cache the skin image using the generic function
+            return self.load_and_cache_image(skin_image_url, skin_image_cache_file, max_height=35)
+
+        def get_buddy_image():
+            if skin_buddy_url is None:
+                return None
+
+            # Define the cache file for buddy images
+            buddy_image_cache_file = r"assets\gui\cache\buddies.json"
+
+            # Load and cache the buddy image using the generic function
+            return self.load_and_cache_image(skin_buddy_url, buddy_image_cache_file, max_height=35)
+
+        def merge_images(skin_image, buddy_image):
+            if buddy_image is None:
+                return skin_image
+
+            # Resize the buddy image while maintaining aspect ratio to fit within the maximum height (35)
+            max_height = 35
+            width, height = buddy_image.size
+            new_width = int((max_height / height) * width)
+            buddy_image = buddy_image.resize((new_width, max_height))
+
+            # Paste the resized buddy image in the bottom left corner of the skin image
+            skin_image.paste(buddy_image, (0, skin_image.size[1] - buddy_image.size[1]), buddy_image)
+            return skin_image
+
+        skin_image = get_skin_image()
+        buddy_image = get_buddy_image()
+        merged_images = merge_images(skin_image, buddy_image)
+        return ImageTk.PhotoImage(merged_images)
+
+    def clear_frame(self):
+        """ hide all frames, apart from the tabs """
+        for widget in t.winfo_children():
+            if widget not in [self.tab_frame]:
+                widget.grid_forget()
+
+    def show_live_game_frame(self):
+        self.clear_frame()
+        self.live_game_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
+
+    def show_skins_frame(self):
+        self.clear_frame()
+        self.skins_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
+
+    def show_settings_frame(self):
+        self.clear_frame()
+        self.settings_frame.grid(row=1, column=0, columnspan=10, padx=5, pady=5, sticky="nsew")
+
+    def clear_cash(self):
+        cash_folder = r"assets\gui\cache"
+        for file in os.listdir(cash_folder):
+            file_path = os.path.join(cash_folder, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
+
+    def force_refresh(self):
+        # TODO force refresh
+        ...
+
+    def refresh_weapon_amount(self):
+        # TODO refresh weapon amount
+        weapon_amount = self.weapon_amount_entry.get()
+
+        if not weapon_amount:
+            weapon_amount = 1
+
+        weapon_amount = int(weapon_amount)
+
+        if weapon_amount > len(self.weapon_comboboxes):
+            # Add weapon comboboxes
+            for i in range(weapon_amount - len(self.weapon_comboboxes)):
+                weapon_combobox = ttk.Combobox(self.weapon_combobox_frame, values=WEAPONS)
+                weapon_combobox.current(0)
+                self.weapon_comboboxes.append(weapon_combobox)
+
+        elif weapon_amount < len(self.weapon_comboboxes):
+            # Remove weapon comboboxes
+            for i in range(len(self.weapon_comboboxes) - weapon_amount):
+                self.weapon_comboboxes[-1].destroy()
+                self.weapon_comboboxes.pop()
+
+        # Clear the existing grid
+        for widget in self.weapon_combobox_frame.winfo_children():
+            widget.grid_forget()
+
+        # Display weapon combo boxes in the new frame
+        for i, weapon_combobox in enumerate(self.weapon_comboboxes):
+            weapon_combobox.grid(row=i + 2, column=0, columnspan=2, sticky="w")
+
+        # Update the grid of the weapon_combobox_frame in the settings_frame
+        self.weapon_combobox_frame.grid(row=1, column=3, rowspan=4, sticky="new")
+
+    def skin_seperator(self):
+        table_length = int(self.config.weapon_amount) + 2
+        return [""] * table_length
+
+    def emtpy_row(self):
+        return [" "] * sum(1 for value in self.config.table.values() if value)
+
+    def update_game_server(self, server):
+        self.game_server_label["text"] = server
+
+    def update_game_state(self, mode, clr):
+        self.start_time = datetime.now()
+        self.game_state_label["text"] = mode
+        self.game_state_label.configure(foreground=colors.rgb_to_hex(clr))
+
+        if mode == "In-Menus":
+            self.game_map_image_label.image = ""
+            self.game_map_image_label.configure(image="")
+            self.game_map_image_label.configure(text="")
+            self.game_mode_label["text"] = ""
+
+            table_data = [['Agent', 'Name'] + self.config.weapons]
+            self.player_skin_table.update_content([table_data])
+            self.enemy_team_average_frame.grid_forget()
+
+        if mode == "In-Game":
+            self.enemy_team_average_frame.grid(row=0, column=8, sticky="e")
+
+    def update_player_table(self, data):
+        players_data = data.get('players', {})
+        table_data = [['Party', 'Agent', 'Name', 'Rank', "RR", 'Prev. Rank', 'Peak Rank', 'Peak. Episode', 'Leaderboard', 'HS', 'WR', 'KD', 'Level']]
+
+        ally_average_rank = data.get('ally_avg_rank', [])
+        ally_average_rank = int(sum(ally_average_rank) / len(ally_average_rank) if ally_average_rank else 0)
+        ally_average_rank_image = self.load_rank_image(ally_average_rank)
+        self.ally_team_average_image.image = ally_average_rank_image
+        self.ally_team_average_image.configure(image=ally_average_rank_image)
+
+        enemy_average_rank = data.get('enemy_avg_rank', [])
+        enemy_average_rank = int(sum(enemy_average_rank) / len(enemy_average_rank) if enemy_average_rank else 0)
+        enemy_team_average_image = self.load_rank_image(enemy_average_rank)
+        self.enemy_team_average_image.image = enemy_team_average_image
+        self.enemy_team_average_image.configure(image=enemy_team_average_image)
+
+        for player_id, player_info in players_data.items():
+            if int(player_id) != float(player_id):
+                table_data.append(self.emtpy_row())
+                continue
+
+            party_icon = player_info.get('party_icon', ('', (0, 0, 0)))
+            agent = self.load_agent_image(player_info.get('agent', ''))
+            name = player_info.get('name', '')
+            rank = self.load_rank_image(player_info.get('rank', 0))
+            rr = player_info.get('rr', 0)
+            prev_rank = self.load_rank_image(player_info.get('prev_rank', 0))
+            peak_rank = self.load_rank_image(player_info.get('peak_rank', 0))
+            peak_rank_ep = player_info.get('peak_rank_ep', ('', (0, 0, 0)))
+            leaderboard = player_info.get('leaderboard', 0)
+            hs = player_info.get('hs', (0, (0, 0, 0)))
+            wr = player_info.get('wr', (0, (0, 0, 0)))
+            kd = player_info.get('kd', 0.0)
+            level = self.load_player_level_image(player_info.get('level', ('', (0, 0, 0)))[0])
+
+            # Append player data to the table_data
+            table_data.append([party_icon, agent, name, rank, rr, prev_rank, peak_rank, peak_rank_ep, leaderboard, hs, wr, kd, level])
+
+        self.player_table.update_content(table_data)
+
+    def update_player_skin_table(self, data):
+        players_skin_data = data.get('players', {})
+        table_data = [['Agent', 'Name'] + self.config.weapons]
+
+        for player_id, player_info in players_skin_data.items():
+            agent = self.load_agent_image(player_info.get('agent', ''))
+            name = player_info.get('name', '')
+            skins = player_info.get('skins', {})
+
+            # Append player data to the table_data
+            table_data.append([agent, name] + [self.load_skin_image(skins.get(weapon, {})) for weapon in self.config.weapons])
+
+        self.player_skin_table.update_content(table_data)
+
+    def update_game_time(self):
+        passed_time = datetime.now() - self.start_time
+        passed_time = str(passed_time).split(".", maxsplit=1)[0]
+        self.game_time_label["text"] = passed_time
+
+    def update_map(self, map_id):
+        game_map_name, game_map_image = self.load_map(map_id)
+        self.game_map_image_label.image = game_map_image
+        self.game_map_image_label.configure(image=game_map_image)
+        self.game_map_image_label.configure(text=game_map_name)

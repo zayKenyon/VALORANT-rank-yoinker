@@ -1,6 +1,6 @@
 import requests
 
-class Content():
+class Content:
     def __init__(self, Requests, log):
         self.Requests = Requests
         self.log = log
@@ -65,6 +65,13 @@ class Content():
             val_map_dict.update({val_map['displayName']: val_map['splash']})
         return val_map_dict
 
+    def get_map_uuid(self, val_maps) -> dict:
+        val_map_uuid_dict = {}
+        val_map_uuid_dict.update({None: None})
+        for val_map in val_maps["data"]:
+            val_map_uuid_dict.update({val_map['displayName']: val_map['uuid']})
+        return val_map_uuid_dict
+
     def get_act_episode_from_act_id(self, act_id):
         final = {
             "act": None,
@@ -79,3 +86,11 @@ class Content():
                 final["episode"] = int(season["Name"][-1])
                 break
         return final
+
+    def get_level_data(self):
+        with requests.Session() as s:
+            r = s.get("https://valorant-api.com/v1/levelborders")
+            data = r.json()
+
+        level_data = [(entry["startingLevel"], entry["levelNumberAppearance"]) for entry in data["data"]]
+        return level_data

@@ -1,6 +1,5 @@
 import glob
 import os
-import time
 import re
 
 class ChatLogging:

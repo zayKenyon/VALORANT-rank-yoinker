@@ -37,8 +37,8 @@ class Requests:
         release_version = json_data[0]["tag_name"]  # get release version
         for asset in json_data[0]["assets"]:
             if "zip" in asset["content_type"]:
-                    link = asset["browser_download_url"]  # link for the latest release
-                    break
+                link = asset["browser_download_url"]  # link for the latest release
+                break
         if float(release_version) > float(self.version):
             print(f"New version available! {link}")
             if sys.argv[0][-3:] == "exe":
@@ -70,13 +70,13 @@ class Requests:
         if not rStatus["status_good"] or rStatus["print_message"]:
             status_color = (255, 0, 0) if not rStatus["status_good"] else (0, 255, 0)
             print(color(rStatus["message_to_display"], fore=status_color))
-            
+
     def fetch(self, url_type: str, endpoint: str, method: str, rate_limit_seconds=5):
         try:
             if url_type == "glz":
                 response = requests.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
-                    f" response code: {response.status_code}")
+                         f" response code: {response.status_code}")
 
                 if response.status_code == 404:
                     return response.json()
@@ -125,7 +125,7 @@ class Requests:
             elif url_type == "local":
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                     ('riot:' + self.lockfile['password']).encode()).decode()}
-                
+
                 while True:
                     try:
                         response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
@@ -187,14 +187,13 @@ class Requests:
 
     def get_lockfile(self):
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')
-        
+
         if self.Error.LockfileError(path):
             with open(path) as lockfile:
                 self.log("opened lockfile")
                 data = lockfile.read().split(':')
                 keys = ['name', 'PID', 'port', 'password', 'protocol']
                 return dict(zip(keys, data))
-
 
     def get_headers(self, refresh=False):
         if self.headers == {} or refresh:

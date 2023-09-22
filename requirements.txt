@@ -16,3 +16,5 @@ urllib3==2.0.4
 wcwidth==0.2.6
 websocket-server==0.6.4
 websockets==11.0.3
+ttkbootstrap~=1.10.1
+Pillow==10.0.0

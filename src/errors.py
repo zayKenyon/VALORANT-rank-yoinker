@@ -3,11 +3,11 @@ import os.path
 import time
 import os
 
+
 class Error:
-    
+
     def __init__(self, log):
         self.log = log
-
 
     def PortError(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,13 +25,11 @@ class Error:
         sock.close()
 
     def LockfileError(self, path):
-        
         if os.path.exists(path):
             return True
-        else:
-            # self.log("Lockfile does not exist, VALORANT is not open")
-            print("\nVALORANT is not open. Please open valorant\n")
-            while not os.path.exists(path):
-                time.sleep(1)
-            os.system('cls')
-            return True
+
+        print("\nVALORANT is not open. Please open valorant\n")
+        while not os.path.exists(path):
+            time.sleep(1)
+        os.system('cls')
+        return True

@@ -33,7 +33,7 @@ class Ws:
         self.player_data = player_data
 
     async def recconect_to_websocket(self, initial_game_state):
-        #wont actually recconect :)
+        # wont actually recconect :)
         local_headers = {}
         local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
         url = f"wss://127.0.0.1:{self.lockfile['port']}"
@@ -91,12 +91,12 @@ class Ws:
                         agent = self.colors.get_agent_from_uuid(self.player_data[message['puuid']]['agent'].lower())
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
-                            self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
+                            self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent[0]), clr)}: {message['body']}")
                         else:
-                            if agent == "":
+                            if agent[0] == "":
                                 agent_str = ""
                             else:
-                                agent_str = f" ({agent})"
+                                agent_str = f" ({agent[0]})"
                             self.print_message(f"{chat_prefix} {color(name, clr)}{agent_str}: {message['body']}")
                         self.id_seen.append(message['id'])
 

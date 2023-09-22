@@ -11,7 +11,6 @@ class Names:
         response = requests.put(self.Requests.pd_url + "/name-service/v2/players", headers=self.Requests.get_headers(), json=[puuid], verify=False)
         return response.json()[0]["GameName"] + "#" + response.json()[0]["TagLine"]
 
-
     def get_multiple_names_from_puuid(self, puuids):
         response = requests.put(self.Requests.pd_url + "/name-service/v2/players", headers=self.Requests.get_headers(), json=puuids, verify=False)
 

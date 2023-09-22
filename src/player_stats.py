@@ -19,9 +19,9 @@ class PlayerStats:
             # pyperclip.copy(str(r.json()))
             if r.status_code == 404: # too old match
                 return {
-                "kd": "N/a",
-                "hs": "N/a"
-            }
+                    "kd": "N/a",
+                    "hs": "N/a"
+                }
 
             total_hits = 0
             total_headshots = 0
@@ -51,13 +51,12 @@ class PlayerStats:
                 "hs": "N/a"
             }
 
-
-            if total_hits == 0: # No hits
+            if total_hits == 0:  # No hits
                 return final
-            hs = int((total_headshots/total_hits)*100)
+            hs = int((total_headshots / total_hits) * 100)
             final["hs"] = hs
             return final
-        except IndexError: #no matches
+        except IndexError:  # no matches
             return {
                 "kd": "N/a",
                 "hs": "N/a"
@@ -70,7 +69,7 @@ if __name__ == "__main__":
     from logs import Logging
     from errors import Error
     import urllib3
-    # import pyperclip
+
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     Logging = Logging()
@@ -86,4 +85,3 @@ if __name__ == "__main__":
 
     res = r.get_stats("963ad672-61e1-537e-8449-06ece1a5ceb7")
     print(res)
-    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}")

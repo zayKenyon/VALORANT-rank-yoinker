@@ -6,7 +6,6 @@ enablePrivateLogging = True
 hide_names = True
 hide_levels = True
 
-
 gamemodes = {
     "newmap": "New Map",
     "competitive": "Competitive",
@@ -80,56 +79,61 @@ GAMEPODS = requests.get("https://valorant-api.com/internal/locres/en-US").json()
 
 symbol = "■"
 PARTYICONLIST = [
-            color(symbol, fore=(227, 67, 67)),
-            color(symbol, fore=(216, 67, 227)),
-            color(symbol, fore=(67, 70, 227)),
-            color(symbol, fore=(67, 227, 208)),
-            color(symbol, fore=(94, 227, 67)),
-            color(symbol, fore=(226, 237, 57)),
-            color(symbol, fore=(212, 82, 207)),
-            symbol
-        ]
+    (symbol, (227, 67, 67)),
+    (symbol, (216, 67, 227)),
+    (symbol, (67, 70, 227)),
+    (symbol, (67, 227, 208)),
+    (symbol, (94, 227, 67)),
+    (symbol, (226, 237, 57)),
+    (symbol, (212, 82, 207)),
+    (symbol, (255, 255, 255)),
+]
 
+GAMESATEDICT = {
+    "INGAME": ('In-Game', (241, 39, 39)),
+    "PREGAME": ('Agent Select', (103, 237, 76)),
+    "MENUS": ('In-Menus', (238, 241, 54)),
+}
 
 NUMBERTORANKS = [
-            color('Unranked', fore=(46, 46, 46)),
-            color('Unranked', fore=(46, 46, 46)),
-            color('Unranked', fore=(46, 46, 46)),
-            color('Iron 1', fore=(72, 69, 62)),
-            color('Iron 2', fore=(72, 69, 62)),
-            color('Iron 3', fore=(72, 69, 62)),
-            color('Bronze 1', fore=(187, 143, 90)),
-            color('Bronze 2', fore=(187, 143, 90)),
-            color('Bronze 3', fore=(187, 143, 90)),
-            color('Silver 1', fore=(174, 178, 178)),
-            color('Silver 2', fore=(174, 178, 178)),
-            color('Silver 3', fore=(174, 178, 178)),
-            color('Gold 1', fore=(197, 186, 63)),
-            color('Gold 2', fore=(197, 186, 63)),
-            color('Gold 3', fore=(197, 186, 63)),
-            color('Platinum 1', fore=(24, 167, 185)),
-            color('Platinum 2', fore=(24, 167, 185)),
-            color('Platinum 3', fore=(24, 167, 185)),
-            color('Diamond 1', fore=(216, 100, 199)),
-            color('Diamond 2', fore=(216, 100, 199)),
-            color('Diamond 3', fore=(216, 100, 199)),
-            color('Ascendant 1', fore=(24, 148, 82)),
-            color('Ascendant 2', fore=(24, 148, 82)),
-            color('Ascendant 3', fore=(24, 148, 82)),
-            color('Immortal 1', fore=(221, 68, 68)),
-            color('Immortal 2', fore=(221, 68, 68)),
-            color('Immortal 3', fore=(221, 68, 68)),
-            color('Radiant', fore=(255, 253, 205)),
-        ]
+    ('Unranked', (46, 46, 46)),
+    ('Unranked', (46, 46, 46)),
+    ('Unranked', (46, 46, 46)),
+    ('Iron 1', (72, 69, 62)),
+    ('Iron 2', (72, 69, 62)),
+    ('Iron 3', (72, 69, 62)),
+    ('Bronze 1', (187, 143, 90)),
+    ('Bronze 2', (187, 143, 90)),
+    ('Bronze 3', (187, 143, 90)),
+    ('Silver 1', (174, 178, 178)),
+    ('Silver 2', (174, 178, 178)),
+    ('Silver 3', (174, 178, 178)),
+    ('Gold 1', (197, 186, 63)),
+    ('Gold 2', (197, 186, 63)),
+    ('Gold 3', (197, 186, 63)),
+    ('Platinum 1', (24, 167, 185)),
+    ('Platinum 2', (24, 167, 185)),
+    ('Platinum 3', (24, 167, 185)),
+    ('Diamond 1', (216, 100, 199)),
+    ('Diamond 2', (216, 100, 199)),
+    ('Diamond 3', (216, 100, 199)),
+    ('Ascendant 1', (24, 148, 82)),
+    ('Ascendant 2', (24, 148, 82)),
+    ('Ascendant 3', (24, 148, 82)),
+    ('Immortal 1', (221, 68, 68)),
+    ('Immortal 2', (221, 68, 68)),
+    ('Immortal 3', (221, 68, 68)),
+    ('Radiant', (255, 253, 205)),
+]
 
 tierDict = {
-            "0cebb8be-46d7-c12a-d306-e9907bfc5a25": (0, 149, 135),
-            "e046854e-406c-37f4-6607-19a9ba8426fc": (241, 184, 45),
-            "60bca009-4182-7998-dee7-b8a2558dc369": (209, 84, 141),
-            "12683d76-48d7-84a3-4e09-6985794f0445": (90, 159, 226),
-            "411e4a55-4e59-7757-41f0-86a53f101bb5": (239, 235, 101),
-            None: None
-        }
+    "0cebb8be-46d7-c12a-d306-e9907bfc5a25": (0, 149, 135),
+    "e046854e-406c-37f4-6607-19a9ba8426fc": (241, 184, 45),
+    "60bca009-4182-7998-dee7-b8a2558dc369": (209, 84, 141),
+    "12683d76-48d7-84a3-4e09-6985794f0445": (90, 159, 226),
+    "411e4a55-4e59-7757-41f0-86a53f101bb5": (239, 235, 101),
+    None: None
+}
 
 WEAPONS = [
     "Classic",
@@ -153,28 +157,38 @@ WEAPONS = [
 ]
 
 DEFAULT_CONFIG = {
-        "cooldown": 10,
-        "port": 1100,
-        "weapon": "Vandal",
-        "chat_limit": 5,
-        "table": {
-            "skin": True,
-            "rr": True,
-            "peakrank": True,
-            "previousrank" : False,
-            "leaderboard": True,
-            "headshot_percent": True,
-            "winrate": True,
-            "kd": False,
-            "level": True
-        },
-        "flags": {
-            "last_played": True,
-            "auto_hide_leaderboard": True,
-            "pre_cls": False,
-            "game_chat": True,
-            "peak_rank_act": True,
-            "discord_rpc": True,
-            "aggregate_rank_rr": True
-        }
+    "gui": True,
+    "cooldown": 10,
+    "port": 1100,
+    "weapon": "Vandal, Phantom",
+    "weapon_amount": 2,
+    "chat_limit": 5,
+    "calculation_range": 1,
+    "table": {
+        "party": True,
+        "agent": True,
+        "top_agent": False,
+        "top_agent_map": False,
+        "top_role": False,
+        "name": True,
+        "skin": True,
+        "rank": True,
+        "rr": True,
+        "peakrank": True,
+        "previousrank" : False,
+        "leaderboard": True,
+        "headshot_percent": True,
+        "winrate": True,
+        "kd": False,
+        "level": True
+    },
+    "flags": {
+        "last_played": True,
+        "auto_hide_leaderboard": True,
+        "pre_cls": False,
+        "game_chat": True,
+        "peak_rank_act": True,
+        "discord_rpc": True,
+        "aggregate_rank_rr": True
     }
+}

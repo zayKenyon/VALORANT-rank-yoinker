@@ -20,7 +20,7 @@ class Config:
             self.log("config.json not found, creating new one")
             with open("config.json", "w") as file:
                 config = self.config_dialog(file)
-            
+
         try:
             with open("config.json", "r") as file:
                 self.log("config opened")
@@ -34,12 +34,12 @@ class Config:
                     self.log("config.json is missing keys")
                     with open("config.json", 'w') as w:
                         self.log(f"missing keys: " + str(missingkeys))
-                        for key in missingkeys:   
+                        for key in missingkeys:
                             config[key] = DEFAULT_CONFIG[key]
 
                         self.log("Succesfully added missing keys")
-                        json.dump(config, w, indent=4)
-    
+                        json.dump(config, w, indent=2)
+
         except (JSONDecodeError):
             self.log("invalid file")
             with open("config.json", "w") as file:
@@ -53,26 +53,30 @@ class Config:
 
             self.log(f"got cooldown with value '{self.cooldown}'")
 
-            if not self.weapon_check(config["weapon"]):
-                self.weapon = "vandal" # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
-            else:   
-                self.weapon = config["weapon"]
-            
+            weapons = [weapon.strip() for weapon in config["weapon"].split(",")]
+            if not self.weapon_checks(weapons):
+                self.weapons = ["vandal", "phantom"] # if the user manually entered a wrong name into the config file, this will be the default until changed by the user.
+                self.log(f"Invalid weapon name in config, defaulting to vandal")
+            else:
+                self.weapons = weapons
+
     def get_feature_flag(self,key):
         return self.__dict__.get("flags",DEFAULT_CONFIG["flags"]).get(key,DEFAULT_CONFIG["flags"][key])
 
     def get_table_flag(self,key):
-        return self.__dict__.get("table",DEFAULT_CONFIG["flags"]).get(key,DEFAULT_CONFIG["table"][key])         
+        return self.__dict__.get("table", DEFAULT_CONFIG["flags"]).get(key, DEFAULT_CONFIG["table"][key])
 
     def config_dialog(self, fileToWrite: TextIOWrapper):
         self.log("color config prompt called")
         jsonToWrite = DEFAULT_CONFIG
-        
-        json.dump(jsonToWrite, fileToWrite, indent=4)
+
+        json.dump(jsonToWrite, fileToWrite, indent=2)
         return jsonToWrite
 
-    def weapon_check(self, name):
-        if name in [weapon["displayName"] for weapon in requests.get("https://valorant-api.com/v1/weapons").json()["data"]]:
-            return True
-        else:
-            return False
+    def weapon_checks(self, names):
+        weapon_data = requests.get("https://valorant-api.com/v1/weapons").json()["data"]
+        weapon_names = [weapon["displayName"] for weapon in weapon_data]
+        for name in names:
+            if name not in weapon_names:
+                return False
+        return True
