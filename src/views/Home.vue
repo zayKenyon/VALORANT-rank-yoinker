@@ -105,12 +105,13 @@ export default {
     onMessage(event) {
       const { Players, time, map = {} } = JSON.parse(event.data);
 
-      let { splash = "images/default-splash.jpeg" } = map;
+      const { splash = "images/default-splash.jpeg" } = map;
 
       document.documentElement.style.setProperty(
         "--splash-map",
         `url(${splash})`
       );
+
       this.timeStamp = time;
       this.mapName = map.name;
       this.mapSplash = map.splash;
