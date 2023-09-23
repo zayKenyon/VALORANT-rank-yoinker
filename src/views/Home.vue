@@ -65,6 +65,7 @@ export default {
 
     connection.onerror = () => {
       this.timeStamp = null;
+      this.map = null;
     };
 
     if (this.attackingTeam.length == 0 && this.defendingTeam.length == 0) {
@@ -76,6 +77,7 @@ export default {
       attackingTeam: [],
       defendingTeam: [],
       timeStamp: new Date().getTime() / 1000,
+      currentMap: "N/A",
       showInventory: false,
       inventory: {},
       pages: {
@@ -110,6 +112,8 @@ export default {
         `url(${splash})`
       );
       this.timeStamp = time;
+      this.mapName = map.name;
+      this.mapSplash = map.splash;
 
       this.attackingTeam = Object.values(Players)
         .filter((p) => p.Team == "Red")
