@@ -101,8 +101,14 @@ export default {
       this.inventory = {};
     },
     onMessage(event) {
-      const { Players, time } = JSON.parse(event.data);
+      const { Players, time, map = {} } = JSON.parse(event.data);
 
+      let { splash = "images/default-splash.jpeg" } = map;
+
+      document.documentElement.style.setProperty(
+        "--splash-map",
+        `url(${splash})`
+      );
       this.timeStamp = time;
 
       this.attackingTeam = Object.values(Players)

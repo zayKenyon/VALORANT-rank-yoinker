@@ -18,7 +18,7 @@ export default {
 
 <style lang="scss">
 body {
-  background: url("https://progioco.com/wp-content/uploads/2023/03/Confermata-la-versione-beta-globale-di-Valorant-Premier-nuova-modalita.jpg");
+  background: var(--splash-map);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
