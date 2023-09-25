@@ -116,7 +116,7 @@ class AccountManager:
             current_account_auth_data = self.auth.auth_account(cookies=self.account_config.accounts_data[account]["cookies"])
             if current_account_auth_data is None:
                 self.log("Failed to auth account with cookies! (change accounts) ")
-                print("Cookies are invalid or have expired! Please login again.")
+                print("Cookies are invalid or have expired! Please login again. (Cookies only stays for few days, don't know why :/)")
                 self.account_config.remove_account(account)
                 self.menu(self.last_account_data)
             else:
