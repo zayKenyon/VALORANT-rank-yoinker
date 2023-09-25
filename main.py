@@ -275,7 +275,7 @@ try:
                 isRange = False
                 playersLoaded = 1
                 
-                heartbeat_data["map"] = map_dict[coregame_stats["MapID"].lower()],
+                heartbeat_data["map"] = map_urls[coregame_stats["MapID"].lower()],
                 with richConsole.status("Loading Players...") as status: 
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
