@@ -14,6 +14,11 @@ class Names:
 
     def get_multiple_names_from_puuid(self, puuids):
         response = requests.put(self.Requests.pd_url + "/name-service/v2/players", headers=self.Requests.get_headers(), json=puuids, verify=False)
+
+        if 'errorCode' in response.json():
+            self.log(f'{response.json()["errorCode"]}, new token retrieved')
+            response = requests.put(self.Requests.pd_url + "/name-service/v2/players", headers=self.Requests.get_headers(refresh=True), json=puuids, verify=False)
+
         name_dict = {player["Subject"]: f"{player['GameName']}#{player['TagLine']}"
                      for player in response.json()}
         return name_dict

@@ -6,9 +6,7 @@
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
-[![Language][language-shield]][language-url]
-[![License][license-shield]][license-url]
-     
+    
  
   <ol>
     <li><a href="#about-the-project">About The Project</a></li>
@@ -35,14 +33,15 @@
 
 ### Bundled Release:
 
-1) Download the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
-2) Extract **all** files.
-3) Run vRY.exe.
+1) Download [Microsoft Visual C++ Libraries](https://github.com/abbodi1406/vcredist/releases)
+2) Download the [release](https://github.com/isaacKenyon/valorant-rank-yoinker/releases/latest).
+3) Extract **all** files.
+4) Run vRY.exe.
 
 ### Running from source:
 
 1) Download [Python 3.10](https://www.python.org/downloads/release/python-3100/), make sure it is added to the PATH. (This is an option on installation.)
-   1) Any Python version post 3.8 should work.
+   1) Any Python version post 3.10 should work.
 2) Download the [source](https://github.com/isaacKenyon/VALORANT-rank-yoinker/archive/refs/heads/main.zip).
 3) Open a terminal within the source folder.
 4) `pip install -r requirements.txt`
@@ -74,7 +73,7 @@ If you want to make a small change to the application, you can:
 
 ## What about that Tweet?
 
- The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies outlines how
+ The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies, outlines how
  applications are not allowed to expose data hidden by the game client. As of Version 1.262, vRY respects streamer mode.
 
 ## Contributing
@@ -104,11 +103,5 @@ If you want to make a small change to the application, you can:
 [discord-url]: https://discord.gg/HeTKed64Ka
 [discord-banner]: https://discordapp.com/api/guilds/872101595037446144/widget.png?style=banner2
 
-[downloads-shield]: https://img.shields.io/github/downloads/isaacKenyon/VALORANT-rank-yoinker/total?style=for-the-badge&logo=github
-[downloads-url]: https://github.com/isaacKenyon/VALORANT-rank-yoinker/releases/latest
-
-[language-shield]: https://img.shields.io/github/languages/top/isaacKenyon/Valorant-rank-yoinker?logo=python&logoColor=yellow&style=for-the-badge
-[language-url]: https://www.python.org/
-
-[license-shield]: https://img.shields.io/github/license/isaacKenyon/valorant-rank-yoinker?style=for-the-badge
-[license-url]: https://github.com/isaacKenyon/valorant-rank-yoinker/blob/main/LICENSE
+[downloads-shield]: https://img.shields.io/github/downloads/zayKenyon/VALORANT-rank-yoinker/total?style=for-the-badge&logo=github
+[downloads-url]: https://github.com/zayKenyon/VALORANT-rank-yoinker/releases/latest
