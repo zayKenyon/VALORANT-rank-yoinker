@@ -29,7 +29,10 @@ class Requests:
         
         self.puuid = ''
         #fetch puuid so its avaible outside
-        self.get_headers()
+        if not self.get_headers(init=True):
+            self.log("Invalid URI format, invalid lockfile, going back to menu")
+            self.get_lockfile(ignoreLockfile=True)
+        
 
     @staticmethod
     def check_version(version, copy_run_update_script):
@@ -141,7 +144,7 @@ class Requests:
                         else:
                             break
                     except ConnectionError:
-                        print("Connection error, retrying in 5 seconds")
+                        self.log("Connection error, retrying in 5 seconds")
                         time.sleep(5)
                 if endpoint != "/chat/v4/presences":
                     self.log(
@@ -189,10 +192,11 @@ class Requests:
                     self.log(f"got version from logs '{version}'")
                     return version
 
-    def get_lockfile(self):
+    def get_lockfile(self, ignoreLockfile=False):
+        #ignoring lockfile is for when lockfile exists but it's not really valid, (local endpoints are not initialized yet)
         path = os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')
         
-        if self.Error.LockfileError(path):
+        if self.Error.LockfileError(path, ignoreLockfile=ignoreLockfile):
             with open(path) as lockfile:
                 self.log("opened lockfile")
                 data = lockfile.read().split(':')
@@ -200,13 +204,36 @@ class Requests:
                 return dict(zip(keys, data))
 
 
-    def get_headers(self, refresh=False):
+    def get_headers(self, refresh=False, init=False):
         if self.headers == {} or refresh:
-            local_headers = {'Authorization': 'Basic ' + base64.b64encode(
-                ('riot:' + self.lockfile['password']).encode()).decode()}
-            response = requests.get(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token",
-                                    headers=local_headers, verify=False)
-            entitlements = response.json()
+            try_again = True
+            while try_again:
+                local_headers = {'Authorization': 'Basic ' + base64.b64encode(
+                    ('riot:' + self.lockfile['password']).encode()).decode()}
+                try:
+                    response = requests.get(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token",
+                                            headers=local_headers, verify=False)
+                    self.log(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token\n{local_headers}")
+                except ConnectionError:
+                    self.log(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token\n{local_headers}")
+                    self.log("Connection error, retrying in 1 seconds, getting new lockfile")
+                    time.sleep(1)
+                    self.lockfile = self.get_lockfile()
+                    continue
+                entitlements = response.json()
+                if entitlements.get("message") == "Entitlements token is not ready yet":
+                    try_again = True
+                    time.sleep(1)
+                elif entitlements.get("message") == "Invalid URI format":
+                    self.log(f"Invalid uri format: {entitlements}")
+                    if init:
+                        return False
+                    else:
+                        try_again = True
+                        time.sleep(5)
+                else:
+                    try_again = False
+
             self.puuid = entitlements['subject']
             headers = {
                 'Authorization': f"Bearer {entitlements['accessToken']}",

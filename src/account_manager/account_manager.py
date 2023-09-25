@@ -161,7 +161,7 @@ class AccountManager:
         if account_data != None:
             #Logged in as....
             if option == 0:
-                pass
+                self.start_valorant()
             #Change accounts
             elif option == 1:
                 self.menu_change_accounts()

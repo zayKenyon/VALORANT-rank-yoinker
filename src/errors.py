@@ -24,9 +24,9 @@ class Error:
             self.log("Port is being blocked by the firewall or in use by another application")
         sock.close()
 
-    def LockfileError(self, path):
-        
-        if os.path.exists(path):
+    def LockfileError(self, path, ignoreLockfile=False):
+        #ignoring lockfile is for when lockfile exists but it's not really valid, (local endpoints are not initialized yet)
+        if os.path.exists(path) and ignoreLockfile == False:
             return True
         else:
             self.log("Lockfile does not exist, VALORANT is not open")
