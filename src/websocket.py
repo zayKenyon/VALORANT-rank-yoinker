@@ -7,8 +7,8 @@ from colr import color
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog,
-                 rpc=None):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, server, rpc=None):
+
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -26,6 +26,7 @@ class Ws:
         self.up = "\033[A"
         self.chat_limit = cfg.chat_limit
         self.chatlog = chatlog
+        self.server = server
         if self.cfg.get_feature_flag("discord_rpc"):
             self.rpc = rpc
 
@@ -92,12 +93,29 @@ class Ws:
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
                             self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
+                            self.server.send_payload("chat",{
+                                "time": message["time"],
+                                "puuid": player,
+                                "self": message["puuid"] == self.Requests.puuid,
+                                "group":re.sub("\[|\]","",self.colors.escape_ansi(chat_prefix)),
+                                "agent": self.colors.escape_ansi(agent),
+                                "text": message['body']
+                            })
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
                             self.print_message(f"{chat_prefix} {color(name, clr)}{agent_str}: {message['body']}")
+                            self.server.send_payload("chat",{
+                                "time": message["time"],
+                                "puuid": player,
+                                "self": message["puuid"] == self.Requests.puuid,
+                                "group":re.sub("\[|\]","",self.colors.escape_ansi(chat_prefix)),
+                                "player": name,
+                                "agent": self.colors.escape_ansi(agent),
+                                "text": message['body']
+                            })
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
