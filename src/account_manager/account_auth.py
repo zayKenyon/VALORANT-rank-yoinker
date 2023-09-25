@@ -33,11 +33,15 @@ class TLSAdapter(requests.adapters.HTTPAdapter):
 class AccountAuth:
     def __init__(self, log, NUMBERTORANKS):
         self.log = log
+
+        log("Getting versions from valorant-api.com for account auth-ing")
+        version = self.get_current_version()
+
         self.session = requests.Session()
         self.session.mount("https://", TLSAdapter())
         self.headers = {
             "Accept-Encoding": "deflate, gzip, zstd",
-            "user-agent": "RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)",
+            "user-agent": f"RiotClient/{version['riotClientBuild']} rso-auth (Windows;10;;Professional, x64)",
             "Cache-Control": "no-cache",
             "Accept": "application/json",
             'Accept-Language':'en-US,en;q=0.9'
@@ -46,7 +50,7 @@ class AccountAuth:
             'X-Riot-ClientPlatform': "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjog"
                                         "IldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5"
                                         "MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
-            'X-Riot-ClientVersion': self.get_current_version(),
+            'X-Riot-ClientVersion': version["riotClientVersion"],
             "User-Agent": "ShooterGame/13 Windows/10.0.19043.1.256.64bit"
         }
         self.puuid = ""
@@ -55,7 +59,9 @@ class AccountAuth:
         self.NUMBERTORANKS = NUMBERTORANKS
 
     def get_current_version(self):
-        return requests.get("https://valorant-api.com/v1/version").json()["data"]["riotClientVersion"]
+        return requests.get("https://valorant-api.com/v1/version").json()["data"]
+
+        
 
     def auth_account(self, username=None, password=None, cookies=None):
         self.session.cookies.clear()
@@ -144,8 +150,7 @@ class AccountAuth:
         else:
             rank = 0
         rank = self.escape_ansi(self.NUMBERTORANKS[rank])
-
-        name = requests.put(f"https://pd.{self.region}.a.pvp.net/name-service/v2/players", json=[self.puuid]).json()
+        name = requests.put(f"https://pd.{self.region}.a.pvp.net/name-service/v2/players", headers=self.auth_headers, json=[self.puuid]).json()
         name = name[0]["GameName"] + "#" + name[0]["TagLine"]
         r_account_xp = requests.get(f"https://pd.{self.region}.a.pvp.net/account-xp/v1/players/{self.puuid}", headers=self.auth_headers, verify=False)
         level = r_account_xp.json()["Progress"]["Level"]
