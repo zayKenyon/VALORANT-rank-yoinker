@@ -19,18 +19,20 @@ class Requests:
         self.headers = {}
         self.log = log
 
+
+        self.lockfile = self.get_lockfile()
         self.region = self.get_region()
         self.pd_url = f"https://pd.{self.region[0]}.a.pvp.net"
         self.glz_url = f"https://glz-{self.region[1][0]}.{self.region[1][1]}.a.pvp.net"
         self.log(f"Api urls: pd_url: '{self.pd_url}', glz_url: '{self.glz_url}'")
         self.region = self.region[0]
-        self.lockfile = self.get_lockfile()
-
+        
         self.puuid = ''
         #fetch puuid so its avaible outside
         self.get_headers()
 
-    def check_version(self):
+    @staticmethod
+    def check_version(version, copy_run_update_script):
         # checking for latest release
         r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
         json_data = r.json()
@@ -39,7 +41,7 @@ class Requests:
             if "zip" in asset["content_type"]:
                     link = asset["browser_download_url"]  # link for the latest release
                     break
-        if float(release_version) > float(self.version):
+        if float(release_version) > float(version):
             print(f"New version available! {link}")
             if sys.argv[0][-3:] == "exe":
                 while True:
@@ -47,12 +49,13 @@ class Requests:
                     if update_now.lower() == "n" or update_now.lower() == "no":
                         return
                     elif update_now.lower() == "y" or update_now.lower() == "yes" or update_now == "":
-                        self.copy_run_update_script(link)
+                        copy_run_update_script(link)
                         os._exit(1)
                     else:
                         print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
 
-    def copy_run_update_script(self, link):
+    @staticmethod
+    def copy_run_update_script(link):
         try:
             os.mkdir(os.path.join(os.getenv('APPDATA'), "vry"))
         except FileExistsError:
@@ -63,7 +66,8 @@ class Requests:
         z.extractall(os.path.join(os.getenv('APPDATA'), "vry"))
         subprocess.Popen([os.path.join(os.getenv('APPDATA'), "vry", "updatescript.bat"), os.path.join(os.getenv('APPDATA'), "vry", ".".join(os.path.basename(link).split(".")[:-1])), os.getcwd(), os.path.join(os.getenv('APPDATA'), "vry")])
 
-    def check_status(self):
+    @staticmethod
+    def check_status():
         # checking status
         rStatus = requests.get(
             "https://raw.githubusercontent.com/zayKenyon/VALORANT-rank-yoinker/main/status.json").json()
