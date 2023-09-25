@@ -35,9 +35,12 @@ from src.table import Table
 from src.websocket import Ws
 from src.os import get_os
 
+from src.account_manager.account_manager import AccountManager
+from src.account_manager.account_config import AccountConfig
+from src.account_manager.account_auth import AccountAuth
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# os.system('cls')
 os.system(f"title VALORANT rank yoinker v{version}")
 
 server = ""
@@ -71,10 +74,6 @@ try:
         program_exit(0)
     else:
         log(f"Operating system: {get_os()[0]}\n")
-
-    ChatLogging = ChatLogging()
-    chatlog = ChatLogging.chatLog
-
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
@@ -82,12 +81,10 @@ try:
                 message="Do you want to run vRY now?", default=True
             ).execute()
             if run_app:
-                os.system('mode 150,35')
                 os.system('cls')
             else:
                 os._exit(0)
         else:
-            os.system('mode 150,35')
             os.system('cls')
     except Exception as e:
         print("Something went wrong while running configurator!")
@@ -96,12 +93,16 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 
+    ChatLogging = ChatLogging()
+    chatlog = ChatLogging.chatLog
 
-    ErrorSRC = Error(log)
+    acc_manager = AccountManager(log, AccountConfig, AccountAuth, NUMBERTORANKS)
 
-    Requests = Requests(version, log, ErrorSRC)
-    Requests.check_version()
+    ErrorSRC = Error(log, acc_manager)
+
+    Requests.check_version(version, Requests.copy_run_update_script)
     Requests.check_status()
+    Requests = Requests(version, log, ErrorSRC)
 
     cfg = Config(log)
 
