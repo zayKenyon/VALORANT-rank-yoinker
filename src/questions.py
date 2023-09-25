@@ -6,9 +6,11 @@ TABLE_OPTS = {
     "rr": "Ranked Rating",
     "leaderboard": "Leaderboard Position",
     "peakrank": "Peak Rank",
+    "previousrank": "Previous Act Rank",
     "headshot_percent": "Headshot Percentage",
     "winrate": "WinRate",
-    "kd": "K/D Ratio <!> Last Game Only <!>"
+    "kd": "K/D Ratio <!> Last Game Only <!>",
+    "level": "Account Level"
 }
 
 FLAGS_OPTS = {
@@ -17,7 +19,8 @@ FLAGS_OPTS = {
     "pre_cls": "Pre-Clear Screen",
     "game_chat": "Print Game Chat",
     "peak_rank_act": "Peak Rank Act",
-    "discord_rpc": "Discord Rich Presence"
+    "discord_rpc": "Discord Rich Presence",
+    "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column"
 }
 
 weapon_question = lambda config: {
@@ -62,9 +65,20 @@ flags_question = lambda config: {
         "long_instruction": "Press 'space' to toggle selection and 'enter' to submit"
     }
 
+chat_limit_question = lambda config: {
+        "type": "number",
+        "name": "chat_limit",
+        "message": "Please enter the length of the chat messages history:",
+        "default": config.get("chat_limit", 5),
+        "min_allowed":0,
+        "max_allowed": 100,
+        "filter": lambda ans: int(ans)
+    }
+
 basic_questions = lambda config: [
     weapon_question(config=config),
-    table_question(config=config)
+    table_question(config=config),
+    chat_limit_question(config=config)
 ]
 
 advance_questions = lambda config: [

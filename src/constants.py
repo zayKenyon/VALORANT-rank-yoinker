@@ -1,7 +1,7 @@
 import requests
 from colr import color
 
-version = "2.50"
+version = "2.60"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
@@ -11,10 +11,12 @@ gamemodes = {
     "newmap": "New Map",
     "competitive": "Competitive",
     "unrated": "Unrated",
+    "swiftplay": "Swiftplay",
     "spikerush": "Spike Rush",
     "deathmatch": "Deathmatch",
     "ggteam": "Escalation",
     "onefa": "Replication",
+    "hurm": "Team Deathmatch",
     "custom": "Custom",
     "snowball": "Snowball Fight",
     "": "Custom",
@@ -50,27 +52,28 @@ sockets = {
 
 
 AGENTCOLORLIST = {
-            "neon": (28, 69, 161),
-            "none": (100, 100, 100),
-            "viper": (48, 186, 135),
-            "yoru": (52, 76, 207),
-            "astra": (113, 42, 232),
-            "breach": (217, 122, 46),
-            "brimstone": (217, 122, 46),
-            "cypher": (245, 240, 230),
-            "jett": (154,222,255),
-            "kay/o": (133, 146, 156),
-            "killjoy": (255, 217, 31),
-            "omen": (71, 80, 143),
-            "phoenix": (254, 130, 102),
-            "raze": (217, 122, 46),
-            "reyna": (181, 101, 181),
-            "sage": (90, 230, 213),
-            "skye": (192, 230, 158),
-            "sova": (37, 143, 204),
-            "chamber": (200, 200, 200),
-            "fade": (92, 92, 94)
-        }
+    "none": (100, 100, 100),
+    "astra": (113, 42, 232),
+    "breach": (217, 122, 46),
+    "brimstone": (217, 122, 46),
+    "cypher": (245, 240, 230),
+    "chamber": (200, 200, 200),
+    "deadlock": (102, 119, 176),
+    "fade": (92, 92, 94),
+    "jett": (154, 222, 255),
+    "kay/o": (133, 146, 156),
+    "killjoy": (255, 217, 31),
+    "omen": (71, 80, 143),
+    "phoenix": (254, 130, 102),
+    "raze": (217, 122, 46),
+    "reyna": (181, 101, 181),
+    "sage": (90, 230, 213),
+    "skye": (192, 230, 158),
+    "sova": (37, 143, 204),
+    "neon": (28, 69, 161),
+    "viper": (48, 186, 135),
+    "yoru": (52, 76, 207),
+}
 
 
 GAMEPODS = requests.get("https://valorant-api.com/internal/locres/en-US").json()["data"]["UI_GamePodStrings"]
@@ -153,14 +156,17 @@ DEFAULT_CONFIG = {
         "cooldown": 10,
         "port": 1100,
         "weapon": "Vandal",
+        "chat_limit": 5,
         "table": {
             "skin": True,
             "rr": True,
             "peakrank": True,
+            "previousrank" : False,
             "leaderboard": True,
             "headshot_percent": True,
             "winrate": True,
-            "kd": False
+            "kd": False,
+            "level": True
         },
         "flags": {
             "last_played": True,
@@ -168,6 +174,7 @@ DEFAULT_CONFIG = {
             "pre_cls": False,
             "game_chat": True,
             "peak_rank_act": True,
-            "discord_rpc": True
+            "discord_rpc": True,
+            "aggregate_rank_rr": True
         }
     }

@@ -4,11 +4,11 @@ import ssl
 import base64
 import json
 from colr import color
-import re
 
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc=None):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, server, rpc=None):
+
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -24,30 +24,14 @@ class Ws:
         self.hide_names = hide_names
         self.message_history = []
         self.up = "\033[A"
-        self.chat_limit = 5
+        self.chat_limit = cfg.chat_limit
         self.chatlog = chatlog
+        self.server = server
         if self.cfg.get_feature_flag("discord_rpc"):
             self.rpc = rpc
 
     def set_player_data(self, player_data):
         self.player_data = player_data
-
-    # async def conntect_to_websocket(self, initial_game_state):
-
-
-    #     local_headers = {}
-    #     local_headers['Authorization'] = 'Basic ' + base64.b64encode(('riot:' + self.lockfile['password']).encode()).decode()
-    #     url = f"wss://127.0.0.1:{self.lockfile['port']}"
-    #     self.websocket_client = websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers)
-    #     async with self.websocket_client as websocket:
-    #         await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
-    #         return None
-    #         # while True:
-    #         #     response = await websocket.recv()
-    #         #     h = self.handle(response, initial_game_state)
-    #         #     if h is not None:
-    #         #         return h
-
 
     async def recconect_to_websocket(self, initial_game_state):
         #wont actually recconect :)
@@ -76,7 +60,7 @@ class Ws:
                         state = None
                     else:
                         state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
-                    
+
                     if state is not None:
                         if self.cfg.get_feature_flag("discord_rpc"):
                             self.rpc.set_rpc(json.loads(base64.b64decode(presence['private'])))
@@ -109,12 +93,29 @@ class Ws:
                         name = f"{message['game_name']}#{message['game_tag']}"
                         if self.player_data[message['puuid']]['streamer_mode'] and self.hide_names and message['puuid'] not in self.player_data["ignore"]:
                             self.print_message(f"{chat_prefix} {color(self.colors.escape_ansi(agent), clr)}: {message['body']}")
+                            self.server.send_payload("chat",{
+                                "time": message["time"],
+                                "puuid": player,
+                                "self": message["puuid"] == self.Requests.puuid,
+                                "group":re.sub("\[|\]","",self.colors.escape_ansi(chat_prefix)),
+                                "agent": self.colors.escape_ansi(agent),
+                                "text": message['body']
+                            })
                         else:
                             if agent == "":
                                 agent_str = ""
                             else:
                                 agent_str = f" ({agent})"
                             self.print_message(f"{chat_prefix} {color(name, clr)}{agent_str}: {message['body']}")
+                            self.server.send_payload("chat",{
+                                "time": message["time"],
+                                "puuid": player,
+                                "self": message["puuid"] == self.Requests.puuid,
+                                "group":re.sub("\[|\]","",self.colors.escape_ansi(chat_prefix)),
+                                "player": name,
+                                "agent": self.colors.escape_ansi(agent),
+                                "text": message['body']
+                            })
                         self.id_seen.append(message['id'])
 
     def print_message(self, message):
@@ -123,29 +124,9 @@ class Ws:
         if self.messages > self.chat_limit:
             print(self.up * self.chat_limit, end="")
             for i in range(len(self.message_history) - self.chat_limit + 1, len(self.message_history)):
-                print(self.message_history[i] + " " * max([0, len(self.colors.escape_ansi(self.message_history[i-1])) - len(self.colors.escape_ansi(self.message_history[i]))]))
-            print(message + " " * max([0, len(self.colors.escape_ansi(self.message_history[-1])) - len(self.colors.escape_ansi(message))]))
+                print(self.message_history[i] + " " * max([0, len(self.colors.escape_ansi(self.message_history[i-1]).encode('utf8')) - len(self.colors.escape_ansi(self.message_history[i]).encode('utf8'))]))
+            print(message + " " * max([0, len(self.colors.escape_ansi(self.message_history[-1]).encode('utf8')) - len(self.colors.escape_ansi(message).encode('utf8'))]))
         else:
             print(message)
 
         self.message_history.append(message)
-
-    
-
-# if __name__ == "__main__":
-#     try:
-#         with open(os.path.join(os.getenv('LOCALAPPDATA'), R'Riot Games\Riot Client\Config\lockfile')) as lockfile:
-#             data = lockfile.read().split(':')
-#             keys = ['name', 'PID', 'port', 'password', 'protocol']
-#             lockfile = dict(zip(keys, data))
-#     except:
-#         raise Exception("Lockfile not found")
-
-
-#     ws = Ws(lockfile, "MENUS")
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(ws.conntect_to_websocket("MENUS"))
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_forever()

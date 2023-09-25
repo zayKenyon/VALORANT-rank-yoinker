@@ -5,10 +5,22 @@ class Rank:
         self.log = log
         self.ranks_before = ranks_before
         self.content = content
+        self.requestMap = {}
+
+    def get_request(self, puuid):
+        if puuid in self.requestMap:
+            return self.requestMap[puuid]
+
+        response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+        self.requestMap[puuid] = response
+        return response
+
+    def invalidate_cached_responses(self):
+        self.requestMap = {}
 
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
-        response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+        response = self.get_request(puuid)
         # pyperclip.copy(str(response.json()))
         final = {
             "rank": None,

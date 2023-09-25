@@ -12,6 +12,7 @@ TABLE_COLUMN_NAMES = Literal[
     "Rank",
     "RR",
     "Peak Rank",
+    "Previous Act Rank",
     "Pos.",
     "HS",
     "WR",
@@ -32,6 +33,7 @@ class Table:
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
+            bool(config.table.get("previousrank", False)), # Previous Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
             bool(
                 config.table.get("headshot_percent", True)
@@ -40,7 +42,7 @@ class Table:
                 config.table.get("winrate", True)
             ),  # wr
             bool(config.table.get("kd", True)),  # KD
-            True,  # Level
+            bool(config.table.get("level", True)),  # Level
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
@@ -48,7 +50,7 @@ class Table:
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
         self.chatlog = chatlog
-        self.console = RichConsole()
+        self.console = RichConsole(color_system="truecolor")
 
 
         #only to get init value not used

@@ -1,43 +1,39 @@
-import traceback
-import requests
-import urllib3
+import asyncio
 import os
+import socket
 import sys
 import time
-import asyncio
+import traceback
+
+import requests
+import urllib3
+from colr import color as colr
 from InquirerPy import inquirer
-
-from src.constants import *
-from src.requestsV import Requests
-from src.logs import Logging
-from src.config import Config
-from src.colors import Colors
-from src.rank import Rank
-from src.content import Content
-from src.names import Names
-from src.presences import Presences
-from src.Loadouts import Loadouts
-from src.websocket import Ws
-
-from src.states.menu import Menu
-from src.states.pregame import Pregame
-from src.states.coregame import Coregame
-
-from src.table import Table
-from src.server import Server
-from src.errors import Error
-
-from src.stats import Stats
-from src.configurator import configure
-from src.player_stats import PlayerStats
+from rich.console import Console as RichConsole
 
 from src.chatlogs import ChatLogging
-
+from src.colors import Colors
+from src.config import Config
+from src.configurator import configure
+from src.constants import *
+from src.content import Content
+from src.errors import Error
+from src.Loadouts import Loadouts
+from src.logs import Logging
+from src.names import Names
+from src.player_stats import PlayerStats
+from src.presences import Presences
+from src.rank import Rank
+from src.requestsV import Requests
 from src.rpc import Rpc
-
-from colr import color as colr
-
-from rich.console import Console as RichConsole
+from src.server import Server
+from src.states.coregame import Coregame
+from src.states.menu import Menu
+from src.states.pregame import Pregame
+from src.stats import Stats
+from src.table import Table
+from src.websocket import Ws
+from src.os import get_os
 
 from src.account_manager.account_manager import AccountManager
 from src.account_manager.account_config import AccountConfig
@@ -54,12 +50,30 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     log(f"exited program with error code {status}")
     raise sys.exit(status)
 
-
+def get_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 try:
     Logging = Logging()
     log = Logging.log
 
+    # OS Logging + quit if OS unsupported
+    if get_os()[1] == False:
+        print(f"Unsupported operating system: {get_os()[0]}\n")
+        log(f"Unsupported operating system: {get_os()[0]}\n")
+        program_exit(0)
+    else:
+        log(f"Operating system: {get_os()[0]}\n")
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
@@ -86,7 +100,6 @@ try:
 
     ErrorSRC = Error(log, acc_manager)
 
-    
     Requests.check_version(version, Requests.copy_run_update_script)
     Requests.check_status()
     Requests = Requests(version, log, ErrorSRC)
@@ -112,21 +125,26 @@ try:
 
 
     agent_dict = content.get_all_agents()
-    map_dict = content.get_maps()
+
+    map_info = content.get_all_maps()
+    map_urls = content.get_map_urls(map_info)
+    map_splashes = content.get_map_splashes(map_info)
+
+    current_map = coregame.get_current_map(map_urls, map_splashes)
 
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
-    loadoutsClass = Loadouts(Requests, log, colors, Server)
+    loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, chatlog, log)
 
     stats = Stats()
 
     if cfg.get_feature_flag("discord_rpc"):
-        rpc = Rpc(map_dict, gamemodes, colors, log)
+        rpc = Rpc(map_urls, gamemodes, colors, log)
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, Server, rpc)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
@@ -134,12 +152,13 @@ try:
     log(f"VALORANT rank yoinker v{version}")
 
 
-
-
     valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)
+    previousSeasonID = content.get_previous_season_id(gameContent)
     lastGameState = ""
+
+    print(color(f"\nWs Server - {get_ip()}:{cfg.port}", fore=(255, 127, 80)))
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
     chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
@@ -147,10 +166,7 @@ try:
 
     richConsole = RichConsole()
 
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_until_complete(Wss.conntect_to_websocket(game_state))
-    # loop.close()
+
     firstTime = True
     firstPrint = True
     while True:
@@ -186,7 +202,11 @@ try:
             else:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
+                previous_game_state = game_state
                 game_state = loop.run_until_complete(Wss.recconect_to_websocket(game_state))
+                # We invalidate the cached responses when going from any state to menus
+                if previous_game_state != game_state and game_state == "MENUS":
+                    rank.invalidate_cached_responses()
                 log(f"new game state: {game_state}")
                 loop.close()
             firstTime = False
@@ -209,6 +229,20 @@ try:
                     os.system('cls')
 
             is_leaderboard_needed = False
+
+            priv_presence = presences.get_private_presence(presence)
+            if priv_presence["provisioningFlow"] == "CustomGame" or priv_presence["partyState"] == "CUSTOM_GAME_SETUP":
+                gamemode = "Custom Game"
+            else:
+                gamemode = gamemodes.get(priv_presence['queueId'])
+
+            heartbeat_data = {
+                "time": int(time.time()),
+                "state": game_state,
+                "mode": gamemode,
+                "puuid": Requests.puuid,
+                "players": {}
+            }
 
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
@@ -235,16 +269,21 @@ try:
                     server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                loadouts = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
+                loadouts_arr = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
+                loadouts = loadouts_arr[0]
+                loadouts_data = loadouts_arr[1]
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
+                
+                heartbeat_data["map"] = map_urls[coregame_stats["MapID"].lower()],
                 with richConsole.status("Loading Players...") as status: 
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
+                    partyNum = 0
                     partyIcons = {}
                     lastTeamBoolean = False
                     lastTeam = "Red"
@@ -298,7 +337,6 @@ try:
                                                 })
 
                         party_icon = ''
-
                         # set party premade icon
                         for party in partyOBJ:
                             if player["Subject"] in partyOBJ[party]:
@@ -306,11 +344,14 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    partyNum = partyCount + 1
                                     partyCount += 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
+
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
@@ -367,6 +408,8 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                            rankName += f" ({playerRank['rr']})"
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -379,6 +422,9 @@ try:
 
                         # PEAK RANK
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+
+                        # PREVIOUS RANK
+                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -399,18 +445,41 @@ try:
                                               rankName,
                                               rr,
                                               peakRank,
+                                              previousRank,
                                               leaderboard,
                                               hs,
                                               wr,
                                               kd,
                                               level
                                               ])
+
+                        heartbeat_data["players"][player["Subject"]] = {
+                            "puuid": player["Subject"],
+                            "name": names[player["Subject"]],
+                            "partyNumber": partyNum if party_icon != "" else 0,
+                            "agent": agent_dict[player["CharacterID"].lower()],
+                            "rank": playerRank["rank"],
+                            "peakRank": playerRank["peakrank"],
+                            "peakRankAct": peakRankAct,
+                            "rr": rr,
+                            "kd": ppstats["kd"],
+                            "headshotPercentage": ppstats["hs"],
+                            "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
+                            "level": player_level,
+                            "agentImgLink": loadouts_data["Players"][player["Subject"]].get("Agent",None),
+                            "team": loadouts_data["Players"][player["Subject"]].get("Team",None),
+                            "sprays": loadouts_data["Players"][player["Subject"]].get("Sprays",None),
+                            "title": loadouts_data["Players"][player["Subject"]].get("Title",None),
+                            "playerCard": loadouts_data["Players"][player["Subject"]].get("PlayerCard",None),
+                            "weapons": loadouts_data["Players"][player["Subject"]].get("Weapons",None)
+                        }                     
+
                         stats.save_data(
                             {
                                 player["Subject"]: {
                                     "name": names[player["Subject"]],
                                     "agent": agent_dict[player["CharacterID"].lower()],
-                                    "map": map_dict[coregame_stats["MapID"].lower()],
+                                    "map": current_map,
                                     "rank": playerRank["rank"],
                                     "rr": rr,
                                     "match_id": coregame.match_id,
@@ -435,7 +504,7 @@ try:
                 # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
                                             #   state="pregame")
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
@@ -457,11 +526,13 @@ try:
                                     partyIcons.update({party: PARTYICONLIST[partyCount]})
                                     # PARTY_ICON
                                     party_icon = PARTYICONLIST[partyCount]
+                                    partyNum = partyCount + 1
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
@@ -520,6 +591,8 @@ try:
 
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
+                        if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                            rankName += f" ({playerRank['rr']})"
 
                         # RANK RATING
                         rr = playerRank["rr"]
@@ -530,6 +603,9 @@ try:
                             peakRankAct = ""
                         # PEAK RANK
                         peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+
+                        # PREVIOUS RANK
+                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -551,19 +627,35 @@ try:
                                               rankName,
                                               rr,
                                               peakRank,
+                                              previousRank,
                                               leaderboard,
                                               hs,
                                               wr,
                                               kd,
                                               level,
                                               ])
+
+                        heartbeat_data["players"][player["Subject"]] = {
+                            "name": names[player["Subject"]],
+                            "partyNumber": partyNum if party_icon != "" else 0,
+                            "agent": agent_dict[player["CharacterID"].lower()],
+                            "rank": playerRank["rank"],
+                            "peakRank": playerRank["peakrank"],
+                            "peakRankAct": peakRankAct,
+                            "level": player_level,
+                            "rr": rr,
+                            "kd": ppstats["kd"],
+                            "headshotPercentage": ppstats["hs"],
+                            "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
+                        }
+
                         # bar()
             if game_state == "MENUS":
                 already_played_with = []
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -575,7 +667,7 @@ try:
                             playersLoaded += 1
                             party_icon = PARTYICONLIST[0]
                             playerRank = rank.get_rank(player["Subject"], seasonID)
-
+                            previousPlayerRank = rank.get_rank(player["Subject"], previousSeasonID)
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
                                     rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
@@ -604,6 +696,8 @@ try:
 
                             # RANK
                             rankName = NUMBERTORANKS[playerRank["rank"]]
+                            if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
+                                rankName += f" ({playerRank['rr']})"
 
                             # RANK RATING
                             rr = playerRank["rr"]
@@ -615,6 +709,9 @@ try:
 
                             # PEAK RANK
                             peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+
+                            # PREVIOUS RANK
+                            previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
 
                             # LEADERBOARD
                             leaderboard = playerRank["leaderboard"]
@@ -635,12 +732,27 @@ try:
                                                 rankName,
                                                 rr,
                                                 peakRank,
+                                                previousRank,
                                                 leaderboard,
                                                 hs,
                                                 wr,
                                                 kd,
                                                 level
                                                 ])
+                            
+                            heartbeat_data["players"][player["Subject"]] = {
+                                "name": names[player["Subject"]],
+                                "rank": playerRank["rank"],
+                                "peakRank": playerRank["peakrank"],
+                                "peakRankAct": peakRankAct,
+                                "level": player_level,
+                                "rr": rr,
+                                "kd": ppstats["kd"],
+                                "headshotPercentage": ppstats["hs"],
+                                "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
+                            }
+
+                            # bar()
                     seen.append(player["Subject"])
             if (title := game_state_dict.get(game_state)) is None:
                 # program_exit(1)
@@ -664,7 +776,11 @@ try:
                         table.set_runtime_col_flag('Party', False)
                         table.set_runtime_col_flag('Agent',False)
 
+                # We don't to show the RR column if the "aggregate_rank_rr" feature flag is True.
+                table.set_runtime_col_flag('RR', cfg.table.get("rr") and not cfg.get_feature_flag("aggregate_rank_rr"))
+
                 table.set_caption(f"VALORANT rank yoinker v{version}")
+                Server.send_payload("heartbeat",heartbeat_data)
                 table.display()
                 firstPrint = False
 
