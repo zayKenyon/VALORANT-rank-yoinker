@@ -121,14 +121,17 @@ export default {
         
         connection.onmessage = function(event) {
             console.log(JSON.parse(event.data));
-            self.loadoutJSON = JSON.parse(event.data)
-            localStorage.clear()
-            localStorage.setItem("loadoutJSON", JSON.stringify(self.loadoutJSON))
-            self.Players = self.loadoutJSON.Players
-            // self.lastUpdate = +new Date
-            self.lastUpdate = self.loadoutJSON.time
-            // console.log(+new Date)
-            localStorage.setItem("lastUpdated", +new Date)
+            let json = JSON.parse(event.data)
+            if (json.type == "matchLoadout") {
+                self.loadoutJSON = json
+                localStorage.clear()
+                localStorage.setItem("loadoutJSON", JSON.stringify(self.loadoutJSON))
+                self.Players = self.loadoutJSON.Players
+                // self.lastUpdate = +new Date
+                self.lastUpdate = self.loadoutJSON.time
+                // console.log(+new Date)
+                localStorage.setItem("lastUpdated", +new Date)
+            }
         }
 
         connection.onopen = function() {
