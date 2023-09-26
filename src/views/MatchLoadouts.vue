@@ -122,7 +122,8 @@ export default {
         connection.onmessage = function(event) {
             console.log(JSON.parse(event.data));
             let json = JSON.parse(event.data)
-            if (json.type == "matchLoadout") {
+            // if json.type exists and is matchLoadout
+            if (json.type == undefined || json.type == "matchLoadout" ) {
                 self.loadoutJSON = json
                 localStorage.clear()
                 localStorage.setItem("loadoutJSON", JSON.stringify(self.loadoutJSON))
