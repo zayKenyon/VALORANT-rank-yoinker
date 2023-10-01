@@ -141,7 +141,7 @@ import {
   SNIPERS,
   MACHINE_GUNS,
   filterWeapons,
-} from "../utils/weapons";
+} from "@/utils/weapons";
 
 export default {
   mounted() {

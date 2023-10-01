@@ -52,7 +52,7 @@ import rawJson from "@/assets/json/match.json";
 
 import InventoryModal from "@/components/InventoryModal.vue";
 
-import { PRIMARY_WEAPONS } from "../utils/weapons";
+import { PRIMARY_WEAPONS } from "@/utils/weapons";
 
 import moment from "moment";
 
@@ -113,7 +113,7 @@ export default {
       this.timeStamp = time;
 
       this.attackingTeam = Object.values(Players)
-        .filter((p) => p.Team == "Red")
+        .filter((p) => p.Team === "Red")
         .map((p) => {
           return {
             ...p,
@@ -121,7 +121,7 @@ export default {
           };
         });
       this.defendingTeam = Object.values(Players)
-        .filter((p) => p.Team == "Blue")
+        .filter((p) => p.Team === "Blue")
         .map((p) => {
           return {
             ...p,
