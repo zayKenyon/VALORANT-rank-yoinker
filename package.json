@@ -1,6 +1,6 @@
 {
   "name": "valorant-rank-yoinker",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "serve": "npx vue-cli-service serve",
     "build": "npx vue-cli-service build",
