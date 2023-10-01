@@ -81,9 +81,9 @@ export default {
       showInventory: false,
       inventory: {},
       pages: {
-        vry: "https://github.com/zayKenyon/VALORANT-rank-yoinker",
-        github: "https://github.com/thurdev",
-        discord: "https://discord.gg/kSCjdWKZfq",
+        vry: "https://zaykenyon.github.io/VALORANT-rank-yoinker/",
+        github: "https://github.com/zayKenyon/VALORANT-rank-yoinker",
+        discord: "https://discord.gg/HeTKed64Ka",
       },
     };
   },
