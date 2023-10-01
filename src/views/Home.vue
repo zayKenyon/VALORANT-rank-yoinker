@@ -77,7 +77,6 @@ export default {
       attackingTeam: [],
       defendingTeam: [],
       timeStamp: new Date().getTime() / 1000,
-      currentMap: "N/A",
       showInventory: false,
       inventory: {},
       pages: {
@@ -106,15 +105,12 @@ export default {
       const { Players, time, map = {} } = JSON.parse(event.data);
 
       const { splash = "images/default-splash.jpeg" } = map;
-
       document.documentElement.style.setProperty(
         "--splash-map",
         `url(${splash})`
       );
 
       this.timeStamp = time;
-      this.mapName = map.name;
-      this.mapSplash = map.splash;
 
       this.attackingTeam = Object.values(Players)
         .filter((p) => p.Team == "Red")
