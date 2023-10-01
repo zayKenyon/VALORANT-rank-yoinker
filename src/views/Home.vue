@@ -52,7 +52,7 @@ import rawJson from "@/assets/json/match.json";
 
 import InventoryModal from "@/components/InventoryModal.vue";
 
-import { PRIMARY_WEAPONS } from "@/utils/weapons";
+import { FAVOURITE_WEAPONS } from "@/utils/weapons";
 
 import moment from "moment";
 
@@ -131,7 +131,7 @@ export default {
     },
     filterWeapons(weapons) {
       return Object.values(weapons).filter((w) =>
-        PRIMARY_WEAPONS.includes(w.weapon)
+        FAVOURITE_WEAPONS.includes(w.weapon)
       );
     },
   },

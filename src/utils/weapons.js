@@ -37,7 +37,7 @@ export const MELEE = [
     "Melee"
 ];
 
-export const PRIMARY_WEAPONS = [
+export const FAVOURITE_WEAPONS = [
     "Sheriff",
     "Phantom",
     "Vandal",
