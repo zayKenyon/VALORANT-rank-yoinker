@@ -6,12 +6,6 @@
 export default {
   name: "App",
   methods: {
-    redirectToGithub() {
-      window.open("https://github.com/isaacKenyon/VALORANT-rank-yoinker");
-    },
-    redirectToDiscord() {
-      window.open("https://discord.gg/HeTKed64Ka");
-    },
   },
 };
 </script>
