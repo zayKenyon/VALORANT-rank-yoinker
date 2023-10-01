@@ -2,9 +2,9 @@
   "name": "valorant-rank-yoinker",
   "version": "1.0.0",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "serve": "npx vue-cli-service serve",
+    "build": "npx vue-cli-service build",
+    "lint": "npx vue-cli-service lint",
     "deploy": "node scripts/gh-pages-deploy.js"
   },
   "dependencies": {
