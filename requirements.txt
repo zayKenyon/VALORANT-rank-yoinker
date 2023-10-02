@@ -10,6 +10,7 @@ pfzy==0.3.4
 prompt-toolkit==3.0.39
 Pygments==2.15.1
 pypresence==4.3.0
+PyYAML==6.0.1
 requests==2.31.0
 rich==13.5.1
 urllib3==2.0.4
