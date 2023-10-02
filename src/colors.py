@@ -9,7 +9,7 @@ class Colors:
         self.tier_dict = tierDict
         self.AGENTCOLORLIST = AGENTCOLORLIST
 
-    def get_color_from_team(self, team, name, playerPuuid, selfPuuid, agent=None, party_members=None):
+    def get_color_from_team(self, team, name, playerPuuid, selfPuuid, agent=None, party_members=None, already_seen=None):
         orig_name = name
         if agent is not None:
             if self.hide_names:
@@ -17,18 +17,16 @@ class Colors:
                     name = self.agent_dict[agent.lower()]
                 else:
                     name = "Player"
+        if playerPuuid in party_members:
+            name = orig_name
         if team == 'Red':
-            if playerPuuid not in party_members:
-                Teamcolor = color(name, fore=(238, 77, 77))
-            else:
-                Teamcolor = color(orig_name, fore=(238, 77, 77))
+            Teamcolor = color(name, fore=(238, 77, 77))
         elif team == 'Blue':
-            if playerPuuid not in party_members:
-                Teamcolor = color(name, fore=(76, 151, 237))
-            else:
-                Teamcolor = color(orig_name, fore=(76, 151, 237))
+            Teamcolor = color(name, fore=(76, 151, 237))
         else:
             Teamcolor = ''
+        if already_seen:
+            Teamcolor = color(name, fore=(10, 211, 8))
         if playerPuuid == selfPuuid:
             Teamcolor = color(orig_name, fore=(221, 224, 41))
         return Teamcolor

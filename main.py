@@ -295,9 +295,11 @@ try:
                     for p in Players:
                         if p["Subject"] == Requests.puuid:
                             allyTeam = p["TeamID"]
+                            break
                     for player in Players:
                         status.update(f"Loading players... [{playersLoaded}/{len(Players)}]")
                         playersLoaded += 1
+                        times = 0
 
                         if player["Subject"] in stats_data.keys():
                             if player["Subject"] != Requests.puuid and player["Subject"] not in partyMembersList:
@@ -309,32 +311,41 @@ try:
                                     curr_player_stat = stats_data[player["Subject"]][-i]
                                 if curr_player_stat["match_id"] != coregame.match_id:
                                     #checking for party memebers and self players
-                                    times = 0
                                     m_set = ()
                                     for m in stats_data[player["Subject"]]:
                                         if m["match_id"] != coregame.match_id and m["match_id"] not in m_set:
+                                            # saves if they were on your team or not, defaults to true for old data
+                                            teammate = m.get("team", True)
                                             times += 1
                                             m_set += (m["match_id"],)
+
+                                    if teammate:
+                                        team = "with"
+                                    else:
+                                        team = "against"
+
                                     if player["PlayerIdentity"]["Incognito"] == False:
                                         already_played_with.append(
-                                                {
-                                                    "times": times,
-                                                    "name": curr_player_stat["name"],
-                                                    "agent": curr_player_stat["agent"],
-                                                    "time_diff": time.time() - curr_player_stat["epoch"]
-                                                })
+                                            {
+                                                "times": times,
+                                                "name": curr_player_stat["name"],
+                                                "agent": curr_player_stat["agent"],
+                                                "time_diff": time.time() - curr_player_stat["epoch"],
+                                                "team": team
+                                            })
                                     else:
                                         if player["TeamID"] == allyTeam:
                                             team_string = "your"
                                         else:
                                             team_string = "enemy"
                                         already_played_with.append(
-                                                {
-                                                    "times": times,
-                                                    "name": agent_dict[player["CharacterID"].lower()] + " on " + team_string + " team",
-                                                    "agent": curr_player_stat["agent"],
-                                                    "time_diff": time.time() - curr_player_stat["epoch"]
-                                                })
+                                            {
+                                                "times": times,
+                                                "name": agent_dict[player["CharacterID"].lower()] + " on " + team_string + " team",
+                                                "agent": curr_player_stat["agent"],
+                                                "time_diff": time.time() - curr_player_stat["epoch"],
+                                                "team": team
+                                            })
 
                         party_icon = ''
                         # set party premade icon
@@ -373,12 +384,17 @@ try:
 
                         if player["PlayerIdentity"]["Incognito"]:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, agent=player["CharacterID"], party_members=partyMembersList)
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"], Requests.puuid,
+                                                                   agent=player["CharacterID"],
+                                                                   party_members=partyMembersList,
+                                                                   already_seen=True if times > 0 else False)
                         else:
                             Namecolor = colors.get_color_from_team(player["TeamID"],
-                                                            names[player["Subject"]],
-                                                            player["Subject"], Requests.puuid, party_members=partyMembersList)
+                                                                   names[player["Subject"]],
+                                                                   player["Subject"], Requests.puuid,
+                                                                   party_members=partyMembersList,
+                                                                   already_seen=True if times > 0 else False)
                         if lastTeam != player["TeamID"]:
                             if lastTeamBoolean:
                                 table.add_empty_row()
@@ -484,6 +500,7 @@ try:
                                     "rr": rr,
                                     "match_id": coregame.match_id,
                                     "epoch": time.time(),
+                                    "team": player["TeamID"] == allyTeam
                                 }
                             }
                         )
@@ -774,7 +791,7 @@ try:
                 if game_state == "INGAME":
                     if isRange:
                         table.set_runtime_col_flag('Party', False)
-                        table.set_runtime_col_flag('Agent',False)
+                        table.set_runtime_col_flag('Agent', False)
 
                 # We don't to show the RR column if the "aggregate_rank_rr" feature flag is True.
                 table.set_runtime_col_flag('RR', cfg.table.get("rr") and not cfg.get_feature_flag("aggregate_rank_rr"))
@@ -796,8 +813,8 @@ try:
                     if len(already_played_with) > 0:
                         print("\n")
                         for played in already_played_with:
-                            print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
-                            chatlog(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                            print(f"Already played {played['team']} {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
+                            chatlog(f"Already played {played['team']} {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
