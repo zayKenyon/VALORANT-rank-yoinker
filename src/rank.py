@@ -1,4 +1,3 @@
-
 class Rank:
     def __init__(self, Requests, log, content, ranks_before):
         self.Requests = Requests
@@ -11,14 +10,14 @@ class Rank:
         if puuid in self.requestMap:
             return self.requestMap[puuid]
 
-        response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}", "get")
+        response = self.Requests.fetch("pd", f"/mmr/v1/players/{puuid}", "get")
         self.requestMap[puuid] = response
         return response
 
     def invalidate_cached_responses(self):
         self.requestMap = {}
 
-    #in future rewrite this code
+    # in future rewrite this code
     def get_rank(self, puuid, seasonID):
         response = self.get_request(puuid)
         final = {
@@ -32,18 +31,26 @@ class Rank:
             "peakrankep": None,
             "statusgood": None,
             "statuscode": None,
-            }
+        }
         try:
             if response.ok:
                 r = response.json()
-                rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
+                rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][
+                    seasonID
+                ]["CompetitiveTier"]
                 if int(rankTIER) >= 21:
                     final["rank"] = rankTIER
-                    final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
-                    final["leaderboard"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]
+                    final["rr"] = r["QueueSkills"]["competitive"][
+                        "SeasonalInfoBySeasonID"
+                    ][seasonID]["RankedRating"]
+                    final["leaderboard"] = r["QueueSkills"]["competitive"][
+                        "SeasonalInfoBySeasonID"
+                    ][seasonID]["LeaderboardRank"]
                 elif int(rankTIER) not in (0, 1, 2):
                     final["rank"] = rankTIER
-                    final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
+                    final["rr"] = r["QueueSkills"]["competitive"][
+                        "SeasonalInfoBySeasonID"
+                    ][seasonID]["RankedRating"]
                     final["leaderboard"] = 0
                 else:
                     final["rank"] = 0
@@ -69,8 +76,15 @@ class Rank:
         seasons = r["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
         if seasons is not None:
             for season in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
-                if r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"] is not None:
-                    for winByTier in r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"]:
+                if (
+                    r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season][
+                        "WinsByTier"
+                    ]
+                    is not None
+                ):
+                    for winByTier in r["QueueSkills"]["competitive"][
+                        "SeasonalInfoBySeasonID"
+                    ][season]["WinsByTier"]:
                         if season in self.ranks_before:
                             if int(winByTier) > 20:
                                 winByTier = int(winByTier) + 3
@@ -81,23 +95,25 @@ class Rank:
         else:
             final["peakrank"] = max_rank
         try:
-            wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
-            total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfGames"]
+            wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID][
+                "NumberOfWinsWithPlacements"
+            ]
+            total_games = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][
+                seasonID
+            ]["NumberOfGames"]
             final["numberofgames"] = total_games
             try:
                 wr = int(wins / total_games * 100)
-            except ZeroDivisionError: #no loses
+            except ZeroDivisionError:  # no loses
                 wr = 100
-        except (KeyError, TypeError): #haven't played this season, #no data?
+        except (KeyError, TypeError):  # haven't played this season, #no data?
             wr = "N/a"
-
 
         final["wr"] = wr
         final["statusgood"] = response.ok
         final["statuscode"] = response.status_code
 
-
-        #peak rank act and ep
+        # peak rank act and ep
         peak_rank_act_ep = self.content.get_act_episode_from_act_id(max_rank_season)
         final["peakrankact"] = peak_rank_act_ep["act"]
         final["peakrankep"] = peak_rank_act_ep["episode"]
@@ -110,6 +126,7 @@ if __name__ == "__main__":
     from logs import Logging
     from errors import Error
     import urllib3
+
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     Logging = Logging()
@@ -119,7 +136,7 @@ if __name__ == "__main__":
 
     Requests = Requests(version, log, ErrorSRC)
 
-    #season id
+    # season id
     s_id = "67e373c7-48f7-b422-641b-079ace30b427"
 
     r = Rank(Requests, log, before_ascendant_seasons)

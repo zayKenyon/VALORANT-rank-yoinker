@@ -30,7 +30,7 @@ def configure():
         "Full Advance Config (I know what i am doing!)",
         Separator(),
         "Save and Exit Configurator",
-        "Exit Configurator"
+        "Exit Configurator",
     ]
 
     changed_config = {}
@@ -54,7 +54,7 @@ def configure():
         elif choice is menu_choices[5]:
             changed_config |= prompt(advance_questions(config=loop_config))
         elif choice is menu_choices[7]:
-            proceed=True
+            proceed = True
             break
         else:
             proceed = (not len(changed_config.keys()) > 0) or inquirer.confirm(
@@ -62,7 +62,7 @@ def configure():
             ).execute()
             break
 
-        os.system('cls')
+        os.system("cls")
 
     if proceed:
         config = default_config | user_config | changed_config

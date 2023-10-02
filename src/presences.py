@@ -2,26 +2,32 @@ import base64
 import json
 import time
 
+
 class Presences:
     def __init__(self, Requests, log):
         self.Requests = Requests
         self.log = log
 
     def get_presence(self):
-        presences = self.Requests.fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
-        return presences['presences']
+        presences = self.Requests.fetch(
+            url_type="local", endpoint="/chat/v4/presences", method="get"
+        )
+        return presences["presences"]
 
     def get_game_state(self, presences):
         return self.get_private_presence(presences)["sessionLoopState"]
 
     def get_private_presence(self, presences):
         for presence in presences:
-            if presence['puuid'] == self.Requests.puuid:
-                #preventing vry from crashing when lol is open
-                if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
+            if presence["puuid"] == self.Requests.puuid:
+                # preventing vry from crashing when lol is open
+                if (
+                    presence.get("championId") is not None
+                    or presence.get("product") == "league_of_legends"
+                ):
                     return None
                 else:
-                    return json.loads(base64.b64decode(presence['private']))
+                    return json.loads(base64.b64decode(presence["private"]))
 
     def decode_presence(self, private):
         if "{" not in str(private) and private is not None and str(private) != "":

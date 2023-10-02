@@ -1,17 +1,18 @@
 import os
 import json
 
+
 class Stats:
     def __init__(self):
         pass
 
     def save_data(self, data):
         try:
-            os.mkdir(os.path.join(os.getenv('APPDATA'), "vry"))
+            os.mkdir(os.path.join(os.getenv("APPDATA"), "vry"))
         except FileExistsError:
             pass
         try:
-            with open(os.path.join(os.getenv('APPDATA'), "vry/stats.json"), "r") as f:
+            with open(os.path.join(os.getenv("APPDATA"), "vry/stats.json"), "r") as f:
                 original_data = json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             original_data = {}
@@ -23,12 +24,12 @@ class Stats:
             else:
                 updated_data[puuid].append(data[puuid])
 
-        with open(os.path.join(os.getenv('APPDATA'), "vry/stats.json"), "w") as f:
+        with open(os.path.join(os.getenv("APPDATA"), "vry/stats.json"), "w") as f:
             json.dump(updated_data, f)
 
     def read_data(self):
         try:
-            with open(os.path.join(os.getenv('APPDATA'), "vry/stats.json"), "r") as f:
+            with open(os.path.join(os.getenv("APPDATA"), "vry/stats.json"), "r") as f:
                 return json.load(f)
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             return {}
