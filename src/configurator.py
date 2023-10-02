@@ -4,7 +4,6 @@ import os
 from InquirerPy import inquirer, prompt
 from InquirerPy.separator import Separator
 
-from src.constants import DEFAULT_CONFIG
 
 from src.questions import *
 
@@ -18,7 +17,7 @@ def configure():
     except FileNotFoundError:
         print("Generating default configuration")
         user_config = default_config
-    except json.JSONDecodeError: 
+    except json.JSONDecodeError:
         print("config file maybe broken, using default instead")
         user_config = default_config
 

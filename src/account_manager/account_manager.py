@@ -1,4 +1,4 @@
-import InquirerPy, subprocess, re
+import InquirerPy, subprocess
 from InquirerPy import inquirer
 
 
@@ -96,7 +96,7 @@ class AccountManager:
             account_option = remove_account_prompt["choices"].index(result["menu"])
             account = account_order_list[account_option]
 
-            
+
             if self.last_account_data["name"] == self.account_config.accounts_data[account]["name"]:
                 self.account_config.remove_account(account)
                 self.menu(None)

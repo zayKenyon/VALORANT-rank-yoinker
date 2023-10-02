@@ -1,6 +1,5 @@
 from typing import Literal, get_args
 
-# from prettytable import PrettyTable
 from rich.table import Table as RichTable
 from rich.console import Console as RichConsole
 
@@ -68,7 +67,7 @@ class Table:
 
     def set_title(self, title):
         self.rich_table.title = self.ansi_to_console(title)
-    
+
     def set_caption(self, caption):
         self.rich_table.caption = self.ansi_to_console(caption)
 
@@ -82,7 +81,7 @@ class Table:
         # row = [c for c, i in zip(args, self.col_flags) if i]
         # row = [self.ansi_to_console(str(i)) for i in row]
         self.rows.append(zip(self.field_names_candidates, args))
-        
+
         # self.rich_table.add_row(*row)
 
     def add_empty_row(self):
@@ -115,7 +114,7 @@ class Table:
         self.rich_table.title_style = "bold"
         self.rich_table.caption_style = "italic rgb(50,505,50)"
         self.rich_table.caption_justify = "left"
-        
+
         pass
 
     def ansi_to_console(self, line):

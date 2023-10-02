@@ -5,7 +5,6 @@ import sys
 import time
 import traceback
 
-import requests
 import urllib3
 from colr import color as colr
 from InquirerPy import inquirer
@@ -275,9 +274,9 @@ try:
                 # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
-                
+
                 heartbeat_data["map"] = map_urls[coregame_stats["MapID"].lower()],
-                with richConsole.status("Loading Players...") as status: 
+                with richConsole.status("Loading Players...") as status:
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
@@ -472,7 +471,7 @@ try:
                             "title": loadouts_data["Players"][player["Subject"]].get("Title",None),
                             "playerCard": loadouts_data["Players"][player["Subject"]].get("PlayerCard",None),
                             "weapons": loadouts_data["Players"][player["Subject"]].get("Weapons",None)
-                        }                     
+                        }
 
                         stats.save_data(
                             {
@@ -739,7 +738,7 @@ try:
                                                 kd,
                                                 level
                                                 ])
-                            
+
                             heartbeat_data["players"][player["Subject"]] = {
                                 "name": names[player["Subject"]],
                                 "rank": playerRank["rank"],
