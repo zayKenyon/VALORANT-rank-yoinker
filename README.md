@@ -6,6 +6,8 @@
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
+[![Black CodeStyle][black-codestyle-shield]][black-codestyle-url]
+
     
  
   <ol>
@@ -105,3 +107,6 @@ If you want to make a small change to the application, you can:
 
 [downloads-shield]: https://img.shields.io/github/downloads/zayKenyon/VALORANT-rank-yoinker/total?style=for-the-badge&logo=github
 [downloads-url]: https://github.com/zayKenyon/VALORANT-rank-yoinker/releases/latest
+
+[black-codestyle-shield]: https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge
+[black-codestyle-url]: https://github.com/psf/black
