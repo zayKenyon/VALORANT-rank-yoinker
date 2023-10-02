@@ -7,6 +7,7 @@
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
 [![Black CodeStyle][black-codestyle-shield]][black-codestyle-url]
+[![Pylint CodeStyle][pylint-codestyle-shield]][pylint-codestyle-url]
 
     
  
@@ -112,3 +113,6 @@ If you want to make a small change to the application, you can:
 
 [black-codestyle-shield]: https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge
 [black-codestyle-url]: https://github.com/psf/black
+
+[pylint-codestyle-shield]: https://img.shields.io/badge/linting-pylint-yellowgreen?style=for-the-badge
+[pylint-codestyle-url]: https://github.com/pylint-dev/pylint
