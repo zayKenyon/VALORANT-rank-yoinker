@@ -1,0 +1,6 @@
+# Specifies only dev-specific requirements,
+# But imports the common ones too.
+
+-r common.txt
+black==23.9.1
+pylint==3.0.0

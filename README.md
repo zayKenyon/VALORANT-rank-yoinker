@@ -81,6 +81,8 @@ If you want to make a small change to the application, you can:
 ## Contributing
 
  Any contributions you make are **greatly appreciated**.
+ Make sure to install dev-specific packages with `pip install -r 
+ requirements.dev.txt`!
  
 ## Contact 
 

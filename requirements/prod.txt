@@ -1,0 +1,4 @@
+# Specifies only prod-specific requirements,
+# But imports the common ones too.
+
+-r common.txt
