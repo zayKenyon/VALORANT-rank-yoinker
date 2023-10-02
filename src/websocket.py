@@ -13,7 +13,6 @@ class Ws:
 
         self.lockfile = lockfile
         self.Requests = Requests
-        # websocket.enableTrace(True)
         self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.ssl_context.check_hostname = False
         self.ssl_context.verify_mode = ssl.CERT_NONE

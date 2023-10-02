@@ -18,15 +18,12 @@ class Presences:
         for presence in presences:
             if presence['puuid'] == self.Requests.puuid:
                 #preventing vry from crashing when lol is open
-                # print(presence)
-                # print(presence.get("championId"))
                 if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
                     return None
                 else:
                     return json.loads(base64.b64decode(presence['private']))
 
     def decode_presence(self, private):
-        # try:
         if "{" not in str(private) and private is not None and str(private) != "":
             dict = json.loads(base64.b64decode(str(private)).decode("utf-8"))
             if dict.get("isValid"):

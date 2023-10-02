@@ -144,9 +144,6 @@ try:
         rpc = None
 
     Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, Server, rpc)
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # loop.run_forever()
 
     log(f"VALORANT rank yoinker v{version}")
 
@@ -174,14 +171,6 @@ try:
         table.reset_runtime_col_flags()
 
         try:
-
-
-            # loop = asyncio.get_event_loop()
-            # loop.run_until_complete(Wss.conntect_to_websocket())
-            # if firstTime:
-            #     loop = asyncio.new_event_loop()
-            #     asyncio.set_event_loop(loop)
-            #     game_state = loop.run_until_complete(Wss.conntect_to_websocket(game_state))
             if firstTime:
                 run = True
                 while run:
@@ -209,9 +198,6 @@ try:
                 log(f"new game state: {game_state}")
                 loop.close()
             firstTime = False
-            # loop = asyncio.new_event_loop()
-            # asyncio.set_event_loop(loop)
-            # loop.run_until_complete()
         except TypeError:
             raise Exception("Game has not started yet!")
         # if cfg.cooldown == 0 or game_state != lastGameState:
@@ -271,14 +257,12 @@ try:
                 loadouts_arr = loadoutsClass.get_match_loadouts(coregame.get_coregame_match_id(), Players, cfg.weapon, valoApiSkins, names, state="game")
                 loadouts = loadouts_arr[0]
                 loadouts_data = loadouts_arr[1]
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                 isRange = False
                 playersLoaded = 1
 
                 heartbeat_data["map"] = map_urls[coregame_stats["MapID"].lower()],
                 with richConsole.status("Loading Players...") as status:
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
-                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     Players.sort(key=lambda Players: Players["TeamID"], reverse=True)
                     partyCount = 0
@@ -354,13 +338,6 @@ try:
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
-                        # rankStatus = playerRank[1]
-                        #useless code since rate limit is handled in the requestsV
-                        # while not rankStatus:
-                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                        #     time.sleep(10)
-                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                        #     rankStatus = playerRank[1]
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
@@ -391,16 +368,12 @@ try:
                         else:
                             PLcolor = colors.level_to_color(player_level)
                         # AGENT
-                        # agent = str(agent_dict.get(player["CharacterID"].lower()))
                         agent = colors.get_agent_from_uuid(player["CharacterID"].lower())
                         if agent == "" and len(Players) == 1:
                             isRange = True
 
                         # NAME
                         name = Namecolor
-
-                        # VIEWS
-                        # views = get_views(names[player["Subject"]])
 
                         # skin
                         skin = loadouts[player["Subject"]]
@@ -439,7 +412,6 @@ try:
                         table.add_row_table([party_icon,
                                               agent,
                                               name,
-                                              # views,
                                               skin,
                                               rankName,
                                               rr,
@@ -499,17 +471,12 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
-                #temporary until other regions gets fixed?
-                # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
-                                            #   state="pregame")
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
                     partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players), presence)
                     partyMembers = menu.get_party_members(Requests.puuid, presence)
                     partyMembersList = [a["Subject"] for a in partyMembers]
-                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     partyCount = 0
                     partyIcons = {}
@@ -536,14 +503,6 @@ try:
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
                                 rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
-                        # rankStatus = playerRank[1]
-                        #useless code since rate limit is handled in the requestsV
-                        # while not rankStatus:
-                        #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                        #     time.sleep(10)
-                        #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                        #     rankStatus = playerRank[1]
-                        # playerRank = playerRank[0]
 
                         ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
@@ -581,13 +540,6 @@ try:
                         # NAME
                         name = NameColor
 
-                        # VIEWS
-                        # views = get_views(names[player["Subject"]])
-
-                        #temporary until other regions gets fixed?
-                        # skin
-                        # skin = loadouts[player["Subject"]]
-
                         # RANK
                         rankName = NUMBERTORANKS[playerRank["rank"]]
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get("rr"):
@@ -621,7 +573,6 @@ try:
                         table.add_row_table([party_icon,
                                               agent,
                                               name,
-                                              # views,
                                               "",
                                               rankName,
                                               rr,
@@ -655,8 +606,6 @@ try:
                 names = namesClass.get_names_from_puuids(Players)
                 playersLoaded = 1
                 with richConsole.status("Loading Players...") as status:
-                # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
-                    # log(f"retrieved names dict: {names}")
                     Players.sort(key=lambda Players: Players["PlayerIdentity"].get("AccountLevel"), reverse=True)
                     seen = []
                     for player in Players:
@@ -670,15 +619,6 @@ try:
                             if player["Subject"] == Requests.puuid:
                                 if cfg.get_feature_flag("discord_rpc"):
                                     rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
-
-                            # rankStatus = playerRank[1]
-                            #useless code since rate limit is handled in the requestsV
-                            # while not rankStatus:
-                            #     print("You have been rate limited, 😞 waiting 10 seconds!")
-                            #     time.sleep(10)
-                            #     playerRank = rank.get_rank(player["Subject"], seasonID)
-                            #     rankStatus = playerRank[1]
-                            # playerRank = playerRank["rank"]
 
                             ppstats = pstats.get_stats(player["Subject"])
                             hs = ppstats["hs"]
@@ -783,14 +723,6 @@ try:
                 table.display()
                 firstPrint = False
 
-                # print(f"VALORANT rank yoinker v{version}")
-                # chatlog(f"VALORANT rank yoinker v{version}")
-                                        #                 {
-                                        #     "times": sum(stats_data[player["Subject"]]),
-                                        #     "name": curr_player_stat["name"],
-                                        #     "agent": curr_player_stat["agent"],
-                                        #     "time_diff": time.time() - curr_player_stat["time"]
-                                        # })
                 if cfg.get_feature_flag("last_played"):
                     if len(already_played_with) > 0:
                         print("\n")
@@ -801,7 +733,6 @@ try:
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:
-            # time.sleep(cfg.cooldown)
             pass
 except KeyboardInterrupt:
     #lame implementation of fast ctrl+c exit

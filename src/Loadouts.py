@@ -41,19 +41,14 @@ class Loadouts:
                     for skin in valoApiSkins.json()["data"]:
                         if skin_id.lower() == skin["uuid"].lower():
                             rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
-                            # if rgb_color is not None:
                             weaponLists.update({players[player]["Subject"]: color(skin["displayName"], fore=rgb_color)})
-                            # else:
-                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
         final_json = self.convertLoadoutToJsonArray(PlayerInventorys, playersBackup, state, names)
-        # self.log(f"json for website: {final_json}")
         self.Server.send_payload("matchLoadout",final_json)
         return [weaponLists,final_json]
 
     #this will convert valorant loadouts to json with player names
     def convertLoadoutToJsonArray(self, PlayerInventorys, players, state, names):
         #get agent dict from main in future
-        # names = self.namesClass.get_names_from_puuids(players)
         valoApiSprays = requests.get("https://valorant-api.com/v1/sprays")
         valoApiWeapons = requests.get("https://valorant-api.com/v1/weapons")
         valoApiBuddies = requests.get("https://valorant-api.com/v1/buddies")
@@ -137,9 +132,6 @@ class Loadouts:
                                 )
 
                     #create buddy field
-                    # self.log("predefined sockets")
-                    # final_json[players[i]["Subject"]]["Weapons"].update({skin: {}})
-
                     #buddies
                     for socket in PlayerInventory["Items"][skin]["Sockets"]:
                         if sockets["skin_buddy"] == socket:

@@ -21,7 +21,6 @@ class Rank:
     #in future rewrite this code
     def get_rank(self, puuid, seasonID):
         response = self.get_request(puuid)
-        # pyperclip.copy(str(response.json()))
         final = {
             "rank": None,
             "rr": None,
@@ -36,14 +35,9 @@ class Rank:
             }
         try:
             if response.ok:
-                # self.log("retrieved rank successfully")
                 r = response.json()
                 rankTIER = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["CompetitiveTier"]
                 if int(rankTIER) >= 21:
-                    # rank = [rankTIER,
-                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]]
-
                     final["rank"] = rankTIER
                     final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
                     final["leaderboard"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["LeaderboardRank"]
@@ -51,10 +45,6 @@ class Rank:
                     final["rank"] = rankTIER
                     final["rr"] = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"]
                     final["leaderboard"] = 0
-
-                    # rank = [rankTIER,
-                            # r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["RankedRating"],
-                            # 0]
                 else:
                     final["rank"] = 0
                     final["rr"] = 0
@@ -87,10 +77,8 @@ class Rank:
                         if int(winByTier) > max_rank:
                             max_rank = int(winByTier)
                             max_rank_season = season
-            # rank.append(max_rank)
             final["peakrank"] = max_rank
         else:
-            # rank.append(max_rank)
             final["peakrank"] = max_rank
         try:
             wins = r["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][seasonID]["NumberOfWinsWithPlacements"]
@@ -101,15 +89,13 @@ class Rank:
             except ZeroDivisionError: #no loses
                 wr = 100
         except (KeyError, TypeError): #haven't played this season, #no data?
-            # print("test")
             wr = "N/a"
 
 
-        # rank.append(wr)
         final["wr"] = wr
         final["statusgood"] = response.ok
         final["statuscode"] = response.status_code
-        
+
 
         #peak rank act and ep
         peak_rank_act_ep = self.content.get_act_episode_from_act_id(max_rank_season)
@@ -124,7 +110,6 @@ if __name__ == "__main__":
     from logs import Logging
     from errors import Error
     import urllib3
-    import pyperclip
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     Logging = Logging()
@@ -133,15 +118,11 @@ if __name__ == "__main__":
     ErrorSRC = Error(log)
 
     Requests = Requests(version, log, ErrorSRC)
-    #custom region
-    # Requests.pd_url = "https://pd.na.a.pvp.net"
 
     #season id
-    s_id = "67e373c7-48f7-b422-641b-079ace30b427" 
+    s_id = "67e373c7-48f7-b422-641b-079ace30b427"
 
     r = Rank(Requests, log, before_ascendant_seasons)
 
     res = r.get_rank("", s_id)
     print(res)
-    #[[rank, rr, leadeboard, peak rank, wr,] status]
-    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}\nWR: {res[0][4]}%")

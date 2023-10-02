@@ -16,7 +16,6 @@ class PlayerStats:
         response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=1&queue=competitive", "get")
         try:
             r = self.Requests.fetch('pd', f"/match-details/v1/matches/{response.json()['Matches'][0]['MatchID']}", "get")
-            # pyperclip.copy(str(r.json()))
             if r.status_code == 404: # too old match
                 return {
                 "kd": "N/a",
@@ -34,7 +33,6 @@ class PlayerStats:
                             total_hits += hits["headshots"]
                             total_headshots += hits["headshots"]
 
-            # print(f"Total hits: {total_hits}\nTotal headshots: {total_headshots}\nHS%: {round((total_headshots/total_hits)*100, 1)}")
             for player in r.json()["players"]:
                 if player["subject"] == puuid:
                     kills = player["stats"]["kills"]
@@ -70,7 +68,6 @@ if __name__ == "__main__":
     from logs import Logging
     from errors import Error
     import urllib3
-    # import pyperclip
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     Logging = Logging()
@@ -79,11 +76,8 @@ if __name__ == "__main__":
     ErrorSRC = Error(log)
 
     Requests = Requests(version, log, ErrorSRC)
-    #custom region
-    # Requests.pd_url = "https://pd.ap.a.pvp.net"
 
     r = PlayerStats(Requests, log, "a")
 
     res = r.get_stats("963ad672-61e1-537e-8449-06ece1a5ceb7")
     print(res)
-    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}")

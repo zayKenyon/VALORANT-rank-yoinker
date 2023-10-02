@@ -60,9 +60,6 @@ class Table:
             c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
         ]
 
-        # for field in fields_to_display:
-        #     self.rich_table.add_column(field, justify="center")
-        # self.set_collumns()
         self.rows = []
 
     def set_title(self, title):
@@ -78,15 +75,9 @@ class Table:
         self.rich_table.field_names = field_names
 
     def add_row_table(self, args: list):
-        # row = [c for c, i in zip(args, self.col_flags) if i]
-        # row = [self.ansi_to_console(str(i)) for i in row]
         self.rows.append(zip(self.field_names_candidates, args))
 
-        # self.rich_table.add_row(*row)
-
     def add_empty_row(self):
-        # empty_row = [""] * sum(self.col_flags)
-        # self.rich_table.add_row(*empty_row)
         self.rows.append(zip(self.field_names_candidates, ""*len(self.field_names_candidates)))
 
     def apply_rows(self):
