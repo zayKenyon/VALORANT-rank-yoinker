@@ -1,3 +1,4 @@
+import re
 import websockets
 import websockets.client
 import ssl
@@ -111,7 +112,8 @@ class Ws:
                                 "time": message["time"],
                                 "puuid": player,
                                 "self": message["puuid"] == self.Requests.puuid,
-                                "group":re.sub("\[|\]","",self.colors.escape_ansi(chat_prefix)),
+                                "group": re.sub("\[|\]","",self.colors.escape_ansi(
+		                                chat_prefix)),
                                 "player": name,
                                 "agent": self.colors.escape_ansi(agent),
                                 "text": message['body']
