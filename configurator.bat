@@ -1,1 +1,1 @@
-@vRY.exe --config
+@vry.exe --config
