@@ -146,6 +146,7 @@ WEAPONS = [
     "Phantom",
     "Vandal",
     "Marshal",
+    "Outlaw",
     "Operator",
     "Ares",
     "Odin",
