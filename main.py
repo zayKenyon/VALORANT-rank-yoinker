@@ -811,9 +811,9 @@ except:
     log(traceback.format_exc())
     print(color(
         "The program has encountered an error. If the problem persists, please reach support"
-        f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
+        f" with the logs found in {os.getcwd()}\\logs", fore=(255, 0, 0)))
     chatlog(color(
         "The program has encountered an error. If the problem persists, please reach support"
-        f" with the logs found in {os.getcwd()}\logs", fore=(255, 0, 0)))
+        f" with the logs found in {os.getcwd()}\\logs", fore=(255, 0, 0)))
     input("press enter to exit...\n")
     os._exit(1)
