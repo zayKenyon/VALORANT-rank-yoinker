@@ -89,7 +89,7 @@ If you want to make a small change to the application, you can:
 ## Acknowledgements
 
  - [Valorant-API.com](https://valorant-api.com/)
- - [Hamper](https://hamper.codes/)
+ - [Hamper](https://hamper.dev/)
  - [D3CRYPT](https://d3crypt360.pages.dev/)
  
 ## Disclaimer
