@@ -18,6 +18,7 @@ from src.configurator import configure
 from src.constants import *
 from src.content import Content
 from src.errors import Error
+from src.installer import install
 from src.Loadouts import Loadouts
 from src.logs import Logging
 from src.names import Names
@@ -84,10 +85,19 @@ try:
                 os.system('cls')
             else:
                 os._exit(0)
+        elif len(sys.argv) > 1 and sys.argv[1] == "--install":
+            install()
+            run_app = inquirer.confirm(
+                message="Do you want to run vRY now?", default=True
+            ).execute() 
+            if run_app:
+                os.system('cls')
+            else:
+                os._exit(0)
         else:
             os.system('cls')
     except Exception as e:
-        print("Something went wrong while running configurator!")
+        print("Something went wrong while running configurator or installer!")
         log(f"configurator encountered an error")
         log(str(traceback.format_exc()))
         input("press enter to exit...\n")
