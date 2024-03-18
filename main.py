@@ -67,13 +67,9 @@ try:
     Logging = Logging()
     log = Logging.log
 
-    # OS Logging + quit if OS unsupported
-    if get_os()[1] == False:
-        print(f"Unsupported operating system: {get_os()[0]}\n")
-        log(f"Unsupported operating system: {get_os()[0]}\n")
-        program_exit(0)
-    else:
-        log(f"Operating system: {get_os()[0]}\n")
+    # OS Logging
+    log(f"Operating system: {get_os()}\n")
+    
     try:
         if len(sys.argv) > 1 and sys.argv[1] == "--config":
             configure()
