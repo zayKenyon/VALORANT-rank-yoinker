@@ -70,47 +70,83 @@ class Content():
             "act": None,
             "episode": None
         }
-    
-        def parse_season_number(name):
-            # Convert roman numerals to integers
-            roman_map = {
+
+        def roman_to_int(roman):
+            """Convert a Roman numeral to an integer."""
+            # Basic Roman numeral values
+            roman_values = {
                 'I': 1,
-                'II': 2,
-                'III': 3,
-                'IV': 4,
-                'V': 5
+                'V': 5,
+                'X': 10,
+                'L': 50,
+                'C': 100
             }
         
-            # For episodes (using regular numbers)
+            total = 0
+            prev_value = 0
+
+            # Process the Roman numeral from right to left
+            for char in reversed(roman.upper()):
+                if char not in roman_values:
+                    return None
+            
+                current_value = roman_values[char]
+                if current_value < prev_value:
+                    total -= current_value
+                else:
+                    total += current_value
+                prev_value = current_value
+
+            return total
+
+        def parse_season_number(name):
+            """Parse the season number from a name string.
+            Handles both regular numbers and Roman numerals."""
+           # Check for empty or invalid input
+            if not name or not isinstance(name, str):
+                return None
+
+            parts = name.split()
+            if not parts:
+                return None
+
+            number_part = parts[-1]
+
+            # For episodes (using regular numbers primarily)
             if name.startswith('EPISODE'):
                 try:
-                    return int(name.split()[-1])
-                except (ValueError, IndexError):
-                    return None
-                
-            # For acts (using Roman numerals)
+                    return int(number_part)
+                except ValueError:
+                    return roman_to_int(number_part)
+
+            # For acts (using Roman numerals primarily)
             elif name.startswith('ACT'):
+                roman_result = roman_to_int(number_part)
+                if roman_result is not None:
+                    return roman_result
+            
                 try:
-                    roman_numeral = name.split()[-1]
-                    return roman_map.get(roman_numeral)
-                except (KeyError, IndexError):
+                    return int(number_part)
+                except ValueError:
                     return None
-                
+
             return None
 
+        # Process seasons to find act and episode
         act_found = False
         for season in self.content["Seasons"]:
-        
+            # Check for matching act ID
             if season["ID"].lower() == act_id.lower():
                 act_num = parse_season_number(season["Name"])
                 if act_num is not None:
                     final["act"] = act_num
                 act_found = True
-            
+        
+            # Find the first episode after the act
             if act_found and season["Type"] == "episode":
                 episode_num = parse_season_number(season["Name"])
                 if episode_num is not None:
                     final["episode"] = episode_num
                 break
-    
+
         return final
