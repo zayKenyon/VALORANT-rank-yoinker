@@ -70,12 +70,47 @@ class Content():
             "act": None,
             "episode": None
         }
+    
+        def parse_season_number(name):
+            # Convert roman numerals to integers
+            roman_map = {
+                'I': 1,
+                'II': 2,
+                'III': 3,
+                'IV': 4,
+                'V': 5
+            }
+        
+            # For episodes (using regular numbers)
+            if name.startswith('EPISODE'):
+                try:
+                    return int(name.split()[-1])
+                except (ValueError, IndexError):
+                    return None
+                
+            # For acts (using Roman numerals)
+            elif name.startswith('ACT'):
+                try:
+                    roman_numeral = name.split()[-1]
+                    return roman_map.get(roman_numeral)
+                except (KeyError, IndexError):
+                    return None
+                
+            return None
+
         act_found = False
         for season in self.content["Seasons"]:
+        
             if season["ID"].lower() == act_id.lower():
-                final["act"] = int(season["Name"][-1])
+                act_num = parse_season_number(season["Name"])
+                if act_num is not None:
+                    final["act"] = act_num
                 act_found = True
+            
             if act_found and season["Type"] == "episode":
-                final["episode"] = int(season["Name"][-1])
+                episode_num = parse_season_number(season["Name"])
+                if episode_num is not None:
+                    final["episode"] = episode_num
                 break
+    
         return final
