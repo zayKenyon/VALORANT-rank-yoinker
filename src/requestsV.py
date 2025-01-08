@@ -37,25 +37,34 @@ class Requests:
     @staticmethod
     def check_version(version, copy_run_update_script):
         # checking for latest release
-        r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
-        json_data = r.json()
-        release_version = json_data[0]["tag_name"]  # get release version
-        for asset in json_data[0]["assets"]:
-            if "zip" in asset["content_type"]:
-                    link = asset["browser_download_url"]  # link for the latest release
-                    break
-        if float(release_version) > float(version):
-            print(f"New version available! {link}")
-            if sys.argv[0][-3:] == "exe":
-                while True:
-                    update_now = input("Do you want to update now? (Y/n): ")
-                    if update_now.lower() == "n" or update_now.lower() == "no":
-                        return
-                    elif update_now.lower() == "y" or update_now.lower() == "yes" or update_now == "":
-                        copy_run_update_script(link)
-                        os._exit(1)
-                    else:
-                        print('Invalid input please response with "yes" or "no" ("y", "n") or press enter to update')
+        try:
+            r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
+        except requests.exceptions.RequestException:
+            print(color("[WARNING] Unable to check for updates - skipping...", fore=(255, 165, 0)))
+            return
+
+        try:
+            json_data = r.json()
+            release_version = json_data[0]["tag_name"]  # get release version
+            for asset in json_data[0]["assets"]:
+                if "zip" in asset["content_type"]:
+                        link = asset["browser_download_url"] # link for the latest release
+                        break
+            if float(release_version) > float(version):
+                print(color("[UPDATE] New version available!", fore=(0, 255, 0)))
+                if sys.argv[0][-3:] == "exe":
+                    while True:
+                        update_now = input(color("Would you like to update now? (Y/n): ", fore=(0, 255, 0)))
+                        if update_now.lower() == "n" or update_now.lower() == "no":
+                            return
+                        elif update_now.lower() == "y" or update_now.lower() == "yes" or update_now == "":
+                            copy_run_update_script(link)
+                            os._exit(1)
+                        else:
+                            print('Please respond with "yes" or "no" ("y", "n") or press enter')
+        except Exception:
+            print(color("[WARNING] Error checking for updates - skipping...", fore=(255, 165, 0)))
+            return
 
     @staticmethod
     def copy_run_update_script(link):
@@ -72,11 +81,21 @@ class Requests:
     @staticmethod
     def check_status():
         # checking status
-        rStatus = requests.get(
-            "https://raw.githubusercontent.com/zayKenyon/VALORANT-rank-yoinker/main/status.json").json()
-        if not rStatus["status_good"] or rStatus["print_message"]:
-            status_color = (255, 0, 0) if not rStatus["status_good"] else (0, 255, 0)
-            print(color(rStatus["message_to_display"], fore=status_color))
+        try:
+            rStatus = requests.get(
+                "https://raw.githubusercontent.com/zayKenyon/VALORANT-rank-yoinker/main/status.json")
+        except requests.exceptions.RequestException:
+            print(color("[WARNING] Unable to check status - skipping...", fore=(255, 165, 0)))
+            return
+
+        try:
+            status_data = rStatus.json()
+            if not status_data["status_good"] or status_data["print_message"]:
+                status_color = (255, 0, 0) if not status_data["status_good"] else (0, 255, 0)
+                print(color(status_data["message_to_display"], fore=status_color))
+        except Exception:
+            print(color("[WARNING] Failed processing status - skipping...", fore=(255, 165, 0)))
+            return
             
     def fetch(self, url_type: str, endpoint: str, method: str, rate_limit_seconds=5):
         try:
