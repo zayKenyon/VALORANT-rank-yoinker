@@ -40,7 +40,7 @@ class Requests:
         try:
             r = requests.get("https://api.github.com/repos/zayKenyon/VALORANT-rank-yoinker/releases")
         except requests.exceptions.RequestException:
-            print(color("[ WARNING ] Unable to check for updates - skipping...", fore=(255, 165, 0)))
+            print(color("[WARNING] Unable to check for updates - skipping...", fore=(255, 165, 0)))
             return
 
         try:
@@ -51,8 +51,7 @@ class Requests:
                         link = asset["browser_download_url"] # link for the latest release
                         break
             if float(release_version) > float(version):
-                print(color("[ UPDATE ] New version available!", fore=(0, 255, 0)))
-                print(color(f"Download link: {link}", fore=(0, 255, 255)))
+                print(color("[UPDATE] New version available!", fore=(0, 255, 0)))
                 if sys.argv[0][-3:] == "exe":
                     while True:
                         update_now = input(color("Would you like to update now? (Y/n): ", fore=(0, 255, 0)))
@@ -64,7 +63,7 @@ class Requests:
                         else:
                             print('Please respond with "yes" or "no" ("y", "n") or press enter')
         except Exception:
-            print(color("[ WARNING ] Error checking for updates - skipping...", fore=(255, 165, 0)))
+            print(color("[WARNING] Error checking for updates - skipping...", fore=(255, 165, 0)))
             return
 
     @staticmethod
@@ -86,7 +85,7 @@ class Requests:
             rStatus = requests.get(
                 "https://raw.githubusercontent.com/zayKenyon/VALORANT-rank-yoinker/main/status.json")
         except requests.exceptions.RequestException:
-            print(color("[ WARNING ] Unable to check status - skipping...", fore=(255, 165, 0)))
+            print(color("[WARNING] Unable to check status - skipping...", fore=(255, 165, 0)))
             return
 
         try:
@@ -95,7 +94,7 @@ class Requests:
                 status_color = (255, 0, 0) if not status_data["status_good"] else (0, 255, 0)
                 print(color(status_data["message_to_display"], fore=status_color))
         except Exception:
-            print(color("[ WARNING ] Failed processing status - skipping...", fore=(255, 165, 0)))
+            print(color("[WARNING] Failed processing status - skipping...", fore=(255, 165, 0)))
             return
             
     def fetch(self, url_type: str, endpoint: str, method: str, rate_limit_seconds=5):
