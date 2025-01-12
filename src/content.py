@@ -71,9 +71,14 @@ class Content():
             "episode": None
         }
 
+        def has_letter_and_number(text):
+            """Check if text contains both letters and numbers (new format)."""
+            has_letter = any(c.isalpha() for c in text)
+            has_number = any(c.isdigit() for c in text)
+            return has_letter and has_number
+
         def roman_to_int(roman):
             """Convert a Roman numeral to an integer."""
-            # Basic Roman numeral values
             roman_values = {
                 'I': 1,
                 'V': 5,
@@ -85,7 +90,6 @@ class Content():
             total = 0
             prev_value = 0
 
-            # Process the Roman numeral from right to left
             for char in reversed(roman.upper()):
                 if char not in roman_values:
                     return None
@@ -100,9 +104,7 @@ class Content():
             return total
 
         def parse_season_number(name):
-            """Parse the season number from a name string.
-            Handles both regular numbers and Roman numerals."""
-           # Check for empty or invalid input
+            """Parse the season number from a name string."""
             if not name or not isinstance(name, str):
                 return None
 
@@ -111,6 +113,10 @@ class Content():
                 return None
 
             number_part = parts[-1]
+            
+            # If it has a letter + number(new format), return the original value.
+            if has_letter_and_number(number_part):
+                return number_part.lower()
 
             # For episodes (using regular numbers primarily)
             if name.startswith('EPISODE'):
