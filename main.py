@@ -11,7 +11,6 @@ from colr import color as colr
 from InquirerPy import inquirer
 from rich.console import Console as RichConsole
 
-from src.chatlogs import ChatLogging
 from src.colors import Colors
 from src.config import Config
 from src.configurator import configure
@@ -89,9 +88,6 @@ try:
         input("press enter to exit...\n")
         os._exit(1)
 
-    ChatLogging = ChatLogging()
-    chatlog = ChatLogging.chatLog
-
     acc_manager = AccountManager(log, AccountConfig, AccountAuth, NUMBERTORANKS)
 
     ErrorSRC = Error(log, acc_manager)
@@ -131,7 +127,7 @@ try:
     colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
-    table = Table(cfg, chatlog, log)
+    table = Table(cfg, log)
 
     stats = Stats()
 
@@ -140,7 +136,7 @@ try:
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, Server, rpc)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, Server, rpc)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
@@ -157,7 +153,6 @@ try:
     print("\nvRY Mobile", color(f"- {get_ip()}:{cfg.port}", fore=(255, 127, 80)))
 
     print(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
-    chatlog(color("\nVisit https://vry.netlify.app/matchLoadouts to view full player inventories\n", fore=(255, 253, 205)))
 
 
     richConsole = RichConsole()
@@ -411,7 +406,8 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        has_letter = any(c.isalpha() for c in str(playerRank['peakrankep']))
+                        peakRankAct = f" ({playerRank['peakrankep']}a{playerRank['peakrankact']})" if has_letter else f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
@@ -594,7 +590,8 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                        has_letter = any(c.isalpha() for c in str(playerRank['peakrankep']))
+                        peakRankAct = f" ({playerRank['peakrankep']}a{playerRank['peakrankact']})" if has_letter else f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
@@ -699,7 +696,8 @@ try:
                             rr = playerRank["rr"]
 
                             #short peak rank string
-                            peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
+                            has_letter = any(c.isalpha() for c in str(playerRank['peakrankep']))
+                            peakRankAct = f" ({playerRank['peakrankep']}a{playerRank['peakrankact']})" if has_letter else f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                             if not cfg.get_feature_flag("peak_rank_act"):
                                 peakRankAct = ""
 
@@ -781,19 +779,11 @@ try:
                 firstPrint = False
 
                 # print(f"VALORANT rank yoinker v{version}")
-                # chatlog(f"VALORANT rank yoinker v{version}")
-                                        #                 {
-                                        #     "times": sum(stats_data[player["Subject"]]),
-                                        #     "name": curr_player_stat["name"],
-                                        #     "agent": curr_player_stat["agent"],
-                                        #     "time_diff": time.time() - curr_player_stat["time"]
-                                        # })
                 if cfg.get_feature_flag("last_played"):
                     if len(already_played_with) > 0:
                         print("\n")
                         for played in already_played_with:
                             print(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
-                            chatlog(f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)")
                 already_played_with = []
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
@@ -806,9 +796,6 @@ except KeyboardInterrupt:
 except:
     log(traceback.format_exc())
     print(color(
-        "The program has encountered an error. If the problem persists, please reach support"
-        f" with the logs found in {os.getcwd()}\\logs", fore=(255, 0, 0)))
-    chatlog(color(
         "The program has encountered an error. If the problem persists, please reach support"
         f" with the logs found in {os.getcwd()}\\logs", fore=(255, 0, 0)))
     input("press enter to exit...\n")
