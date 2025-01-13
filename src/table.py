@@ -22,7 +22,7 @@ TABLE_COLUMN_NAMES = Literal[
 
 
 class Table:
-    def __init__(self, config, chatlog, log):
+    def __init__(self, config, log):
         self.log = log
         self.rich_table = RichTable()
         self.col_flags = [
@@ -49,7 +49,6 @@ class Table:
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
-        self.chatlog = chatlog
         self.console = RichConsole(color_system="truecolor")
 
 
