@@ -20,10 +20,20 @@ class PlayerStats:
             )
             matches = response.json().get("Matches", [])
             if not matches:
-                return {"kd": "N/A", "hs": "N/A", "RankedRatingEarned": "N/A"}
+                return {
+                    "kd": "N/A",
+                    "hs": "N/A",
+                    "RankedRatingEarned": "N/A",
+                    "AFKPenalty": "N/A",
+                }
         except Exception as e:
             self.log(f"Error fetching competitive updates: {e}")
-            return {"kd": "N/A", "hs": "N/A", "RankedRatingEarned": "N/A"}
+            return {
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
+            }
 
         match_id = matches[0].get("MatchID")
         try:
@@ -33,12 +43,22 @@ class PlayerStats:
                 "get",
             )
             if match_response.status_code == 404:
-                return {"kd": "N/A", "hs": "N/A", "RankedRatingEarned": "N/A"}
+                return {
+                    "kd": "N/A",
+                    "hs": "N/A",
+                    "RankedRatingEarned": "N/A",
+                    "AFKPenalty": "N/A",
+                }
 
             match_data = match_response.json()
         except Exception as e:
             self.log(f"Error fetching match details: {e}")
-            return {"kd": "N/A", "hs": "N/A", "RankedRatingEarned": "N/A"}
+            return {
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
+            }
 
         return self._process_match_data(puuid, match_data, matches[0])
 
@@ -50,7 +70,7 @@ class PlayerStats:
             for player in rround.get("playerStats", []):
                 if player["subject"] == puuid:
                     for hits in player.get("damage", []):
-                        total_hits += (
+                        total_hits = (
                             hits.get("legshots", 0)
                             + hits.get("bodyshots", 0)
                             + hits.get("headshots", 0)
@@ -67,11 +87,15 @@ class PlayerStats:
         # Calculate KD
         kd = round(kills / deaths, 2) if deaths else kills
 
+        ranked_rating_earned = match_summary["RankedRatingEarned"]
+        afk_penalty = match_summary["AFKPenalty"]
+
         # Compile final stats
         final_stats = {
             "kd": kd,
             "hs": int((total_headshots / total_hits) * 100) if total_hits else "N/A",
-            "RankedRatingEarned": f"{match_summary.get('RankedRatingEarned', 'N/A')} ({match_summary.get('AFKPenalty', 'N/A')})",
+            "RankedRatingEarned": ranked_rating_earned,
+            "AFKPenalty": afk_penalty,
         }
         return final_stats
 

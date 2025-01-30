@@ -153,19 +153,44 @@ class Colors:
                         )
                 return color(number, fore=f)
 
-    def get_rr_gradient(self, rr_value):
-        """Returns RR value in green if positive, red if negative, and white if zero."""
+    def get_rr_gradient(self, rr_value, afk_penalty):
+        """Returns RR value in green if positive, red if negative, white if zero, and AFK penalty in a different color."""
+
+        # If both values are N/A, return plain "N/A"
+        if rr_value == "N/A" and afk_penalty == "N/A":
+            return color("N/A", fore=(46, 46, 46))  # Grey for "N/A"
+
         try:
             rr_value = int(rr_value)
+            afk_penalty = int(afk_penalty)
         except ValueError:
-            return color("N/a", fore=(46, 46, 46))
+            return color("N/A", fore=(46, 46, 46))  # Grey for invalid values
 
+        # Color coding for RR
         if rr_value > 0:
-            return color(f"+{rr_value}", fore=(18, 204, 25))  # Green for positive RR
+            rr_colored = color(
+                f"+{rr_value}", fore=(18, 204, 25)
+            )  # Green for positive RR
         elif rr_value < 0:
-            return color(f"{rr_value}", fore=(241, 39, 39))  # Red for negative RR
+            rr_colored = color(f"{rr_value}", fore=(241, 39, 39))  # Red for negative RR
         else:
-            return color(f"{rr_value}", fore=(255, 255, 255))  # White for zero RR
+            rr_colored = color(f"{rr_value}", fore=(255, 255, 255))  # White for zero RR
+
+        # Color coding for AFK penalty
+        if afk_penalty == 0:
+            afk_colored = color(
+                f"({afk_penalty})", fore=(200, 200, 200)
+            )  # Grey for no penalty
+        elif afk_penalty <= 5:
+            afk_colored = color(
+                f"({afk_penalty})", fore=(255, 165, 0)
+            )  # Orange for low penalty
+        else:
+            afk_colored = color(
+                f"({afk_penalty})", fore=(255, 0, 0)
+            )  # Red for high penalty
+
+        return f"{rr_colored} ({afk_colored})"
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r"(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]")
