@@ -70,7 +70,7 @@ class PlayerStats:
             for player in rround.get("playerStats", []):
                 if player["subject"] == puuid:
                     for hits in player.get("damage", []):
-                        total_hits = (
+                        total_hits += (
                             hits.get("legshots", 0)
                             + hits.get("bodyshots", 0)
                             + hits.get("headshots", 0)
