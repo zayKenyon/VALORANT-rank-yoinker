@@ -9,7 +9,12 @@ class PlayerStats:
         if not self.config.get_table_flag(
             "headshot_percent"
         ) and not self.config.get_table_flag("kd"):
-            return {"kd": "N/A", "hs": "N/A", "RankedRatingEarned": "N/A"}
+            return {
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
+            }
 
         # Fetch competitive updates
         try:
