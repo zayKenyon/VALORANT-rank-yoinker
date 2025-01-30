@@ -190,7 +190,7 @@ class Colors:
                 f"({afk_penalty})", fore=(255, 0, 0)
             )  # Red for high penalty
 
-        return f"{rr_colored} ({afk_colored})"
+        return f"{rr_colored} {afk_colored}"
 
     def escape_ansi(self, line):
         ansi_escape = re.compile(r"(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]")
