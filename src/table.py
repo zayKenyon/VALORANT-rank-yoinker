@@ -17,7 +17,8 @@ TABLE_COLUMN_NAMES = Literal[
     "HS",
     "WR",
     "KD",
-    "Level"
+    "Level",
+    "ΔRR",
 ]
 
 
@@ -33,16 +34,13 @@ class Table:
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
-            bool(config.table.get("previousrank", False)), # Previous Rank
+            bool(config.table.get("previousrank", False)),  # Previous Rank
             bool(config.table.get("leaderboard", True)),  # Leaderboard Position
-            bool(
-                config.table.get("headshot_percent", True)
-            ),  # hs
-            bool(
-                config.table.get("winrate", True)
-            ),  # wr
+            bool(config.table.get("headshot_percent", True)),  # hs
+            bool(config.table.get("winrate", True)),  # wr
             bool(config.table.get("kd", True)),  # KD
             bool(config.table.get("level", True)),  # Level
+            bool(config.table.get("earned_rr", True)),  # Earned RR
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
@@ -51,13 +49,14 @@ class Table:
         ]
         self.console = RichConsole(color_system="truecolor")
 
-
-        #only to get init value not used
+        # only to get init value not used
         self.overall_col_flags = [
             f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
         ]
         self.fields_to_display = [
-            c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
+            c
+            for c, flag in zip(self.field_names_candidates, self.overall_col_flags)
+            if flag
         ]
 
         # for field in fields_to_display:
@@ -67,7 +66,7 @@ class Table:
 
     def set_title(self, title):
         self.rich_table.title = self.ansi_to_console(title)
-    
+
     def set_caption(self, caption):
         self.rich_table.caption = self.ansi_to_console(caption)
 
@@ -81,17 +80,23 @@ class Table:
         # row = [c for c, i in zip(args, self.col_flags) if i]
         # row = [self.ansi_to_console(str(i)) for i in row]
         self.rows.append(zip(self.field_names_candidates, args))
-        
+
         # self.rich_table.add_row(*row)
 
     def add_empty_row(self):
         # empty_row = [""] * sum(self.col_flags)
         # self.rich_table.add_row(*empty_row)
-        self.rows.append(zip(self.field_names_candidates, ""*len(self.field_names_candidates)))
+        self.rows.append(
+            zip(self.field_names_candidates, "" * len(self.field_names_candidates))
+        )
 
     def apply_rows(self):
         for row in self.rows:
-            row = [self.ansi_to_console(str(v)) for i, v in row if i in self.fields_to_display]
+            row = [
+                self.ansi_to_console(str(v))
+                for i, v in row
+                if i in self.fields_to_display
+            ]
             self.rich_table.add_row(*row)
 
     def reset_runtime_col_flags(self):
@@ -114,7 +119,7 @@ class Table:
         self.rich_table.title_style = "bold"
         self.rich_table.caption_style = "italic rgb(50,505,50)"
         self.rich_table.caption_justify = "left"
-        
+
         pass
 
     def ansi_to_console(self, line):
@@ -127,7 +132,9 @@ class Table:
             splits = string.split("m", 1)
             rgb = [int(i) for i in splits[0].split(";")]
             original_strings = splits[1].split("\x1b[0m")
-            string_to_return += f"[rgb({rgb[0]},{rgb[1]},{rgb[2]})]{'[/]'.join(original_strings)}"
+            string_to_return += (
+                f"[rgb({rgb[0]},{rgb[1]},{rgb[2]})]{'[/]'.join(original_strings)}"
+            )
         return string_to_return
 
     def set_columns(self):
@@ -135,7 +142,9 @@ class Table:
             f1 & f2 for f1, f2 in zip(self.col_flags, self.runtime_col_flags)
         ]
         self.fields_to_display = [
-            c for c, flag in zip(self.field_names_candidates, self.overall_col_flags) if flag
+            c
+            for c, flag in zip(self.field_names_candidates, self.overall_col_flags)
+            if flag
         ]
 
         for field in self.fields_to_display:
