@@ -108,11 +108,14 @@ class Loadouts:
                         final_json[players[i]["Subject"]].update({"AgentArtworkName": agent["displayName"] + "Artwork"})
                         final_json[players[i]["Subject"]].update({"Agent": agent["displayIcon"]})
 
-                for j in range(len(PlayerInventory["Sprays"]["SpraySelections"])):
-                    spray = PlayerInventory["Sprays"]["SpraySelections"][j]
+                spray_selections = [
+                    s for s in PlayerInventory.get("Expressions", {}).get("AESSelections", [])
+                    if s.get("TypeID") == "d5f120f8-ff8c-4aac-92ea-f2b5acbe9475"
+                ]
+                for j, spray in enumerate(spray_selections):
                     final_json[players[i]["Subject"]]["Sprays"].update({j: {}})
                     for sprayValApi in valoApiSprays.json()["data"]:
-                        if spray["SprayID"] == sprayValApi["uuid"]:
+                        if spray["AssetID"].lower() == sprayValApi["uuid"].lower():
                             final_json[players[i]["Subject"]]["Sprays"][j].update({
                                 "displayName": sprayValApi["displayName"],
                                 "displayIcon": sprayValApi["displayIcon"],
