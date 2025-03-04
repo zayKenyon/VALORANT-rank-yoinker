@@ -176,6 +176,21 @@ class AccountManager:
             # elif option == 1:
                 # self.menu_change_accounts()
 
+    def start_menu(self):
+        self.log("Starting menu...")
+        self.account_config.get_riot_client_path()
+        current_account_cookies = self.account_config.load_current_account_cookies()
+        current_account_auth_data = self.auth.auth_account(cookies=current_account_cookies)
+        if current_account_auth_data is not None:
+            self.log("Authed with cookies!")
+            current_account_data = self.auth.get_account_data()
+            self.account_config.save_account_to_config(current_account_auth_data, current_account_data)
+            self.log("Opening menu")
+            self.menu(current_account_data)
+        else:
+            self.log("Failed to auth account with cookies! (start menu) ")
+            self.menu(None)
+
     def start_valorant(self):
         self.log("Starting Valorant...")
         subprocess.Popen([self.account_config.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
