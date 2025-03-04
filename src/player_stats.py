@@ -1,67 +1,108 @@
-
 class PlayerStats:
     def __init__(self, Requests, log, config):
         self.Requests = Requests
         self.log = log
         self.config = config
 
-    #in future rewrite this code
     def get_stats(self, puuid):
-        if not self.config.get_table_flag("headshot_percent") and not self.config.get_table_flag("kd"):
+        # Early exit if no stats are required
+        if not self.config.get_table_flag(
+            "headshot_percent"
+        ) and not self.config.get_table_flag("kd"):
             return {
-                "kd": "N/a",
-                "hs": "N/a"
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
             }
 
-        response = self.Requests.fetch('pd', f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=1&queue=competitive", "get")
+        # Fetch competitive updates
         try:
-            r = self.Requests.fetch('pd', f"/match-details/v1/matches/{response.json()['Matches'][0]['MatchID']}", "get")
-            # pyperclip.copy(str(r.json()))
-            if r.status_code == 404: # too old match
+            response = self.Requests.fetch(
+                "pd",
+                f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=1&queue=competitive",
+                "get",
+            )
+            matches = response.json().get("Matches", [])
+            if not matches:
                 return {
-                "kd": "N/a",
-                "hs": "N/a"
-            }
-
-            total_hits = 0
-            total_headshots = 0
-            for rround in r.json()["roundResults"]:
-                for player in rround["playerStats"]:
-                    if player["subject"] == puuid:
-                        for hits in player["damage"]:
-                            total_hits += hits["legshots"]
-                            total_hits += hits["bodyshots"]
-                            total_hits += hits["headshots"]
-                            total_headshots += hits["headshots"]
-
-            # print(f"Total hits: {total_hits}\nTotal headshots: {total_headshots}\nHS%: {round((total_headshots/total_hits)*100, 1)}")
-            for player in r.json()["players"]:
-                if player["subject"] == puuid:
-                    kills = player["stats"]["kills"]
-                    deaths = player["stats"]["deaths"]
-
-            if deaths == 0:
-                kd = kills
-            elif kills == 0:
-                kd = 0
-            else:
-                kd = round(kills/deaths, 2)
-            final = {
-                "kd": kd,
-                "hs": "N/a"
-            }
-
-
-            if total_hits == 0: # No hits
-                return final
-            hs = int((total_headshots/total_hits)*100)
-            final["hs"] = hs
-            return final
-        except IndexError: #no matches
+                    "kd": "N/A",
+                    "hs": "N/A",
+                    "RankedRatingEarned": "N/A",
+                    "AFKPenalty": "N/A",
+                }
+        except Exception as e:
+            self.log(f"Error fetching competitive updates: {e}")
             return {
-                "kd": "N/a",
-                "hs": "N/a"
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
             }
+
+        match_id = matches[0].get("MatchID")
+        try:
+            match_response = self.Requests.fetch(
+                "pd",
+                f"/match-details/v1/matches/{match_id}",
+                "get",
+            )
+            if match_response.status_code == 404:
+                return {
+                    "kd": "N/A",
+                    "hs": "N/A",
+                    "RankedRatingEarned": "N/A",
+                    "AFKPenalty": "N/A",
+                }
+
+            match_data = match_response.json()
+        except Exception as e:
+            self.log(f"Error fetching match details: {e}")
+            return {
+                "kd": "N/A",
+                "hs": "N/A",
+                "RankedRatingEarned": "N/A",
+                "AFKPenalty": "N/A",
+            }
+
+        return self._process_match_data(puuid, match_data, matches[0])
+
+    def _process_match_data(self, puuid, match_data, match_summary):
+        total_hits, total_headshots, kills, deaths = 0, 0, 0, 0
+
+        # Extract round stats
+        for rround in match_data.get("roundResults", []):
+            for player in rround.get("playerStats", []):
+                if player["subject"] == puuid:
+                    for hits in player.get("damage", []):
+                        total_hits += (
+                            hits.get("legshots", 0)
+                            + hits.get("bodyshots", 0)
+                            + hits.get("headshots", 0)
+                        )
+                        total_headshots += hits.get("headshots", 0)
+
+        # Extract overall player stats
+        for player in match_data.get("players", []):
+            if player["subject"] == puuid:
+                kills = player["stats"].get("kills", 0)
+                deaths = player["stats"].get("deaths", 0)
+                break
+
+        # Calculate KD
+        kd = round(kills / deaths, 2) if deaths else kills
+
+        ranked_rating_earned = match_summary["RankedRatingEarned"]
+        afk_penalty = match_summary["AFKPenalty"]
+
+        # Compile final stats
+        final_stats = {
+            "kd": kd,
+            "hs": int((total_headshots / total_hits) * 100) if total_hits else "N/A",
+            "RankedRatingEarned": ranked_rating_earned,
+            "AFKPenalty": afk_penalty,
+        }
+        return final_stats
 
 
 if __name__ == "__main__":
@@ -70,20 +111,14 @@ if __name__ == "__main__":
     from logs import Logging
     from errors import Error
     import urllib3
-    # import pyperclip
+
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     Logging = Logging()
     log = Logging.log
-
     ErrorSRC = Error(log)
-
     Requests = Requests(version, log, ErrorSRC)
-    #custom region
-    # Requests.pd_url = "https://pd.ap.a.pvp.net"
 
-    r = PlayerStats(Requests, log, "a")
-
-    res = r.get_stats("963ad672-61e1-537e-8449-06ece1a5ceb7")
-    print(res)
-    # print(f"Rank: {res[0][0]} - {NUMBERTORANKS[res[0][0]]}\nPeak Rank: {res[0][3]} - {NUMBERTORANKS[res[0][3]]}\nRR: {res[0][1]}\nLeaderboard: {res[0][2]}\nStatus is good: {res[1]}")
+    player_stats = PlayerStats(Requests, log, "a")
+    result = player_stats.get_stats("963ad672-61e1-537e-8449-06ece1a5ceb7")
+    print(result)
