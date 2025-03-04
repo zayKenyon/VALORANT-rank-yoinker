@@ -167,6 +167,7 @@ DEFAULT_CONFIG = {
         "table": {
             "skin": True,
             "rr": True,
+            "earned_rr": True,
             "peakrank": True,
             "previousrank" : False,
             "leaderboard": True,

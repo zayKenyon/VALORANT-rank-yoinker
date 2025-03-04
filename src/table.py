@@ -40,7 +40,7 @@ class Table:
             bool(config.table.get("winrate", True)),  # wr
             bool(config.table.get("kd", True)),  # KD
             bool(config.table.get("level", True)),  # Level
-            True,  # Earned RR (default visible)
+            bool(config.table.get("earned_rr", True)),  # Earned RR
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
