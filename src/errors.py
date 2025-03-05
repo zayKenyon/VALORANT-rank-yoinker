@@ -30,7 +30,7 @@ class Error:
             return True
         else:
             self.log("Lockfile does not exist, VALORANT is not open")
-            self.acc_manager.start_menu()
+            self.acc_manager.start_valorant()
             
             while not os.path.exists(path):
                 time.sleep(1)

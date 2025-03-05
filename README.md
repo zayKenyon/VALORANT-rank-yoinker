@@ -23,9 +23,9 @@
  ![Screenshot](assets/Example.png)
  ![Skin Showcase Image](assets/SkinShowcase.png)
 
-|Their Queue|Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|![Parties](assets/Party.png)|![Skin](assets/Skin.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
+|Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
+|:---:|:---:|:---:|:---:|:---:|
+|![Skin](assets/Skin.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
     
 
 ## Usage
@@ -41,11 +41,10 @@
 ### Running from source:
 
 1) Download [Python 3.10](https://www.python.org/downloads/release/python-3100/), make sure it is added to the PATH. (This is an option on installation.)
-   1) Any Python version post 3.10 should work.
+   1) 3.11 or 3.12 should work too..
 2) Download the [source](https://github.com/isaacKenyon/VALORANT-rank-yoinker/archive/refs/heads/main.zip).
-3) Open a terminal within the source folder.
-4) `pip install -r requirements.txt`
-5) `main.py`
+3) Run **`INSTALL.bat`** file (or use `pip install -r requirements.txt` in the terminal)
+4) Run **`START.bat`** file (or use `python main.py` in the terminal)
 
 ### Compiling from source:
 

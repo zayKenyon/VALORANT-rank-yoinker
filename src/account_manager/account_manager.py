@@ -1,4 +1,5 @@
 import InquirerPy, subprocess, re
+import ctypes
 from InquirerPy import inquirer
 
 
@@ -193,7 +194,16 @@ class AccountManager:
 
     def start_valorant(self):
         self.log("Starting Valorant...")
-        subprocess.Popen([self.account_config.riot_client_path, "--launch-product=valorant", "--launch-patchline=live"])
+        self.account_config.get_riot_client_path()
+        args = "--launch-product=valorant --launch-patchline=live"
+        ctypes.windll.shell32.ShellExecuteW(
+            None,
+            "open",
+            self.account_config.riot_client_path,
+            args,
+            None,
+            1
+        )
 
 # if __name__ == "__main__":
     # from account_config import AccountConfig
