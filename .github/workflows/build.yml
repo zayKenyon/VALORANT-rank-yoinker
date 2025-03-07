@@ -47,7 +47,7 @@ jobs:
         uses: pr-mpt/actions-commit-hash@v1
       
       - name: Upload Compiled Version
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: VALORANT-rank-yoinker-${{ steps.commit.outputs.short }}
           path: build/exe.win-amd64-${{ env.PYTHON_VERSION }}/**
