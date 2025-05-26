@@ -195,10 +195,10 @@ class AccountManager:
     def _is_valorant_running(self):
         try:
             output = subprocess.check_output(
-                ["tasklist", "/FI", "IMAGENAME eq VALORANT-Win64-Shipping.exe"],
+                ["tasklist", "/FI", "IMAGENAME eq VALORANT-Win64-Shipping.exe", "/FO", "CSV", "/NH"],
                 creationflags=subprocess.CREATE_NO_WINDOW
             ).decode().lower()
-            return "VALORANT-Win64-Shipping.exe" in output
+            return "\"valorant-win64-shipping.exe\"" in output
         except:
             return False
 
