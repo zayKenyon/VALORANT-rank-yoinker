@@ -7,7 +7,7 @@ import traceback
 
 import requests
 import urllib3
-from colr import color as colr
+from src.constants import color
 from InquirerPy import inquirer
 from rich.console import Console as RichConsole
 
@@ -963,9 +963,8 @@ try:
             if (title := game_state_dict.get(game_state)) is None:
                 # program_exit(1)
                 time.sleep(9)
-            if server != "":
-                table.set_title(
-                    f"VALORANT status: {title} {colr('- ' + server, fore=(200, 200, 200))}"
+            if server != "":                table.set_title(
+                    f"VALORANT status: {title} {color('- ' + server, fore=(200, 200, 200))}"
                 )
             else:
                 table.set_title(f"VALORANT status: {title}")

@@ -1,4 +1,4 @@
-from colr import color
+from .constants import color
 from src.constants import tierDict
 import re
 

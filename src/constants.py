@@ -1,10 +1,45 @@
 import requests
-from colr import color
+from colorama import Fore, Back, Style, init
+init(autoreset=True)
+
+def color(text, fore=None, back=None, style=None):
+    """Replacement for colr.color using colorama"""
+    if fore is None:
+        return text
+    
+    # Handle RGB tuples
+    if isinstance(fore, (tuple, list)) and len(fore) == 3:
+        r, g, b = fore
+        # Convert RGB to ANSI escape code for 256-color terminals
+        return f"\033[38;2;{r};{g};{b}m{text}\033[0m"
+    
+    # Handle named colors
+    color_map = {
+        'red': Fore.RED,
+        'green': Fore.GREEN,
+        'yellow': Fore.YELLOW,
+        'blue': Fore.BLUE,
+        'magenta': Fore.MAGENTA,
+        'cyan': Fore.CYAN,
+        'white': Fore.WHITE,
+        'black': Fore.BLACK,
+        'lightred': Fore.LIGHTRED_EX,
+        'lightgreen': Fore.LIGHTGREEN_EX,
+        'lightyellow': Fore.LIGHTYELLOW_EX,
+        'lightblue': Fore.LIGHTBLUE_EX,
+        'lightmagenta': Fore.LIGHTMAGENTA_EX,
+        'lightcyan': Fore.LIGHTCYAN_EX,
+    }
+    
+    if isinstance(fore, str) and fore.lower() in color_map:
+        return color_map[fore.lower()] + text + Style.RESET_ALL
+    
+    return text
 
 version = "2.80"
 enablePrivateLogging = True
-hide_names = True
-hide_levels = True
+hide_names = False
+hide_levels = False
 
 
 gamemodes = {
