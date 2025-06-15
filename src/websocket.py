@@ -4,7 +4,7 @@ import websockets.client
 import ssl
 import base64
 import json
-from colr import color
+from .constants import color
 
 
 class Ws:
