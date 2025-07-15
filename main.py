@@ -42,8 +42,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 os.system(f"title VALORANT rank yoinker v{version}")
 
-server = ""
-
 
 def program_exit(status: int):  # so we don't need to import the entire sys module
     log(f"exited program with error code {status}")
@@ -268,10 +266,6 @@ try:
                     )
                 Wss.set_player_data(players_data)
 
-                try:
-                    server = GAMEPODS[coregame_stats["GamePodID"]]
-                except KeyError:
-                    server = "New server"
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts_arr = loadoutsClass.get_match_loadouts(
@@ -591,10 +585,6 @@ try:
                 pregame_stats = pregame.get_pregame_stats()
                 if pregame_stats == None:
                     continue
-                try:
-                    server = GAMEPODS[pregame_stats["GamePodID"]]
-                except KeyError:
-                    server = "New server"
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
@@ -963,13 +953,7 @@ try:
             if (title := game_state_dict.get(game_state)) is None:
                 # program_exit(1)
                 time.sleep(9)
-            if server != "":
-                table.set_title(
-                    f"VALORANT status: {title} {colr('- ' + server, fore=(200, 200, 200))}"
-                )
-            else:
-                table.set_title(f"VALORANT status: {title}")
-            server = ""
+            table.set_title(f"VALORANT status: {title}")
             if title is not None:
                 if cfg.get_feature_flag("auto_hide_leaderboard") and (
                     not is_leaderboard_needed
