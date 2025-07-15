@@ -25,6 +25,7 @@ TABLE_COLUMN_NAMES = Literal[
 class Table:
     def __init__(self, config, log):
         self.log = log
+        self.config = config
         self.rich_table = RichTable()
         self.col_flags = [
             False,  # Party
@@ -44,6 +45,9 @@ class Table:
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
+        if "Skin" in self.field_names_candidates:
+            skin_index = self.field_names_candidates.index("Skin")
+            self.field_names_candidates[skin_index] = self.config.weapon.capitalize()
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]

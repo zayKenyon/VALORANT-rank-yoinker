@@ -963,7 +963,7 @@ try:
                 if game_state == "MENUS":
                     table.set_runtime_col_flag("Party", False)
                     table.set_runtime_col_flag("Agent", False)
-                    table.set_runtime_col_flag("Skin", False)
+                    table.set_runtime_col_flag(cfg.weapon.capitalize(), False)
 
                 if game_state == "INGAME":
                     if isRange:
