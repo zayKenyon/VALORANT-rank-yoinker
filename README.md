@@ -40,8 +40,7 @@
 
 ### Running from source:
 
-1) Download [Python 3.10](https://www.python.org/downloads/release/python-3100/), make sure it is added to the PATH. (This is an option on installation.)
-   1) 3.11 or 3.12 should work too..
+1) Download Python [3.11](https://www.python.org/downloads/release/python-3119/) or [3.10](https://www.python.org/downloads/release/python-31011/), make sure it is added to the PATH. (This is an option on installation.)
 2) Download the [source](https://github.com/isaacKenyon/VALORANT-rank-yoinker/archive/refs/heads/main.zip).
 3) Run **`INSTALL.bat`** file (or use `pip install -r requirements.txt` in the terminal)
 4) Run **`START.bat`** file (or use `python main.py` in the terminal)
