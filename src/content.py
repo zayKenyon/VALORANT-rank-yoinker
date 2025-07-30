@@ -140,6 +140,8 @@ class Content():
 
         # Process seasons to find act and episode
         act_found = False
+        episode = []
+        episode = self.content["Seasons"][0]
         for season in self.content["Seasons"]:
             # Check for matching act ID
             if season["ID"].lower() == act_id.lower():
@@ -150,9 +152,12 @@ class Content():
         
             # Find the first episode after the act
             if act_found and season["Type"] == "episode":
-                episode_num = parse_season_number(season["Name"])
+                episode_num = parse_season_number(episode["Name"])
                 if episode_num is not None:
                     final["episode"] = episode_num
                 break
+
+            if season["Type"] == "episode":
+                episode = season
 
         return final
