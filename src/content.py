@@ -12,20 +12,20 @@ class Content():
 
     def get_latest_season_id(self, content):
         for season in content["Seasons"]:
-            if season["IsActive"]:
+            if season["IsActive"] and season["Type"] == "act":
                 self.log(f"retrieved season id: {season['ID']}")
                 return season["ID"]
 
     def get_previous_season_id(self, content):
-        previous = content["Seasons"][0]
+        currentseason = []
         for season in content["Seasons"]:
-            if season["IsActive"]:
-                self.log(f"retrieved previous season id: {previous['ID']}")
-                return previous["ID"]
-            # Only store the previous act.
-            if (season["Type"] == "episode"):
-                continue
-            previous = season
+            if season["IsActive"] and season["Type"] == "act":
+                currentseason = season
+
+        for season in content["Seasons"]:
+            if currentseason["StartTime"] == season["EndTime"] and season["Type"] == "act":
+                self.log(f"retrieved previous season id: {season['ID']}")
+                return season["ID"]
         return None
 
     def get_all_agents(self):
@@ -140,6 +140,8 @@ class Content():
 
         # Process seasons to find act and episode
         act_found = False
+        episode = []
+        episode = self.content["Seasons"][0]
         for season in self.content["Seasons"]:
             # Check for matching act ID
             if season["ID"].lower() == act_id.lower():
@@ -150,9 +152,12 @@ class Content():
         
             # Find the first episode after the act
             if act_found and season["Type"] == "episode":
-                episode_num = parse_season_number(season["Name"])
+                episode_num = parse_season_number(episode["Name"])
                 if episode_num is not None:
                     final["episode"] = episode_num
                 break
+
+            if season["Type"] == "episode":
+                episode = season
 
         return final
