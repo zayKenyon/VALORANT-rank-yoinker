@@ -12,7 +12,7 @@ class Content():
 
     def get_latest_season_id(self, content):
         for season in content["Seasons"]:
-            if season["IsActive"]:
+            if season["IsActive"] and season["Type"] == "act":
                 self.log(f"retrieved season id: {season['ID']}")
                 return season["ID"]
 
