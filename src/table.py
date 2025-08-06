@@ -4,21 +4,40 @@ from typing import Literal, get_args
 from rich.table import Table as RichTable
 from rich.console import Console as RichConsole
 
+# define constants for all column headers
+# avoids "magic strings"
+HEADER_PARTY = "Party"
+HEADER_AGENT = "Agent"
+HEADER_NAME = "Name"
+HEADER_SKIN = "Skin"
+HEADER_RANK = "Rank"
+HEADER_RR = "RR"
+HEADER_PEAK_RANK = "Peak Rank"
+HEADER_PREVIOUS_RANK = "Previous Act Rank"
+HEADER_PREVIOUS_RANK_SHORT = "Last Act"
+HEADER_LEADERBOARD_POS = "Pos."
+HEADER_HS_PERCENT = "HS"
+HEADER_WINRATE = "WR"
+HEADER_KD_RATIO = "KD"
+HEADER_LEVEL = "Level"
+HEADER_EARNED_RR = "ΔRR"
+
+
 TABLE_COLUMN_NAMES = Literal[
-    "Party",
-    "Agent",
-    "Name",
-    "Skin",
-    "Rank",
-    "RR",
-    "Peak Rank",
-    "Previous Act Rank",
-    "Pos.",
-    "HS",
-    "WR",
-    "KD",
-    "Level",
-    "ΔRR",
+    HEADER_PARTY,
+    HEADER_AGENT,
+    HEADER_NAME,
+    HEADER_SKIN,
+    HEADER_RANK,
+    HEADER_RR,
+    HEADER_PEAK_RANK,
+    HEADER_PREVIOUS_RANK,
+    HEADER_LEADERBOARD_POS,
+    HEADER_HS_PERCENT,
+    HEADER_WINRATE,
+    HEADER_KD_RATIO,
+    HEADER_LEVEL,
+    HEADER_EARNED_RR,
 ]
 
 
@@ -44,10 +63,22 @@ class Table:
             bool(config.table.get("earned_rr", True)),  # Earned RR
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
-        self.field_names_candidates = list(get_args(TABLE_COLUMN_NAMES))
-        if "Skin" in self.field_names_candidates:
-            skin_index = self.field_names_candidates.index("Skin")
+        
+        candidates = list(get_args(TABLE_COLUMN_NAMES))
+
+        # Set column names based on config
+        if self.config.get_feature_flag("short_ranks"):
+            self.field_names_candidates = [
+                HEADER_PREVIOUS_RANK_SHORT if name == HEADER_PREVIOUS_RANK else name
+                for name in candidates
+            ]
+        else:
+            self.field_names_candidates = candidates
+
+        if HEADER_SKIN in self.field_names_candidates:
+            skin_index = self.field_names_candidates.index(HEADER_SKIN)
             self.field_names_candidates[skin_index] = self.config.weapon.capitalize()
+            
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
@@ -106,9 +137,13 @@ class Table:
     def reset_runtime_col_flags(self):
         self.runtime_col_flags = self.col_flags[:]
 
-    def set_runtime_col_flag(self, field_name: TABLE_COLUMN_NAMES, flag: bool):
-        index = self.field_names_candidates.index(field_name)
-        self.runtime_col_flags[index] = flag
+    def set_runtime_col_flag(self, field_name: str, flag: bool):
+        try:
+            index = self.field_names_candidates.index(field_name)
+            self.runtime_col_flags[index] = flag
+        except ValueError:
+            self.log(f"Warning: Attempted to set a flag for a non-existent column: {field_name}")
+
 
     def display(self):
         self.log("rows: " + str(self.rows))
