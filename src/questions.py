@@ -22,7 +22,8 @@ FLAGS_OPTS = {
     "peak_rank_act": "Peak Rank Act",
     "discord_rpc": "Discord Rich Presence",
     "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column",
-    "server_id": "Show Server ID"
+    "server_id": "Show Server Region ID",
+    "short_ranks": "Short rank names instead of long ones"
 }
 
 weapon_question = lambda config: {
