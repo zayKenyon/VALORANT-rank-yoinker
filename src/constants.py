@@ -125,6 +125,37 @@ NUMBERTORANKS = [
             color('Radiant', fore=(255, 253, 205)),
         ]
 
+SHORT_NUMBERTORANKS = [
+    color('UnR', fore=(46, 46, 46)),
+    color('UnR', fore=(46, 46, 46)),
+    color('UnR', fore=(46, 46, 46)),
+    color('Iron 1', fore=(72, 69, 62)),
+    color('Iron 2', fore=(72, 69, 62)),
+    color('Iron 3', fore=(72, 69, 62)),
+    color('Bron 1', fore=(187, 143, 90)),
+    color('Bron 2', fore=(187, 143, 90)),
+    color('Bron 3', fore=(187, 143, 90)),
+    color('Silv 1', fore=(174, 178, 178)),
+    color('Silv 2', fore=(174, 178, 178)),
+    color('Silv 3', fore=(174, 178, 178)),
+    color('Gold 1', fore=(197, 186, 63)),
+    color('Gold 2', fore=(197, 186, 63)),
+    color('Gold 3', fore=(197, 186, 63)),
+    color('Plat 1', fore=(24, 167, 185)),
+    color('Plat 2', fore=(24, 167, 185)),
+    color('Plat 3', fore=(24, 167, 185)),
+    color('Dia 1', fore=(216, 100, 199)),
+    color('Dia 2', fore=(216, 100, 199)),
+    color('Dia 3', fore=(216, 100, 199)),
+    color('Asc 1', fore=(24, 148, 82)),
+    color('Asc 2', fore=(24, 148, 82)),
+    color('Asc 3', fore=(24, 148, 82)),
+    color('Imm 1', fore=(221, 68, 68)),
+    color('Imm 2', fore=(221, 68, 68)),
+    color('Imm 3', fore=(221, 68, 68)),
+    color('Rad', fore=(255, 253, 205)),
+]
+
 tierDict = {
             "0cebb8be-46d7-c12a-d306-e9907bfc5a25": (0, 149, 135),
             "e046854e-406c-37f4-6607-19a9ba8426fc": (241, 184, 45),
@@ -181,6 +212,7 @@ DEFAULT_CONFIG = {
             "peak_rank_act": True,
             "discord_rpc": True,
             "aggregate_rank_rr": True,
-            "server_id": False
+            "server_id": False,
+            "short_ranks": False
         }
     }
