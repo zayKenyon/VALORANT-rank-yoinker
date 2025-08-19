@@ -186,5 +186,39 @@ class Table:
             if flag
         ]
 
+        skin_column_name = self.config.weapon.capitalize()
+
+        # Columns that should never be truncated
+        static_overflow_fold_columns = {
+            HEADER_HS_PERCENT,
+            HEADER_KD_RATIO,
+            HEADER_LEVEL,
+            HEADER_LEADERBOARD_POS,
+        }
+
+        # Conditional columns
+        conditional_columns = {
+            HEADER_NAME: "truncate_names",
+            skin_column_name: "truncate_skins",
+        }
+
         for field in self.fields_to_display:
-            self.rich_table.add_column(field, justify="center")
+            # Base properties for all columns
+            kwargs = {"justify": "center"}
+            apply_fold = False
+
+            # Check if the column should always fold (not truncated)
+            if field in static_overflow_fold_columns:
+                apply_fold = True
+            # Check flags
+            elif field in conditional_columns:
+                flag_name = conditional_columns[field]
+                if not self.config.get_feature_flag(flag_name):
+                    apply_fold = True
+
+            # Apply
+            if apply_fold:
+                kwargs["overflow"] = "fold"
+
+            # Columns without rules use base args
+            self.rich_table.add_column(field, **kwargs)
