@@ -213,6 +213,8 @@ DEFAULT_CONFIG = {
             "discord_rpc": True,
             "aggregate_rank_rr": True,
             "server_id": False,
-            "short_ranks": False
+            "short_ranks": False,
+            "truncate_skins": True,
+            "truncate_names": True
         }
     }
