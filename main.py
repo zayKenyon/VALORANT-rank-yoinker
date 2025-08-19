@@ -167,6 +167,12 @@ try:
         table.set_default_field_names()
         table.reset_runtime_col_flags()
 
+        # check if short ranks should be used
+        if cfg.get_feature_flag("short_ranks"):
+            Ranks = SHORT_NUMBERTORANKS
+        else:
+            Ranks = NUMBERTORANKS
+
         try:
 
             # loop = asyncio.get_event_loop()
@@ -475,7 +481,7 @@ try:
                         skin = loadouts.get(player["Subject"], "")
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = Ranks[playerRank["rank"]]
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get(
                             "rr"
                         ):
@@ -497,10 +503,10 @@ try:
                             peakRankAct = ""
 
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = Ranks[playerRank["peakrank"]] + peakRankAct
 
                         # PREVIOUS RANK
-                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                        previousRank = Ranks[previousPlayerRank["rank"]]
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -731,7 +737,7 @@ try:
                         # skin = loadouts[player["Subject"]]
 
                         # RANK
-                        rankName = NUMBERTORANKS[playerRank["rank"]]
+                        rankName = Ranks[playerRank["rank"]]
                         if cfg.get_feature_flag("aggregate_rank_rr") and cfg.table.get(
                             "rr"
                         ):
@@ -752,10 +758,10 @@ try:
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
-                        peakRank = NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                        peakRank = Ranks[playerRank["peakrank"]] + peakRankAct
 
                         # PREVIOUS RANK
-                        previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                        previousRank = Ranks[previousPlayerRank["rank"]]
 
                         # LEADERBOARD
                         leaderboard = playerRank["leaderboard"]
@@ -808,6 +814,7 @@ try:
 
                         # bar()
             if game_state == "MENUS":
+                server = ""
                 already_played_with = []
                 Players = menu.get_party_members(Requests.puuid, presence)
                 names = namesClass.get_names_from_puuids(Players)
@@ -877,7 +884,7 @@ try:
                             name = color(names[player["Subject"]], fore=(76, 151, 237))
 
                             # RANK
-                            rankName = NUMBERTORANKS[playerRank["rank"]]
+                            rankName = Ranks[playerRank["rank"]]
                             if cfg.get_feature_flag(
                                 "aggregate_rank_rr"
                             ) and cfg.table.get("rr"):
@@ -900,11 +907,11 @@ try:
 
                             # PEAK RANK
                             peakRank = (
-                                NUMBERTORANKS[playerRank["peakrank"]] + peakRankAct
+                                Ranks[playerRank["peakrank"]] + peakRankAct
                             )
 
                             # PREVIOUS RANK
-                            previousRank = NUMBERTORANKS[previousPlayerRank["rank"]]
+                            previousRank = Ranks[previousPlayerRank["rank"]]
 
                             # LEADERBOARD
                             leaderboard = playerRank["leaderboard"]
@@ -970,7 +977,6 @@ try:
             else:
                 table.set_title(f"VALORANT status: {title}")
             
-            server = ""
             if title is not None:
                 if cfg.get_feature_flag("auto_hide_leaderboard") and (
                     not is_leaderboard_needed
