@@ -5,6 +5,7 @@ version = "2.90"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
+hide_starting_side = True
 
 
 gamemodes = {
