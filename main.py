@@ -968,7 +968,7 @@ try:
             
             title_parts = [f"VALORANT status: {title}"]
             
-            if game_state == "PREGAME" and pregame_stats is not None and not hide_starting_side:
+            if game_state == "PREGAME" and pregame_stats is not None and cfg.get_feature_flag("starting_side"):
                 team_side = "Attacker" if pregame_stats["AllyTeam"]["TeamID"] == "Red" else "Defender"
                 title_parts.append(f" | {colr(team_side, fore=(76, 151, 237) if team_side == 'Defender' else (238, 77, 77))}")
             
