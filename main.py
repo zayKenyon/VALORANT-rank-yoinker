@@ -185,17 +185,15 @@ try:
             if firstTime:
                 run = True
                 while run:
-                    while True:
-                        presence = presences.get_presence()
-                        # wait until your own valorant presence is initialized
-                        if presences.get_private_presence(presence) != None:
-                            break
-                        time.sleep(5)
-                    if cfg.get_feature_flag("discord_rpc"):
-                        rpc.set_rpc(presences.get_private_presence(presence))
-                    game_state = presences.get_game_state(presence)
-                    if game_state != None:
-                        run = False
+                    presence = presences.get_presence()
+                    private_presence = presences.get_private_presence(presence)
+                    # wait until your own valorant presence is initialized
+                    if private_presence is not None:
+                        if cfg.get_feature_flag("discord_rpc"):
+                            rpc.set_rpc(private_presence)
+                        game_state = presences.get_game_state(presence)
+                        if game_state is not None:
+                            run = False
                     time.sleep(2)
                 log(f"first game state: {game_state}")
             else:
@@ -230,11 +228,14 @@ try:
                 os.system("cls")
 
             is_leaderboard_needed = False
-
+            
+            # get new presence
+            presence = presences.get_presence()
             priv_presence = presences.get_private_presence(presence)
+            
             if (
                 priv_presence["provisioningFlow"] == "CustomGame"
-                or priv_presence["partyState"] == "CUSTOM_GAME_SETUP"
+                or priv_presence["partyPresenceData"]["partyState"] == "CUSTOM_GAME_SETUP"
             ):
                 gamemode = "Custom Game"
             else:
@@ -254,7 +255,6 @@ try:
                     continue
                 Players = coregame_stats["Players"]
                 # data for chat to function
-                presence = presences.get_presence()
                 partyMembers = menu.get_party_members(Requests.puuid, presence)
                 partyMembersList = [a["Subject"] for a in partyMembers]
 
