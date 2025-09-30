@@ -59,7 +59,8 @@ class Ws:
                     if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
                         state = None
                     else:
-                        state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
+                        private_data = json.loads(base64.b64decode(presence['private']))
+                        state = private_data["matchPresenceData"]["sessionLoopState"]
 
                     if state is not None:
                         if self.cfg.get_feature_flag("discord_rpc"):
