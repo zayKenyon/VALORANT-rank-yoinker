@@ -26,6 +26,8 @@ class Presences:
                 if presence.get("championId") is not None or presence.get("product") == "league_of_legends":
                     return None
                 else:
+                    if presence['private'] == "": 
+                        return None
                     decoded_private = json.loads(base64.b64decode(presence['private']))
                     # Debug
                     # print(f"DEBUG: Decoded Private Presence -> {decoded_private}")
