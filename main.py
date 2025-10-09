@@ -738,17 +738,17 @@ try:
                             PLcolor = colors.level_to_color(player_level)
                         if player["CharacterSelectionState"] == "locked":
                             agent_color = color(
-                                str(agent_dict.get(player["CharacterID"].lower(), "Unknown")),
+                                agent_dict.get(player["CharacterID"].lower(), "Unknown"),
                                 fore=(255, 255, 255),
                             )
                         elif player["CharacterSelectionState"] == "selected":
                             agent_color = color(
-                                str(agent_dict.get(player["CharacterID"].lower(), "Unknown")),
+                                agent_dict.get(player["CharacterID"].lower(), "Unknown"),
                                 fore=(128, 128, 128),
                             )
                         else:
                             agent_color = color(
-                                str(agent_dict.get(player["CharacterID"].lower(), "Unknown")),
+                                agent_dict.get(player["CharacterID"].lower(), "Unknown"),
                                 fore=(54, 53, 51),
                             )
 
