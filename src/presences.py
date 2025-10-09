@@ -9,6 +9,8 @@ class Presences:
 
     def get_presence(self):
         presences = self.Requests.fetch(url_type="local", endpoint="/chat/v4/presences", method="get")
+        if presences is None:
+            return None
         return presences['presences']
 
     def get_game_state(self, presences):
