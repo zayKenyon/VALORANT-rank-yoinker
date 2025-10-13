@@ -17,7 +17,9 @@ class Colors:
         if agent is not None:
             if self.hide_names:
                 if agent != "":
-                    name = self.agent_dict.get(agent.lower(), "Player") 
+                    name = self.agent_dict[agent.lower()]
+                else:
+                    name = "Player"
         if team == "Red":
             if playerPuuid not in party_members:
                 Teamcolor = color(name, fore=(238, 77, 77))
