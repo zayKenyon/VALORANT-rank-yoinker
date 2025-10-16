@@ -125,7 +125,7 @@ try:
 
     current_map = coregame.get_current_map(map_urls, map_splashes)
 
-    colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
+    colors = Colors(log, hide_names, agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, log)

@@ -39,7 +39,13 @@ class Loadouts:
                     skin_id = \
                         inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
                             "ID"]
-                    for skin in valoApiSkins.json()["data"]:
+                    json_data = valoApiSkins.json()
+
+                    if "data" not in json_data:
+                        self.log("Skins API response missing 'data'.")
+                        return None
+                    
+                    for skin in json_data["data"]:
                         if skin_id.lower() == skin["uuid"].lower():
                             rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                             skin_display_name = skin["displayName"].replace(f" {weapon['displayName']}", "")
