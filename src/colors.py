@@ -41,7 +41,7 @@ class Colors:
         json_data = valoApiSkins.json()
         
         if "data" not in json_data:
-            self.log('Failed to retrieve skin data from api.')
+            self.log("Skins API response missing 'data'.")
             return None
         
         for skin in json_data["data"]:
