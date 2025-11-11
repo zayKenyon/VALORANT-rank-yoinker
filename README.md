@@ -6,7 +6,7 @@
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
-    
+     
  
   <ol>
     <li><a href="#about-the-project">About The Project</a></li>
