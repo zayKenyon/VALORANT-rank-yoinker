@@ -263,7 +263,7 @@ try:
             
             if (
                 priv_presence["provisioningFlow"] == "CustomGame"
-                or priv_presence["partyPresenceData"]["partyState"] == "CUSTOM_GAME_SETUP"
+                or priv_presence["partyState"] == "CUSTOM_GAME_SETUP"
             ):
                 gamemode = "Custom Game"
             else:
