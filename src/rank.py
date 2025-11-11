@@ -102,7 +102,7 @@ class Rank:
                 wr = 100
         except (KeyError, TypeError): #haven't played this season, #no data?
             # print("test")
-            wr = "N/a"
+            wr = "N/A"
 
 
         # rank.append(wr)
