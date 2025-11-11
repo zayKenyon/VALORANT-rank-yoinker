@@ -84,7 +84,7 @@ class Ws:
                 
                 try:
                     private_data = json.loads(base64.b64decode(presence['private']))
-                    state = private_data.get("matchPresenceData", {}).get("sessionLoopState")
+                    state = private_data.get("sessionLoopState")
                 except (json.JSONDecodeError, KeyError, TypeError) as e:
                     self.log(f"Failed to decode private presence data: {e}")
                     state = None
