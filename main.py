@@ -261,9 +261,20 @@ try:
             presence = presences.get_presence()
             priv_presence = presences.get_private_presence(presence)
             
+            # Temp fix: Riot is swapping between nested and flat API structures.
+            party_state = ""
+            if "partyPresenceData" in priv_presence: # Check for nested structure
+                party_state = priv_presence["partyPresenceData"]["partyState"]
+            elif "partyState" in priv_presence: # Check for flattened structure
+                party_state = priv_presence["partyState"]
+            else:
+                # No known structure found, log and fail
+                log("ERROR: Unknown presence API structure in 'main'.")
+                party_state = priv_presence["partyPresenceData"]["partyState"]
+            
             if (
                 priv_presence["provisioningFlow"] == "CustomGame"
-                or priv_presence["partyPresenceData"]["partyState"] == "CUSTOM_GAME_SETUP"
+                or party_state == "CUSTOM_GAME_SETUP"
             ):
                 gamemode = "Custom Game"
             else:

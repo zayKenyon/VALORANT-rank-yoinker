@@ -178,7 +178,13 @@ class Rpc:
                 self._last_sent_payload = payload
 
                 # Logs
-                state = (self._desired_presence.get("matchPresenceData") or {}).get("sessionLoopState")
+                # Handle both flattened and nested API structures (temp fix)
+                state = None
+                if "matchPresenceData" in self._desired_presence: # Check for nested structure first
+                    state = (self._desired_presence.get("matchPresenceData") or {}).get("sessionLoopState")
+                elif "sessionLoopState" in self._desired_presence: # Check for flattened structure
+                    state = self._desired_presence.get("sessionLoopState")
+                
                 if state == "INGAME":
                     self.log("RPC: in-game data update")
                 elif state == "MENUS":
@@ -255,10 +261,37 @@ class Rpc:
         if not presence or not presence.get("isValid"):
             return None
 
-        match_data = presence.get("matchPresenceData", {}) or {}
-        party_data = presence.get("partyPresenceData", {}) or {}
+        # Temp fix: Riot is swapping between nested and flat API structures.
+        session_state = None
+        match_map = ""
+        party_size = 0
+        max_party = 0
+        party_access = ""
+        party_state = ""
 
-        session_state = match_data.get("sessionLoopState")
+        if "matchPresenceData" in presence: # Check for nested structure
+            match_data = presence.get("matchPresenceData", {}) or {}
+            party_data = presence.get("partyPresenceData", {}) or {}
+            
+            session_state = match_data.get("sessionLoopState")
+            match_map = match_data.get("matchMap", "")
+            party_size = party_data.get("partySize")
+            max_party = party_data.get("maxPartySize")
+            party_access = party_data.get("partyAccessibility")
+            party_state = party_data.get("partyState")
+        elif "sessionLoopState" in presence: # Check for flattened structure
+            session_state = presence.get("sessionLoopState")
+            match_map = presence.get("matchMap", "")
+            party_size = presence.get("partySize")
+            max_party = presence.get("maxPartySize")
+            party_access = presence.get("partyAccessibility")
+            party_state = presence.get("partyState")
+        else:
+            # No known structure found, log and fail
+            self.log("ERROR: Unknown presence API structure in 'rpc._build_payload'.")
+            session_state = presence["matchPresenceData"]["sessionLoopState"]
+
+
         if not session_state:
             return None
 
@@ -282,7 +315,7 @@ class Rpc:
             enemy = presence.get("partyOwnerMatchScoreEnemyTeam")
             details = f"{gamemode} // {ally} - {enemy}"
 
-            match_map = (match_data.get("matchMap") or "").lower()
+            match_map = (match_map or "").lower()
             mapText = self.map_dict.get(match_map)
             if mapText == "The Range":
                 mapImage = "splash_range_square"
@@ -296,9 +329,6 @@ class Rpc:
             if not mapText:
                 mapText = None
                 mapImage = None
-
-            party_size = party_data.get("partySize")
-            max_party = party_data.get("maxPartySize")
 
             return dict(
                 state=f"In a Party ({party_size} of {max_party})",
@@ -315,13 +345,9 @@ class Rpc:
             image = "game_icon_yellow" if is_idle else "game_icon"
             image_text = "VALORANT - Idle" if is_idle else "VALORANT - Online"
 
-            party_access = party_data.get("partyAccessibility")
             party_string = "Open Party" if party_access == "OPEN" else "Closed Party"
 
-            gamemode = "Custom Game" if party_data.get("partyState") == "CUSTOM_GAME_SETUP" else self.gamemodes.get(presence.get("queueId"))
-
-            party_size = party_data.get("partySize")
-            max_party = party_data.get("maxPartySize")
+            gamemode = "Custom Game" if party_state == "CUSTOM_GAME_SETUP" else self.gamemodes.get(presence.get("queueId"))
 
             return dict(
                 state=f"{party_string} ({party_size} of {max_party})",
@@ -333,15 +359,12 @@ class Rpc:
             )
 
         if session_state == "PREGAME":
-            is_custom = presence.get("provisioningFlow") == "CustomGame" or party_data.get("partyState") == "CUSTOM_GAME_SETUP"
+            is_custom = presence.get("provisioningFlow") == "CustomGame" or party_state == "CUSTOM_GAME_SETUP"
             gamemode = "Custom Game" if is_custom else self.gamemodes.get(presence.get("queueId"))
 
-            match_map = (match_data.get("matchMap") or "").lower()
+            match_map = (match_map or "").lower()
             mapText = self.map_dict.get(match_map)
             mapImage = f"splash_{mapText}_square".lower() if mapText else None
-
-            party_size = party_data.get("partySize")
-            max_party = party_data.get("maxPartySize")
 
             return dict(
                 state=f"In a Party ({party_size} of {max_party})",
