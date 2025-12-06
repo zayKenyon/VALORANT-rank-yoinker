@@ -13,7 +13,7 @@ pypresence==4.3.0
 PyYAML==6.0.1
 requests==2.32.4
 rich==13.5.1
-urllib3==2.2.2
+urllib3==2.6.0
 wcwidth==0.2.6
 websocket-server==0.6.4
 websockets==11.0.3
