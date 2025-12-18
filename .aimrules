@@ -1,0 +1,631 @@
+# VALORANT Rank Yoinker - AI Development Rules
+
+## Project Overview
+
+**VALORANT rank yoinker (vRY)** is a Python-based desktop application that displays real-time player statistics, ranks, loadouts, and match information for VALORANT players during matches. It works by interfacing with the VALORANT local client API and Riot's public APIs to fetch and display player data in a console-based table format.
+
+**Current Version**: 2.91
+
+**Primary Features**:
+- Real-time player stats display (rank, peak rank, K/D, headshot %, win rate, level)
+- Weapon skin tracking for specific weapons
+- Discord Rich Presence integration
+- Party detection and visualization
+- Match history tracking
+- Mobile companion web interface (vRY Mobile)
+- Multi-account management
+- Game state detection (In-Game, Agent Select, Menus)
+- In-game chat display
+
+## Architecture Overview
+
+### Entry Point: main.py
+The main event loop orchestrates the entire application:
+1. **Initialization Phase**: Loads configuration, authenticates with VALORANT client, initializes all service classes
+2. **Game State Detection Loop**: Uses WebSocket connections and polling to detect game state changes
+3. **Data Fetching Phase**: Based on game state, fetches appropriate player data
+4. **Display Phase**: Renders data in a formatted table using Rich library
+5. **WebSocket Server**: Broadcasts data to mobile clients
+
+### Core Component Architecture
+
+```
+main.py (orchestrator)
+├── src/requestsV.py (API client - handles all HTTP requests to Riot APIs)
+├── src/websocket.py (WebSocket client - monitors game state changes)
+├── src/config.py (configuration management)
+├── src/rank.py (rank data fetching and caching)
+├── src/content.py (game content: agents, maps, seasons)
+├── src/presences.py (player presence data from local API)
+├── src/names.py (player name resolution)
+├── src/player_stats.py (K/D, headshot %, recent match stats)
+├── src/Loadouts.py (weapon skins and cosmetics)
+├── src/colors.py (terminal color formatting)
+├── src/table.py (Rich table display management)
+├── src/server.py (WebSocket server for vRY Mobile)
+├── src/rpc.py (Discord Rich Presence)
+├── src/stats.py (player history tracking)
+├── src/account_manager/ (multi-account system)
+└── src/states/ (game state handlers)
+    ├── coregame.py (in-game state)
+    ├── pregame.py (agent select state)
+    └── menu.py (lobby state)
+```
+
+## Critical API Integration Points
+
+### 1. VALORANT Local Client API (via lockfile)
+**Authentication**:
+- Reads lockfile from `%LOCALAPPDATA%/Riot Games/Riot Client/Config/lockfile`
+- Format: `name:PID:port:password:protocol`
+- Uses Basic Auth with `riot:{password}`
+
+**Key Endpoints**:
+- `/entitlements/v1/token` - Gets access token and entitlements
+- `/chat/v4/presences` - Player presence data (game state, party info)
+- `/chat/v6/messages` - In-game chat messages
+
+**Connection Details**:
+- HTTPS on `127.0.0.1:{port}` from lockfile
+- SSL verification disabled (self-signed cert)
+- WebSocket connection for real-time updates
+
+### 2. Riot PD (Player Data) API
+**Base URL**: `https://pd.{region}.a.pvp.net`
+- `/mmr/v1/players/{puuid}` - Rank, RR, peak rank, win rate
+- `/mmr/v1/players/{puuid}/competitiveupdates` - Recent ranked match performance
+- `/match-details/v1/matches/{match_id}` - Detailed match statistics
+- `/name-service/v2/players` - Convert PUUIDs to GameName#TagLine
+
+### 3. Riot GLZ (Game Load Balancer) API
+**Base URL**: `https://glz-{shard}.{region}.a.pvp.net`
+- `/core-game/v1/players/{puuid}` - Current match ID (in-game)
+- `/core-game/v1/matches/{match_id}` - Live match details
+- `/core-game/v1/matches/{match_id}/loadouts` - Player loadouts (skins)
+- `/pregame/v1/players/{puuid}` - Pregame match ID
+- `/pregame/v1/matches/{match_id}` - Agent select details
+
+### 4. VALORANT-API.com (Community API)
+**Public, no auth required**:
+- `/v1/weapons` - All weapons data
+- `/v1/weapons/skins` - All weapon skins
+- `/v1/agents` - All agents data
+- `/v1/maps` - All maps data
+- `/v1/sprays` - Spray data
+- `/v1/buddies` - Gun buddy data
+- `/v1/playertitles` - Player titles
+- `/v1/playercards` - Player card arts
+
+### 5. Region Detection
+Reads from `%LOCALAPPDATA%/VALORANT/Saved/Logs/ShooterGame.log`:
+- Searches for `.a.pvp.net/account-xp/v1/` to extract PD region
+- Searches for `https://glz` to extract GLZ shard and region
+
+## Data Models and Structures
+
+### Player Data Structure (Heartbeat)
+```python
+{
+    "time": int(time.time()),
+    "state": "INGAME" | "PREGAME" | "MENUS",
+    "mode": gamemode_string,
+    "puuid": player_puuid,
+    "players": {
+        puuid: {
+            "name": "Player#TAG",
+            "partyNumber": 1-8,
+            "agent": "Jett",
+            "rank": 0-27,
+            "peakRank": 0-27,
+            "peakRankAct": "1" | "e8a1",
+            "rr": 0-100,
+            "kd": float,
+            "headshotPercentage": 0-100,
+            "winPercentage": "50 (100)",
+            "level": int,
+            "agentImgLink": url,
+            "team": "Red" | "Blue",
+            "sprays": {},
+            "title": "Title Text",
+            "playerCard": url,
+            "weapons": {}
+        }
+    }
+}
+```
+
+### Rank Data Structure
+```python
+{
+    "rank": 0-27,  # 0-2=Unranked, 3-5=Iron, 6-8=Bronze, 9-11=Silver,
+                    # 12-14=Gold, 15-17=Plat, 18-20=Diamond,
+                    # 21-23=Ascendant, 24-26=Immortal, 27=Radiant
+    "rr": 0-100,
+    "leaderboard": 0 or leaderboard_position,
+    "peakrank": 0-27,
+    "wr": 0-100 or "N/a",
+    "numberofgames": int,
+    "peakrankact": act_number,
+    "peakrankep": episode_number,
+    "statusgood": bool,
+    "statuscode": http_status_code
+}
+```
+
+### Presence API Structure (IMPORTANT: Riot is currently transitioning)
+**Riot is actively swapping between two API structures:**
+
+**Nested Structure (OLD)**:
+```python
+{
+    "isValid": bool,
+    "matchPresenceData": {
+        "sessionLoopState": "INGAME" | "PREGAME" | "MENUS",
+        "matchMap": map_url
+    },
+    "partyPresenceData": {
+        "partyId": uuid,
+        "partySize": int,
+        "maxPartySize": int,
+        "partyAccessibility": "OPEN" | "CLOSED",
+        "partyState": string
+    },
+    "playerPresenceData": {
+        "accountLevel": int
+    }
+}
+```
+
+**Flattened Structure (NEW)**:
+```python
+{
+    "isValid": bool,
+    "sessionLoopState": "INGAME" | "PREGAME" | "MENUS",
+    "matchMap": map_url,
+    "partyId": uuid,
+    "partySize": int,
+    "maxPartySize": int,
+    "partyAccessibility": "OPEN" | "CLOSED",
+    "partyState": string,
+    "accountLevel": int
+}
+```
+
+**CRITICAL**: When accessing presence data, ALWAYS check for both structures:
+```python
+# Example pattern used throughout the codebase
+if "matchPresenceData" in presence:  # Nested structure
+    state = presence["matchPresenceData"]["sessionLoopState"]
+elif "sessionLoopState" in presence:  # Flat structure
+    state = presence["sessionLoopState"]
+else:
+    # Log error and fallback
+    log("ERROR: Unknown presence API structure")
+    state = presence["matchPresenceData"]["sessionLoopState"]  # Will raise KeyError
+```
+
+**Files with presence API handling**:
+- `main.py` (lines 264-273)
+- `src/presences.py` (lines 19-29)
+- `src/websocket.py` (lines 88-97)
+- `src/states/menu.py` (lines 14-26, 54-65, 77-89)
+- `src/rpc.py` (lines 182-186, 264-292)
+
+## Configuration System
+
+### config.json Structure
+```python
+{
+    "cooldown": 10,  # Auto-refresh interval (0 = manual)
+    "port": 1100,  # WebSocket server port for vRY Mobile
+    "weapon": "Vandal",  # Weapon to track skins for
+    "chat_limit": 5,  # Max chat messages to display
+    "table": {  # Column visibility
+        "skin": bool,
+        "rr": bool,
+        "earned_rr": bool,
+        "peakrank": bool,
+        "previousrank": bool,
+        "leaderboard": bool,
+        "headshot_percent": bool,
+        "winrate": bool,
+        "kd": bool,
+        "level": bool
+    },
+    "flags": {  # Feature flags
+        "last_played": bool,  # Show "already played with" messages
+        "auto_hide_leaderboard": bool,  # Hide leaderboard column if no radiant/immortal
+        "pre_cls": bool,  # Clear screen before each update
+        "game_chat": bool,  # Display in-game chat
+        "peak_rank_act": bool,  # Show act/episode for peak rank
+        "discord_rpc": bool,  # Enable Discord Rich Presence
+        "aggregate_rank_rr": bool,  # Show RR in rank column
+        "server_id": bool,  # Show server ID in title
+        "short_ranks": bool,  # Use shortened rank names
+        "truncate_skins": bool,  # Truncate skin names
+        "truncate_names": bool,  # Truncate player names
+        "starting_side": bool  # Show starting side in pregame
+    }
+}
+```
+
+### Constants (src/constants.py)
+- `version`: Current application version
+- `gamemodes`: Queue ID to gamemode name mapping
+- `before_ascendant_seasons`: Season UUIDs before Ascendant rank was added
+- `AGENTCOLORLIST`: Agent name to RGB color mapping
+- `NUMBERTORANKS`: Rank tier (0-27) to colored rank string
+- `SHORT_NUMBERTORANKS`: Abbreviated rank names
+- `tierDict`: Content tier UUID to RGB color (for skins)
+- `WEAPONS`: List of all weapon display names
+- `DEFAULT_CONFIG`: Default configuration template
+
+## Error Handling Patterns
+
+### Rate Limiting
+The `requestsV.py` module handles rate limiting automatically:
+- Detects 429 status codes
+- Implements exponential backoff (5s, 10s, 15s, ...)
+- Refreshes auth tokens on BAD_CLAIMS errors
+- Logs all rate limit incidents
+
+### Connection Errors
+**Lockfile Issues**:
+- Checks if lockfile exists
+- If missing, prompts to start VALORANT
+- Polls until lockfile appears
+- Validates lockfile format
+
+**WebSocket Disconnections**:
+- Implements retry logic with exponential backoff
+- Max 5 retries before marking as DISCONNECTED
+- Returns to main loop for reconnection
+
+### API Response Validation
+**Always check for**:
+- `errorCode` in response JSON
+- 404 status for matches that don't exist yet
+- Missing `data` key in valorant-api.com responses
+- Null/None values in nested structures
+
+## Development Patterns and Conventions
+
+### Class Initialization Pattern
+Most classes follow this pattern:
+```python
+class Example:
+    def __init__(self, Requests, log, ...):
+        self.Requests = Requests
+        self.log = log
+        # ...
+```
+- `Requests`: Instance of requestsV.Requests (API client)
+- `log`: Logging function from src/logs.py
+
+### Logging
+```python
+self.log(f"descriptive message with {variables}")
+```
+- Logs to `logs/log-{number}.txt`
+- Timestamp format: `[YYYY.MM.DD-HH.MM.SS] message`
+- Sanitizes unicode characters
+
+### Color Formatting
+Uses `colr` library:
+```python
+from colr import color
+colored_text = color("text", fore=(R, G, B))
+```
+For Rich library display, ANSI codes are converted:
+```python
+# In table.py
+self.ansi_to_console(colored_string)
+```
+
+### Caching Pattern
+Several classes implement caching:
+```python
+# Example from rank.py
+def get_request(self, puuid):
+    if puuid in self.requestMap:
+        return self.requestMap[puuid]
+    response = self.Requests.fetch(...)
+    self.requestMap[puuid] = response
+    return response
+
+def invalidate_cached_responses(self):
+    self.requestMap = {}
+```
+
+## macOS-Specific Considerations
+
+### Critical Platform Incompatibilities
+
+1. **Lockfile Path**
+   - Windows: `%LOCALAPPDATA%/Riot Games/Riot Client/Config/lockfile`
+   - macOS: VALORANT doesn't officially run on macOS
+   - **Workaround**: Use Parallels/CrossOver or remote connection to Windows machine
+
+2. **Log File Path**
+   - Windows: `%LOCALAPPDATA%/VALORANT/Saved/Logs/ShooterGame.log`
+   - macOS: N/A (VALORANT not supported)
+
+3. **os.system() Commands**
+   - `os.system("cls")` is Windows-only
+   - macOS equivalent: `os.system("clear")`
+   - `os.system(f"title ...")` is Windows-only (sets console title)
+   - macOS: No direct equivalent in standard terminal
+
+4. **Account Manager (src/account_manager/)**
+   - Uses Windows-specific APIs (ctypes.windll.shell32)
+   - Executes `.bat` files (INSTALL.bat, START.bat, etc.)
+   - Reads Windows registry for Riot Client path
+
+5. **File Paths**
+   - Uses Windows path separators in some places
+   - `%APPDATA%` environment variable (Windows-only)
+
+### Running on macOS (Development)
+For development on macOS while VALORANT runs on Windows:
+1. Run VALORANT on Windows VM or separate machine
+2. Modify lockfile reading to access shared/network location
+3. Replace `os.system("cls")` with `os.system("clear")`
+4. Mock or disable account manager features
+5. Use SSH/network connection to access Windows lockfile
+
+## Common Development Tasks
+
+### Adding a New Table Column
+1. Add column header constant in `src/table.py` (e.g., `HEADER_NEW_COLUMN`)
+2. Add to `TABLE_COLUMN_NAMES` Literal type
+3. Update `candidates` list inclusion
+4. Add config flag in `DEFAULT_CONFIG` in `src/constants.py`
+5. Update `col_flags` initialization in `Table.__init__`
+6. Add data fetching logic in `main.py` game state loop
+7. Add column data to `table.add_row_table()` call
+
+### Adding a New API Endpoint
+1. Add method to `src/requestsV.py`:
+   ```python
+   def get_new_data(self, param):
+       return self.fetch("pd", f"/endpoint/{param}", "get")
+   ```
+2. Create wrapper class in `src/` if complex logic needed
+3. Initialize in `main.py` after `Requests` initialization
+4. Use in appropriate game state section
+
+### Adding a New Feature Flag
+1. Add to `DEFAULT_CONFIG["flags"]` in `src/constants.py`
+2. Access via `cfg.get_feature_flag("flag_name")`
+3. Add configuration prompt in `src/configurator.py` if needed
+
+### Debugging API Responses
+1. Check `logs/log-*.txt` for request/response logging
+2. Use `Requests.log` to add debug output
+3. Temporarily add `print(response.json())` after API calls
+4. Use `pyperclip.copy(str(response.json()))` to copy to clipboard
+
+## Testing Considerations
+
+### Manual Testing Checklist
+- [ ] Test in MENUS state (lobby)
+- [ ] Test in PREGAME state (agent select)
+- [ ] Test in INGAME state (active match)
+- [ ] Test with party members
+- [ ] Test with Radiant/Immortal players (leaderboard)
+- [ ] Test reconnection after VALORANT restart
+- [ ] Test with different gamemodes (Comp, Unrated, Spike Rush, etc.)
+- [ ] Test with streamer mode enabled players
+- [ ] Test Discord RPC integration
+- [ ] Test vRY Mobile WebSocket connection
+
+### Edge Cases to Consider
+1. **Empty/Null Data**:
+   - Player with no ranked games this season
+   - Player who just reached account level 20
+   - Match with only yourself (Range)
+
+2. **Rate Limiting**:
+   - 10 players in match = 10+ API calls per refresh
+   - Multiple quick game state changes
+
+3. **API Structure Changes**:
+   - Presence API structure variations (nested vs flat)
+   - New seasons/acts with different ID formats
+   - Content tier changes for skin colors
+
+4. **Network Issues**:
+   - VALORANT client crash mid-match
+   - Network disconnection
+   - Firewall blocking WebSocket server port
+
+## Performance Optimization
+
+### Current Bottlenecks
+1. **Sequential Player Data Fetching**: Main loop fetches each player's data sequentially
+2. **No Request Deduplication**: Same player data may be fetched multiple times if in multiple matches
+3. **API Response Caching**: Only rank data is cached; stats and loadouts are re-fetched every cycle
+
+### Optimization Opportunities
+1. Implement concurrent fetching with `asyncio.gather()`
+2. Add LRU cache for frequently accessed data
+3. Reduce API calls by checking if player list changed before re-fetching
+4. Implement delta updates for WebSocket broadcasts
+
+## Security Considerations
+
+### Authentication Tokens
+- Access tokens stored in memory only (not persisted)
+- Tokens expire and are automatically refreshed
+- Lockfile password changes on VALORANT restart
+
+### HTTPS Certificate Validation
+- Disabled for local API (`verify=False`)
+- Necessary because VALORANT uses self-signed cert
+- Only affects `127.0.0.1` connections
+
+### WebSocket Server
+- Binds to `0.0.0.0` (all interfaces) for vRY Mobile access
+- No authentication on WebSocket server
+- Broadcasts all player data to connected clients
+- **Security Risk**: Anyone on network can connect and view data
+
+### Account Manager
+- Stores cookies in `accounts.json`
+- Cookies can authenticate to Riot accounts
+- **Important**: Cookies expire after a few days but still sensitive
+
+## Dependency Management
+
+### Core Dependencies
+- `requests>=2.32.4`: HTTP client
+- `websockets>=11.0.3`: WebSocket client/server
+- `rich>=13.5.1`: Terminal UI rendering
+- `colr>=0.9.1`: Terminal color formatting
+- `inquirerpy>=0.3.4`: Interactive CLI prompts
+- `pypresence>=4.3.0`: Discord Rich Presence
+- `websocket-server>=0.6.4`: WebSocket server for vRY Mobile
+
+### Build Dependencies
+- `cx_Freeze`: For building standalone .exe
+
+### Version Compatibility
+- Requires Python 3.10 or 3.11
+- Not tested on Python 3.12+
+
+## Troubleshooting Guide
+
+### "Lockfile does not exist"
+- VALORANT is not running
+- Lockfile path is incorrect for your system
+- VALORANT hasn't finished launching yet
+
+### "Rate Limited" / 429 Errors
+- Too many API requests in short time
+- Increase `cooldown` in config.json
+- Check for infinite loops in code
+
+### "Invalid URI format"
+- Lockfile read before VALORANT fully initialized
+- Wait a few seconds and retry
+- Check lockfile contains valid data
+
+### WebSocket Connection Fails
+- Check firewall settings
+- Port already in use by another application
+- Try changing `port` in config.json
+
+### Discord RPC Not Working
+- Discord is not running
+- Discord RPC disabled in config.json
+- Check pypresence installation
+
+### Players Show as "Unknown"
+- Presence data not yet available
+- `presences.wait_for_presence()` timeout
+- Player PUUID not in presence list
+
+## Git Workflow
+
+### Fork Setup
+This is a fork-based contribution workflow:
+
+1. **Initial Setup**:
+   ```bash
+   # If you haven't forked yet:
+   # 1. Go to https://github.com/zayKenyon/VALORANT-rank-yoinker
+   # 2. Click "Fork" button
+   # 3. Clone YOUR fork:
+   git clone https://github.com/YOUR_USERNAME/VALORANT-rank-yoinker
+   cd VALORANT-rank-yoinker
+
+   # Add upstream remote
+   git remote add upstream https://github.com/zayKenyon/VALORANT-rank-yoinker.git
+   git remote -v  # Verify setup
+   ```
+
+2. **Syncing with Upstream**:
+   ```bash
+   # Fetch latest changes from upstream
+   git fetch upstream
+
+   # Merge upstream changes into your main branch
+   git checkout main
+   git merge upstream/main
+
+   # Push updates to your fork
+   git push origin main
+   ```
+
+3. **Creating Feature Branches**:
+   ```bash
+   # Always create feature branches from updated main
+   git checkout main
+   git pull upstream main
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Submitting Changes**:
+   ```bash
+   # Commit your changes
+   git add .
+   git commit -m "Description of changes"
+
+   # Push to your fork
+   git push origin feature/your-feature-name
+
+   # Create Pull Request on GitHub from your fork to upstream
+   ```
+
+### Branching Strategy
+- `main`: Stable, matches upstream
+- `feature/*`: New features
+- `fix/*`: Bug fixes
+- `refactor/*`: Code improvements
+- `docs/*`: Documentation updates
+
+## Additional Resources
+
+- **Official Repo**: https://github.com/zayKenyon/VALORANT-rank-yoinker
+- **Discord Community**: https://discord.gg/HeTKed64Ka
+- **VALORANT API Docs**: https://valorant-api.com/
+- **vRY Mobile**: https://vry.netlify.app/matchLoadouts
+
+## Quick Reference Commands
+
+```bash
+# Development
+python main.py                    # Run application
+python main.py --config          # Run configurator
+python setup.py build            # Build executable
+
+# Installation
+pip install -r requirements.txt  # Install dependencies
+pip install cx_Freeze            # Build tool
+
+# Git
+git fetch upstream               # Get upstream changes
+git merge upstream/main          # Merge upstream into current branch
+git push origin branch-name      # Push to your fork
+```
+
+## Important Files Reference
+
+| File | Purpose | Key Functions/Classes |
+|------|---------|----------------------|
+| main.py | Entry point, main loop | Main event loop, game state handling |
+| src/requestsV.py | API client | fetch(), get_headers(), get_lockfile() |
+| src/rank.py | Rank data | get_rank(), invalidate_cached_responses() |
+| src/presences.py | Presence data | get_presence(), get_game_state() |
+| src/websocket.py | Game state monitoring | recconect_to_websocket(), handle() |
+| src/config.py | Configuration | Config class, get_feature_flag() |
+| src/table.py | Display rendering | Table class, display() |
+| src/colors.py | Color formatting | get_color_from_team(), get_hs_gradient() |
+| src/Loadouts.py | Skins/cosmetics | get_match_loadouts() |
+| src/server.py | WebSocket server | Server class, send_payload() |
+| src/constants.py | Global constants | version, NUMBERTORANKS, gamemodes |
+
+---
+
+**Last Updated**: 2025-12-18
+**For Version**: 2.91
