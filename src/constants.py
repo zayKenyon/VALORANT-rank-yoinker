@@ -1,11 +1,10 @@
 import requests
 from colr import color
 
-version = "2.91"
+version = "2.92"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
-
 
 gamemodes = {
     "newmap": "New Map",
@@ -41,6 +40,7 @@ before_ascendant_seasons = [
     "3e47230a-463c-a301-eb7d-67bb60357d4f",
     "808202d6-4f2b-a8ff-1feb-b3a0590ad79f",
 ]
+
 sockets = {
     "skin": "bcef87d6-209b-46c6-8b19-fbe40bd95abc",
     "skin_level": "e7c63390-eda7-46e0-bb7a-a6abdacd2433",
@@ -48,8 +48,6 @@ sockets = {
     "skin_buddy": "77258665-71d1-4623-bc72-44db9bd5b3b3",
     "skin_buddy_level": "dd3bf334-87f3-40bd-b043-682a57a8dc3a"
 }
-
-
 
 AGENTCOLORLIST = {
     "none": (100, 100, 100),
@@ -92,7 +90,6 @@ PARTYICONLIST = [
             color(symbol, fore=(212, 82, 207)),
             symbol
         ]
-
 
 NUMBERTORANKS = [
             color('Unranked', fore=(46, 46, 46)),
