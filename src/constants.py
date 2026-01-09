@@ -163,6 +163,7 @@ tierDict = {
         }
 
 WEAPONS = [
+    "Bandit",
     "Classic",
     "Shorty",
     "Frenzy",
