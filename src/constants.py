@@ -18,6 +18,7 @@ gamemodes = {
     "hurm": "Team Deathmatch",
     "custom": "Custom",
     "snowball": "Snowball Fight",
+    "valaram": "All Random One Site",
     "": "Custom",
 }
 
