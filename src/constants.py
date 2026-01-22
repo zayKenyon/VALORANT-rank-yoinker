@@ -170,6 +170,7 @@ WEAPONS = [
     "Shorty",
     "Frenzy",
     "Ghost",
+    "Bandit",
     "Sheriff",
     "Stinger",
     "Spectre",
