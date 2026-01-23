@@ -98,7 +98,7 @@ class PlayerStats:
         # Compile final stats
         final_stats = {
             "kd": kd,
-            "hs": int((total_headshots / total_hits) * 100) if total_hits else "N/A",
+            "hs": round((total_headshots / total_hits) * 100) if total_hits else "N/A",
             "RankedRatingEarned": ranked_rating_earned,
             "AFKPenalty": afk_penalty,
         }

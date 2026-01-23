@@ -18,6 +18,7 @@ gamemodes = {
     "hurm": "Team Deathmatch",
     "custom": "Custom",
     "snowball": "Snowball Fight",
+    "valaram": "All Random One Site",
     "": "Custom",
 }
 
@@ -77,6 +78,8 @@ AGENTCOLORLIST = {
     "iso": (87, 74, 194),
     "clove": (242, 143, 208),
     "tejo": (255, 183, 97),
+    "veto": (30, 60, 90),
+    "waylay": (130, 195, 235),
 }
 
 symbol = "■"
@@ -168,6 +171,7 @@ WEAPONS = [
     "Shorty",
     "Frenzy",
     "Ghost",
+    "Bandit",
     "Sheriff",
     "Stinger",
     "Spectre",
