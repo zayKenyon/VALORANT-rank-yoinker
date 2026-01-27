@@ -91,23 +91,29 @@ class Loadouts:
         if state == "game":
             PlayerInventorys = PlayerInventorys["Loadouts"]
 
-            # CharacterID -> Player lookup
-            player_by_character = {
-                p.get("CharacterID", "").lower(): p for p in players}
+            # CharacterID -> Loadout lookup (if player has an agent != spectator)
+            loadout_by_character = {}
+            for entry in PlayerInventorys:
+                char_id = entry.get("CharacterID", "").lower()
+                if char_id:
+                    loadout_by_character[char_id] = entry["Loadout"]
 
-            for loadout_entry in PlayerInventorys:
-                char_id = loadout_entry.get("CharacterID", "").lower()
-                player = player_by_character.get(char_id)
-                if player is None:
-                    continue
-
+            for player in players:
                 subject = player["Subject"]
-                PlayerInventory = loadout_entry["Loadout"]
+                char_id = player.get("CharacterID", "").lower()
+                loadout_entry = loadout_by_character.get(char_id)
+
                 final_json.update(
                     {
                         subject: {}
                     }
                 )
+
+                # skip if not found
+                if loadout_entry is None:
+                    continue
+
+                PlayerInventory = loadout_entry
 
                 # creates name field
                 if hide_names:
