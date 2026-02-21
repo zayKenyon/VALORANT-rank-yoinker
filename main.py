@@ -319,7 +319,7 @@ try:
                 loadouts_arr = loadoutsClass.get_match_loadouts(
                     coregame.get_coregame_match_id(),
                     Players,
-                    cfg.weapon,
+                    ["Vandal", "Phantom"],
                     valoApiSkins,
                     names,
                     state="game",
@@ -516,8 +516,10 @@ try:
                         # VIEWS
                         # views = get_views(names[player["Subject"]])
 
-                        # skin
-                        skin = loadouts.get(player["Subject"], "")
+                        # skins
+                        skin_data = loadouts.get(player["Subject"], {})
+                        vandal_skin = skin_data.get("Vandal", "")
+                        phantom_skin = skin_data.get("Phantom", "")
 
                         # RANK
                         rankName = Ranks[playerRank["rank"]]
@@ -566,8 +568,8 @@ try:
                                 party_icon,
                                 agent,
                                 name,
-                                # views,
-                                skin,
+                                vandal_skin,
+                                phantom_skin,
                                 rankName,
                                 rr,
                                 peakRank,
@@ -822,7 +824,7 @@ try:
                                 party_icon,
                                 agent,
                                 name,
-                                # views,
+                                "",
                                 "",
                                 rankName,
                                 rr,
@@ -973,6 +975,7 @@ try:
                                     agent,
                                     name,
                                     "",
+                                    "",
                                     rankName,
                                     rr,
                                     peakRank,
@@ -1025,7 +1028,8 @@ try:
                 if game_state == "MENUS":
                     table.set_runtime_col_flag("Party", False)
                     table.set_runtime_col_flag("Agent", False)
-                    table.set_runtime_col_flag(cfg.weapon.capitalize(), False)
+                    table.set_runtime_col_flag("Vandal", False)
+                    table.set_runtime_col_flag("Phantom", False)
 
                 if game_state == "INGAME":
                     if isRange:

@@ -14,11 +14,15 @@ class Loadouts:
         self.Server = Server
         self.current_map = current_map
 
-    def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
+    def get_match_loadouts(self, match_id, players, weaponChooses, valoApiSkins, names, state="game"):
         playersBackup = players
         weaponLists = {}
         valApiWeapons = requests.get(
             "https://valorant-api.com/v1/weapons").json()
+
+        if isinstance(weaponChooses, str):
+            weaponChooses = [weaponChooses]
+
         if state == "game":
             team_id = "Blue"
             PlayerInventorys = self.Requests.fetch(
@@ -42,28 +46,27 @@ class Loadouts:
             inv = loadout_by_character.get(char_id)
             if inv is None:
                 continue
-            for weapon in valApiWeapons["data"]:
-                if weapon["displayName"].lower() == weaponChoose.lower():
-                    skin_id = \
-                        inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
-                            "ID"]
-                    json_data = valoApiSkins.json()
+            weaponLists[player["Subject"]] = {}
+            for weaponChoose in weaponChooses:
+                for weapon in valApiWeapons["data"]:
+                    if weapon["displayName"].lower() == weaponChoose.lower():
+                        skin_id = \
+                            inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
+                                "ID"]
+                        json_data = valoApiSkins.json()
 
-                    if "data" not in json_data:
-                        self.log("Skins API response missing 'data'.")
-                        return None
+                        if "data" not in json_data:
+                            self.log("Skins API response missing 'data'.")
+                            return None
 
-                    for skin in json_data["data"]:
-                        if skin_id.lower() == skin["uuid"].lower():
-                            rgb_color = self.colors.get_rgb_color_from_skin(
-                                skin["uuid"].lower(), valoApiSkins)
-                            skin_display_name = skin["displayName"].replace(
-                                f" {weapon['displayName']}", "")
-                            # if rgb_color is not None:
-                            weaponLists.update({player["Subject"]: color(
-                                skin_display_name, fore=rgb_color)})
-                            # else:
-                            #     weaponLists.update({player["Subject"]: color(skin["Name"], fore=rgb_color)})
+                        for skin in json_data["data"]:
+                            if skin_id.lower() == skin["uuid"].lower():
+                                rgb_color = self.colors.get_rgb_color_from_skin(
+                                    skin["uuid"].lower(), valoApiSkins)
+                                skin_display_name = skin["displayName"].replace(
+                                    f" {weapon['displayName']}", "")
+                                weaponLists[player["Subject"]][weapon["displayName"]] = color(
+                                    skin_display_name, fore=rgb_color)
         final_json = self.convertLoadoutToJsonArray(
             PlayerInventorys, playersBackup, state, names)
         # self.log(f"json for website: {final_json}")

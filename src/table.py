@@ -9,7 +9,8 @@ from rich.console import Console as RichConsole
 HEADER_PARTY = "Party"
 HEADER_AGENT = "Agent"
 HEADER_NAME = "Name"
-HEADER_SKIN = "Skin"
+HEADER_VANDAL = "Vandal"
+HEADER_PHANTOM = "Phantom"
 HEADER_RANK = "Rank"
 HEADER_RR = "RR"
 HEADER_PEAK_RANK = "Peak Rank"
@@ -27,7 +28,8 @@ TABLE_COLUMN_NAMES = Literal[
     HEADER_PARTY,
     HEADER_AGENT,
     HEADER_NAME,
-    HEADER_SKIN,
+    HEADER_VANDAL,
+    HEADER_PHANTOM,
     HEADER_RANK,
     HEADER_RR,
     HEADER_PEAK_RANK,
@@ -50,7 +52,8 @@ class Table:
             False,  # Party
             True,  # Agent
             True,  # Name
-            bool(config.table.get("skin", True)),  # Skin
+            bool(config.table.get("skin", True)),  # Vandal
+            bool(config.table.get("skin", True)),  # Phantom
             True,  # Rank
             bool(config.table.get("rr", True)),  # RR
             bool(config.table.get("peakrank", True)),  # Peak Rank
@@ -75,10 +78,6 @@ class Table:
         else:
             self.field_names_candidates = candidates
 
-        if HEADER_SKIN in self.field_names_candidates:
-            skin_index = self.field_names_candidates.index(HEADER_SKIN)
-            self.field_names_candidates[skin_index] = self.config.weapon.capitalize()
-            
         self.field_names = [
             c for c, i in zip(self.field_names_candidates, self.col_flags) if i
         ]
@@ -186,8 +185,6 @@ class Table:
             if flag
         ]
 
-        skin_column_name = self.config.weapon.capitalize()
-
         # Columns that should never be truncated
         static_overflow_fold_columns = {
             HEADER_HS_PERCENT,
@@ -199,7 +196,8 @@ class Table:
         # Conditional columns
         conditional_columns = {
             HEADER_NAME: "truncate_names",
-            skin_column_name: "truncate_skins",
+            HEADER_VANDAL: "truncate_skins",
+            HEADER_PHANTOM: "truncate_skins",
         }
 
         for field in self.fields_to_display:
