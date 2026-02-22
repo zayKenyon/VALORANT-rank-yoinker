@@ -211,38 +211,50 @@ try:
             # loop = asyncio.new_event_loop()
             # asyncio.set_event_loop(loop)
             # loop.run_until_complete()
-        except TypeError:
+        except TypeError as e:
+            log(f"TypeError in websocket connection: {e}")
+            game_state = "DISCONNECTED"
+        except Exception as e:
+            log(f"Unexpected error in websocket connection: {e}")
             game_state = "DISCONNECTED"
 
         if game_state == "DISCONNECTED":
-            richConsole.print("[yellow]Disconnected from Valorant. Attempting to reconnect...[/yellow]")
+            # Add delay before attempting reconnection to prevent rapid reconnection loops
+            time.sleep(10)
+
             # Loop waits for the Valorant client to respond
-            while True:
+            reconnect_attempts = 0
+            max_reconnect_attempts = 3
+
+            while reconnect_attempts < max_reconnect_attempts:
+                reconnect_attempts += 1
+
                 # Rereads the lockfile
                 Requests.lockfile = Requests.get_lockfile()
 
                 if Requests.lockfile is None:
-                    time.sleep(5)
+                    time.sleep(10)
                     continue
 
                 presence_check = presences.get_presence()
-                
+
                 if presence_check is not None:
-                    break 
-                
-                time.sleep(5)
+                    Requests.get_headers(refresh=True)
+                    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, Server, rpc)
+                    firstTime = True
+                    # Don't reset lastGameState to prevent unnecessary reloads after reconnection
+                    break
 
-            richConsole.print("[green]Reconnected successfully! Loading...[/green]")
-            
-            Requests.get_headers(refresh=True)
+                time.sleep(10)
 
-            Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, Server, rpc)
+            if reconnect_attempts >= max_reconnect_attempts:
+                richConsole.print("[red]Failed to reconnect after multiple attempts. Please restart the application.[/red]")
+                input("Press enter to exit...")
+                program_exit(1)
 
-            firstTime = True 
-            lastGameState = ""
             continue
 
-        if True:
+        if game_state != lastGameState:
             log(f"getting new {game_state} scoreboard")
             lastGameState = game_state
             game_state_dict = {
@@ -1057,6 +1069,10 @@ try:
                                 f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)"
                             )
                 already_played_with = []
+        else:
+            # No state change, sleep to prevent tight loop
+            time.sleep(2)
+
         if cfg.cooldown == 0:
             input("Press enter to fetch again...")
         else:

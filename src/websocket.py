@@ -42,11 +42,12 @@ class Ws:
 
         for attempt in range(max_retries):
             try:
-                async with websockets.connect(url, ssl=self.ssl_context, extra_headers=local_headers) as websocket:
+                # Use basic websocket connection without extra_headers to avoid compatibility issues
+                async with websockets.connect(url, ssl=self.ssl_context) as websocket:
                     await websocket.send('[5, "OnJsonApiEvent_chat_v4_presences"]')
                     if self.cfg.get_feature_flag("game_chat"):
                         await websocket.send('[5, "OnJsonApiEvent_chat_v6_messages"]')
-                    
+
                     while True:
                         response = await websocket.recv()
                         result = self.handle(response, initial_game_state)
