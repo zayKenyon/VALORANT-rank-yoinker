@@ -34,16 +34,18 @@ class Loadouts:
             PlayerInventorys = self.Requests.fetch(
                 "glz", f"/pregame/v1/matches/{match_id}/loadouts", "get")
 
-        # CharacterID -> Loadout lookup
-        loadout_by_character = {}
+        # subject (player UUID) -> loadout lookup
+        loadout_by_subject = {}
         for loadout_entry in PlayerInventorys["Loadouts"]:
-            char_id = loadout_entry.get("CharacterID", "").lower()
-            if char_id:
-                loadout_by_character[char_id] = loadout_entry["Loadout"] if state == "game" else loadout_entry
+            subj = loadout_entry.get("Subject", "").lower()
+            # if player has an agent != spectator
+            char_id = loadout_entry.get("CharacterID", "")
+            if subj and char_id:
+                loadout_by_subject[subj] = loadout_entry["Loadout"] if state == "game" else loadout_entry
 
         for player in players:
-            char_id = player.get("CharacterID", "").lower()
-            inv = loadout_by_character.get(char_id)
+            subj = player.get("Subject", "").lower()
+            inv = loadout_by_subject.get(subj)
             if inv is None:
                 continue
             weaponLists[player["Subject"]] = {}
@@ -94,17 +96,19 @@ class Loadouts:
         if state == "game":
             PlayerInventorys = PlayerInventorys["Loadouts"]
 
-            # CharacterID -> Loadout lookup (if player has an agent != spectator)
-            loadout_by_character = {}
+            # subject (player UUID) -> loadout lookup
+            loadout_by_subject = {}
             for entry in PlayerInventorys:
-                char_id = entry.get("CharacterID", "").lower()
-                if char_id:
-                    loadout_by_character[char_id] = entry["Loadout"]
+                subj = entry.get("Subject", "").lower()
+                # if player has an agent != spectator
+                char_id = entry.get("CharacterID", "")
+                if subj and char_id:
+                    loadout_by_subject[subj] = entry["Loadout"]
 
             for player in players:
                 subject = player["Subject"]
-                char_id = player.get("CharacterID", "").lower()
-                loadout_entry = loadout_by_character.get(char_id)
+                subj = subject.lower()
+                loadout_entry = loadout_by_subject.get(subj)
 
                 final_json.update(
                     {
