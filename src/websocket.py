@@ -5,7 +5,7 @@ import ssl
 import base64
 import json
 import asyncio
-from colr import color
+from src.colors import color
 
 class Ws:
     def __init__(self, lockfile, Requests, cfg, colors, hide_names, server, rpc=None):

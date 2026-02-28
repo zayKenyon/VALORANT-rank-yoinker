@@ -7,7 +7,7 @@ import traceback
 
 import requests
 import urllib3
-from colr import color as colr
+from src.colors import color as colr
 from InquirerPy import inquirer
 from rich.console import Console as RichConsole
 
@@ -124,7 +124,7 @@ try:
 
     current_map = coregame.get_current_map(map_urls, map_splashes)
 
-    colors = Colors(log, hide_names, agent_dict, AGENTCOLORLIST)
+    colors = Colors(log, hide_names, agent_dict, AGENTCOLORLIST, tierDict)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, log)
