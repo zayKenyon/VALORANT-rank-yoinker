@@ -1,13 +1,29 @@
-from colr import color
-from src.constants import tierDict
 import re
+from rich.console import Console
+from rich.text import Text
 
+_console = Console(force_terminal=True, color_system="truecolor", width=1000)
+
+def color(text, fore=None):
+    if fore is None:
+        return str(text)
+    
+    style = ""
+    if isinstance(fore, tuple) and len(fore) == 3:
+        style = f"rgb({fore[0]},{fore[1]},{fore[2]})"
+    else:
+        style = str(fore)
+    
+    t = Text(str(text), style=style)
+    with _console.capture() as capture:
+        _console.print(t, end="")
+    return capture.get()
 
 class Colors:
-    def __init__(self, log, hide_names, agent_dict, AGENTCOLORLIST):
+    def __init__(self, log, hide_names, agent_dict, AGENTCOLORLIST, tier_dict):
         self.hide_names = hide_names
         self.agent_dict = agent_dict
-        self.tier_dict = tierDict
+        self.tier_dict = tier_dict
         self.AGENTCOLORLIST = AGENTCOLORLIST
         self.log = log
 
@@ -103,17 +119,17 @@ class Colors:
                         f.append(
                             int(
                                 gradients[gradient][0][rgb]
-                                - offset * number / gradient[1]
+                                - offset * (number - gradient[0]) / (gradient[1] - gradient[0])
                             )
                         )
                     else:
                         f.append(
                             int(
-                                offset * number / gradient[1]
+                                offset * (number - gradient[0]) / (gradient[1] - gradient[0])
                                 + gradients[gradient][0][rgb]
                             )
                         )
-                return color(number, fore=f)
+                return color(number, fore=tuple(f))
 
     def get_wr_gradient(self, number):
         try:
@@ -149,17 +165,17 @@ class Colors:
                         f.append(
                             int(
                                 gradients[gradient][0][rgb]
-                                - offset * number / gradient[1]
+                                - offset * (number - gradient[0]) / (gradient[1] - gradient[0])
                             )
                         )
                     else:
                         f.append(
                             int(
-                                offset * number / gradient[1]
+                                offset * (number - gradient[0]) / (gradient[1] - gradient[0])
                                 + gradients[gradient][0][rgb]
                             )
                         )
-                return color(number, fore=f)
+                return color(number, fore=tuple(f))
 
     def get_rr_gradient(self, rr_value, afk_penalty):
         """Returns RR value in green if positive, red if negative, white if zero, and AFK penalty in a different color."""

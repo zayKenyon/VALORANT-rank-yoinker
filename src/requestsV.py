@@ -3,7 +3,7 @@ import json
 import time
 from json.decoder import JSONDecodeError
 import requests
-from colr import color
+from src.colors import color
 import os
 import shutil
 import sys
