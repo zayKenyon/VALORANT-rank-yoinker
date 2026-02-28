@@ -1,6 +1,6 @@
 import time
 import requests
-from colr import color
+from src.colors import color
 from src.constants import sockets, hide_names
 import json
 

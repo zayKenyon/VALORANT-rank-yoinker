@@ -1,6 +1,5 @@
 certifi==2024.7.4
 charset-normalizer==3.2.0
-Colr==0.9.1
 idna==3.7
 inquirerpy==0.3.4
 markdown-it-py==3.0.0

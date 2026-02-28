@@ -1,5 +1,5 @@
 import requests
-from colr import color
+from src.colors import color
 
 version = "2.92"
 enablePrivateLogging = True
