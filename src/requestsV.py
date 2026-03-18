@@ -209,7 +209,6 @@ class Requests:
                 if 'CI server version:' in line:
                     version_without_shipping = line.split('CI server version: ')[1].strip()
                     version = version_without_shipping.split("-")
-                    version.insert(2, "shipping")
                     version = "-".join(version)
                     self.log(f"got version from logs '{version}'")
                     return version

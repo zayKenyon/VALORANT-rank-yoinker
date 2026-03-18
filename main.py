@@ -149,6 +149,63 @@ try:
     previousSeasonID = content.get_previous_season_id(gameContent)
     lastGameState = ""
 
+    # Cache rank+stats per player for the current match so PREGAME data can be reused in INGAME
+    match_player_cache = {
+        "match_id": None,
+        "players": {},  # puuid -> {"playerRank", "previousPlayerRank", "ppstats", "ts"}
+    }
+    MATCH_PLAYER_CACHE_TTL_SECONDS = 300  # safety TTL
+
+    def reset_match_player_cache(match_id=None):
+        match_player_cache["match_id"] = match_id
+        match_player_cache["players"] = {}
+
+    def ensure_match_player_cache(match_id):
+        if not match_id:
+            return
+
+        # New match => reset cache
+        if match_player_cache["match_id"] != match_id:
+            reset_match_player_cache(match_id)
+            return
+
+        # TTL cleanup (safety)
+        now = time.time()
+        expired = []
+        for puuid, cached in match_player_cache["players"].items():
+            ts = cached.get("ts", now)
+            if (now - ts) > MATCH_PLAYER_CACHE_TTL_SECONDS:
+                expired.append(puuid)
+
+        for puuid in expired:
+            del match_player_cache["players"][puuid]
+
+    def get_or_fetch_rank_and_stats(player_subject, current_match_id):
+        if current_match_id:
+            ensure_match_player_cache(current_match_id)
+            cached = match_player_cache["players"].get(player_subject)
+            if cached is not None:
+                return (
+                    cached["playerRank"],
+                    cached["previousPlayerRank"],
+                    cached["ppstats"],
+                )
+
+        # Cache miss -> fetch
+        playerRank = rank.get_rank(player_subject, seasonID)
+        previousPlayerRank = rank.get_rank(player_subject, previousSeasonID)
+        ppstats = pstats.get_stats(player_subject)
+
+        if current_match_id and match_player_cache["match_id"] == current_match_id:
+            match_player_cache["players"][player_subject] = {
+                "playerRank": dict(playerRank) if isinstance(playerRank, dict) else playerRank,
+                "previousPlayerRank": dict(previousPlayerRank) if isinstance(previousPlayerRank, dict) else previousPlayerRank,
+                "ppstats": dict(ppstats) if isinstance(ppstats, dict) else ppstats,
+                "ts": time.time(),
+            }
+
+        return playerRank, previousPlayerRank, ppstats
+
     print("\nvRY Mobile", color(f"- {get_ip()}:{cfg.port}", fore=(255, 127, 80)))
 
     print(
@@ -205,6 +262,9 @@ try:
                 # We invalidate the cached responses when going from any state to menus
                 if previous_game_state != game_state and game_state == "MENUS":
                     rank.invalidate_cached_responses()
+                    reset_match_player_cache()
+                    if hasattr(pstats, "clear_runtime_cache"):
+                        pstats.clear_runtime_cache()
                 log(f"new game state: {game_state}")
                 loop.close()
             firstTime = False
@@ -213,6 +273,9 @@ try:
             # loop.run_until_complete()
         except TypeError:
             game_state = "DISCONNECTED"
+            reset_match_player_cache()
+            if hasattr(pstats, "clear_runtime_cache"):
+                pstats.clear_runtime_cache()
 
         if game_state == "DISCONNECTED":
             richConsole.print("[yellow]Disconnected from Valorant. Attempting to reconnect...[/yellow]")
@@ -240,6 +303,9 @@ try:
 
             firstTime = True 
             lastGameState = ""
+            reset_match_player_cache()
+            if hasattr(pstats, "clear_runtime_cache"):
+                pstats.clear_runtime_cache()
             continue
 
         if True:
@@ -291,6 +357,8 @@ try:
                 coregame_stats = coregame.get_coregame_stats()
                 if coregame_stats == None:
                     continue
+                coregame_match_id = coregame.get_coregame_match_id()
+                ensure_match_player_cache(coregame_match_id)
                 Players = coregame_stats["Players"]
                 # data for chat to function
                 partyMembers = menu.get_party_members(Requests.puuid, presence)
@@ -317,7 +385,7 @@ try:
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
                 loadouts_arr = loadoutsClass.get_match_loadouts(
-                    coregame.get_coregame_match_id(),
+                    coregame_match_id,
                     Players,
                     cfg.weapon,
                     valoApiSkins,
@@ -431,9 +499,8 @@ try:
                                 else:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
-                        playerRank = rank.get_rank(player["Subject"], seasonID)
-                        previousPlayerRank = rank.get_rank(
-                            player["Subject"], previousSeasonID
+                        playerRank, previousPlayerRank, ppstats = get_or_fetch_rank_and_stats(
+                            player["Subject"], coregame_match_id
                         )
 
                         if player["Subject"] == Requests.puuid:
@@ -457,7 +524,6 @@ try:
                         #     playerRank = rank.get_rank(player["Subject"], seasonID)
                         #     rankStatus = playerRank[1]
 
-                        ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
                         kd = ppstats["kd"]
 
@@ -637,6 +703,8 @@ try:
                 Players = pregame_stats["AllyTeam"]["Players"]
                 presences.wait_for_presence(namesClass.get_players_puuid(Players))
                 names = namesClass.get_names_from_puuids(Players)
+                pregame_match_id = pregame_stats.get("ID")
+                ensure_match_player_cache(pregame_match_id)
                 # temporary until other regions gets fixed?
                 # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
                 #   state="pregame")
@@ -679,9 +747,8 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                                 partyCount += 1
-                        playerRank = rank.get_rank(player["Subject"], seasonID)
-                        previousPlayerRank = rank.get_rank(
-                            player["Subject"], previousSeasonID
+                        playerRank, previousPlayerRank, ppstats = get_or_fetch_rank_and_stats(
+                            player["Subject"], pregame_match_id
                         )
 
                         if player["Subject"] == Requests.puuid:
@@ -706,7 +773,6 @@ try:
                         #     rankStatus = playerRank[1]
                         # playerRank = playerRank[0]
 
-                        ppstats = pstats.get_stats(player["Subject"])
                         hs = ppstats["hs"]
                         kd = ppstats["kd"]
 
@@ -853,6 +919,10 @@ try:
 
                         # bar()
             if game_state == "MENUS":
+                reset_match_player_cache()
+                if hasattr(pstats, "clear_runtime_cache"):
+                    pstats.clear_runtime_cache()
+
                 server = ""
                 already_played_with = []
                 Players = menu.get_party_members(Requests.puuid, presence)
