@@ -1,7 +1,7 @@
 import requests
 from colr import color
 
-version = "2.92"
+version = "2.93"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
@@ -80,6 +80,7 @@ AGENTCOLORLIST = {
     "tejo": (255, 183, 97),
     "veto": (30, 60, 90),
     "waylay": (130, 195, 235),
+    "miks": (250, 203, 115),
 }
 
 symbol = "■"

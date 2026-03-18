@@ -18,7 +18,7 @@ class Colors:
         if agent is not None:
             if self.hide_names:
                 if agent != "":
-                    name = self.agent_dict[agent.lower()]
+                    name = self.agent_dict.get(agent.lower(), "Player")
                 else:
                     name = "Player"
         if team == "Red":
