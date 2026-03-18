@@ -32,7 +32,7 @@ from src.states.pregame import Pregame
 from src.stats import Stats
 from src.table import Table
 from src.websocket import Ws
-from src.os import get_os
+from src.os_info import get_os
 
 from src.account_manager.account_manager import AccountManager
 from src.account_manager.account_config import AccountConfig
