@@ -107,7 +107,7 @@ class AccountAuth:
                 r = self.session.put("https://auth.riotgames.com/api/v1/authorization", json=body, headers=self.headers)
             if r.json().get("error") == "auth_failure":
                 return None
-        pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
+        pattern = re.compile(r'access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
         data = pattern.findall(r.json()['response']['parameters']['uri'])[0]
         access_token = data[0]
         id_token = data[1]
