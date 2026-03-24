@@ -19,6 +19,7 @@ gamemodes = {
     "custom": "Custom",
     "snowball": "Snowball Fight",
     "valaram": "All Random One Site",
+    "dodgeball": "Knockout",
     "": "Custom",
 }
 
