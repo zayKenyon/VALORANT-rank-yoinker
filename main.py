@@ -4,6 +4,8 @@ import socket
 import sys
 import time
 import traceback
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 import urllib3
@@ -420,6 +422,12 @@ try:
                     already_played_with = []
                     stats_data = stats.read_data()
 
+                    # Pre-fetch player stats in parallel
+                    ensure_match_player_cache(coregame_match_id)
+                    with ThreadPoolExecutor(max_workers=len(Players)) as executor:
+                        futures = [executor.submit(get_or_fetch_rank_and_stats, p["Subject"], coregame_match_id) for p in Players]
+                        for future in futures: future.result()
+
                     for p in Players:
                         if p["Subject"] == Requests.puuid:
                             allyTeam = p["TeamID"]
@@ -627,6 +635,61 @@ try:
 
                         # LEVEL
                         level = PLcolor
+
+                        # SMURF / BOOST PROBABILITY
+                        warning = ""
+                        smurf_prob = 0
+                        if player_level != "N/A" and isinstance(player_level, int):
+                            if player_level < 30: smurf_prob += 40
+                            elif player_level < 50: smurf_prob += 20
+                            elif player_level < 100: smurf_prob += 10
+                            
+                        # Advanced metrics from last 20 games
+                        avg_rr_gain = ppstats.get("avg_rr_gain", "N/A")
+                        win_rate_last_20 = ppstats.get("win_rate_last_20", "N/A")
+                        streak = ppstats.get("streak", "N/A")
+                        
+                        if avg_rr_gain != "N/A":
+                            try:
+                                if float(avg_rr_gain) >= 28: smurf_prob += 40
+                                elif float(avg_rr_gain) >= 25: smurf_prob += 25
+                                elif float(avg_rr_gain) >= 22: smurf_prob += 10
+                            except ValueError: pass
+
+                        if win_rate_last_20 != "N/A":
+                            try:
+                                if float(win_rate_last_20) >= 75: smurf_prob += 35
+                                elif float(win_rate_last_20) >= 65: smurf_prob += 20
+                                elif float(win_rate_last_20) <= 35: smurf_prob -= 30
+                            except ValueError: pass
+
+                        if streak != "N/A":
+                            try:
+                                if int(streak) >= 5: smurf_prob += 20
+                                elif int(streak) >= 3: smurf_prob += 10
+                                elif int(streak) <= -5: smurf_prob -= 30
+                            except ValueError: pass
+                            
+                        if kd != "N/A":
+                            try:
+                                raw_kd = float(kd)
+                                if raw_kd > 1.5: smurf_prob += 20
+                                elif raw_kd > 1.3: smurf_prob += 10
+                                elif raw_kd < 0.7: smurf_prob -= 20
+                            except ValueError: pass
+                            
+                        smurf_prob = max(0, min(100, smurf_prob))
+                        
+                        if smurf_prob >= 75:
+                            warning = colr("Smurf?", fore=(255, 60, 60))
+                        elif smurf_prob >= 50:
+                            warning = colr("Sus", fore=(255, 165, 0))
+                        elif smurf_prob <= 10 and kd != "N/A":
+                            try:
+                                if float(kd) < 0.7:
+                                    warning = colr("Boosted?", fore=(128, 128, 128))
+                            except ValueError: pass
+
                         table.add_row_table(
                             [
                                 party_icon,
@@ -644,6 +707,7 @@ try:
                                 kd,
                                 level,
                                 ranked_rating_earned,
+                                warning,
                             ]
                         )
 
@@ -726,6 +790,12 @@ try:
                     )
                     partyCount = 0
                     partyIcons = {}
+
+                    # Pre-fetch player stats in parallel
+                    with ThreadPoolExecutor(max_workers=len(Players)) as executor:
+                        futures = [executor.submit(get_or_fetch_rank_and_stats, p["Subject"], pregame_match_id) for p in Players]
+                        for future in futures: future.result()
+
                     for player in Players:
                         status.update(
                             f"Loading players... [{playersLoaded}/{len(Players)}]"
@@ -883,6 +953,60 @@ try:
                         # LEVEL
                         level = PLcolor
 
+                        # SMURF / BOOST PROBABILITY
+                        warning = ""
+                        smurf_prob = 0
+                        if player_level != "N/A" and isinstance(player_level, int):
+                            if player_level < 30: smurf_prob += 40
+                            elif player_level < 50: smurf_prob += 20
+                            elif player_level < 100: smurf_prob += 10
+                            
+                        # Advanced metrics from last 20 games
+                        avg_rr_gain = ppstats.get("avg_rr_gain", "N/A")
+                        win_rate_last_20 = ppstats.get("win_rate_last_20", "N/A")
+                        streak = ppstats.get("streak", "N/A")
+                        
+                        if avg_rr_gain != "N/A":
+                            try:
+                                if float(avg_rr_gain) >= 28: smurf_prob += 40
+                                elif float(avg_rr_gain) >= 25: smurf_prob += 25
+                                elif float(avg_rr_gain) >= 22: smurf_prob += 10
+                            except ValueError: pass
+
+                        if win_rate_last_20 != "N/A":
+                            try:
+                                if float(win_rate_last_20) >= 75: smurf_prob += 35
+                                elif float(win_rate_last_20) >= 65: smurf_prob += 20
+                                elif float(win_rate_last_20) <= 35: smurf_prob -= 30
+                            except ValueError: pass
+
+                        if streak != "N/A":
+                            try:
+                                if int(streak) >= 5: smurf_prob += 20
+                                elif int(streak) >= 3: smurf_prob += 10
+                                elif int(streak) <= -5: smurf_prob -= 30
+                            except ValueError: pass
+                            
+                        if kd != "N/A":
+                            try:
+                                raw_kd = float(kd)
+                                if raw_kd > 1.5: smurf_prob += 20
+                                elif raw_kd > 1.3: smurf_prob += 10
+                                elif raw_kd < 0.7: smurf_prob -= 20
+                            except ValueError: pass
+                            
+                        smurf_prob = max(0, min(100, smurf_prob))
+                        
+                        if smurf_prob >= 75:
+                            warning = colr("Smurf?", fore=(255, 60, 60))
+                        elif smurf_prob >= 50:
+                            warning = colr("Sus", fore=(255, 165, 0))
+                        elif smurf_prob <= 10 and kd != "N/A":
+                            try:
+                                if float(kd) < 0.7:
+                                    warning = colr("Boosted?", fore=(128, 128, 128))
+                            except ValueError: pass
+
                         table.add_row_table(
                             [
                                 party_icon,
@@ -900,6 +1024,7 @@ try:
                                 kd,
                                 level,
                                 ranked_rating_earned,
+                                warning,
                             ]
                         )
 

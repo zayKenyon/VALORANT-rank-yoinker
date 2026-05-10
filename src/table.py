@@ -21,6 +21,7 @@ HEADER_WINRATE = "WR"
 HEADER_KD_RATIO = "KD"
 HEADER_LEVEL = "Level"
 HEADER_EARNED_RR = "ΔRR"
+HEADER_WARNINGS = "Notes"
 
 
 TABLE_COLUMN_NAMES = Literal[
@@ -38,6 +39,7 @@ TABLE_COLUMN_NAMES = Literal[
     HEADER_KD_RATIO,
     HEADER_LEVEL,
     HEADER_EARNED_RR,
+    HEADER_WARNINGS,
 ]
 
 
@@ -47,7 +49,7 @@ class Table:
         self.config = config
         self.rich_table = RichTable()
         self.col_flags = [
-            False,  # Party
+            bool(config.table.get("party", True)),  # Party
             True,  # Agent
             True,  # Name
             bool(config.table.get("skin", True)),  # Skin
@@ -61,6 +63,7 @@ class Table:
             bool(config.table.get("kd", True)),  # KD
             bool(config.table.get("level", True)),  # Level
             bool(config.table.get("earned_rr", True)),  # Earned RR
+            bool(config.table.get("warnings", True)),  # Warnings
         ]
         self.runtime_col_flags = self.col_flags[:]  # making a copy
         

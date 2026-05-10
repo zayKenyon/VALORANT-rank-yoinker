@@ -195,6 +195,7 @@ DEFAULT_CONFIG = {
     "weapon": "Vandal",
     "chat_limit": 5,
     "table": {
+        "party": True,
         "skin": True,
         "rr": True,
         "earned_rr": True,
@@ -204,7 +205,8 @@ DEFAULT_CONFIG = {
         "headshot_percent": True,
         "winrate": True,
         "kd": False,
-        "level": True
+        "level": True,
+        "warnings": True
     },
     "flags": {
         "last_played": True,

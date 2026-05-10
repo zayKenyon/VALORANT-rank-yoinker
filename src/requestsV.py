@@ -18,6 +18,7 @@ class Requests:
         self.version = version
         self.headers = {}
         self.log = log
+        self.session = requests.Session()
 
 
         self.lockfile = self.get_lockfile()
@@ -55,10 +56,21 @@ class Requests:
                 if sys.argv[0][-3:] == "exe":
                     while True:
                         update_now = input(color("Would you like to update now? (Y/n): ", fore=(0, 255, 0)))
-                        if update_now.lower() == "n" or update_now.lower() == "no":
+                        if update_now.lower() in ("n", "no"):
                             return
-                        elif update_now.lower() == "y" or update_now.lower() == "yes" or update_now == "":
+                        elif update_now.lower() in ("y", "yes", ""):
                             copy_run_update_script(link)
+                            os._exit(1)
+                        else:
+                            print('Please respond with "yes" or "no" ("y", "n") or press enter')
+                else:
+                    while True:
+                        update_now = input(color("Would you like to update now via 'git pull'? (Y/n): ", fore=(0, 255, 0)))
+                        if update_now.lower() in ("n", "no"):
+                            return
+                        elif update_now.lower() in ("y", "yes", ""):
+                            subprocess.call(["git", "pull"])
+                            print(color("[UPDATE] Update complete! Please restart the program.", fore=(0, 255, 0)))
                             os._exit(1)
                         else:
                             print('Please respond with "yes" or "no" ("y", "n") or press enter')
@@ -100,7 +112,7 @@ class Requests:
     def fetch(self, url_type: str, endpoint: str, method: str, rate_limit_seconds=5):
         try:
             if url_type == "glz":
-                response = requests.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
+                response = self.session.request(method, self.glz_url + endpoint, headers=self.get_headers(), verify=False)
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
 
@@ -124,7 +136,7 @@ class Requests:
                     self.fetch(url_type, endpoint, method)
                 return response.json()
             elif url_type == "pd":
-                response = requests.request(method, self.pd_url + endpoint, headers=self.get_headers(), verify=False)
+                response = self.session.request(method, self.pd_url + endpoint, headers=self.get_headers(), verify=False)
                 self.log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
@@ -155,7 +167,7 @@ class Requests:
                 max_retries = 3
                 for i in range(max_retries):
                     try:
-                        response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
+                        response = self.session.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
                                                     headers=local_headers,
                                                     verify=False, timeout=5)
                         if response.status_code == 200 and response.json().get("errorCode") != "RPC_ERROR":
@@ -174,7 +186,7 @@ class Requests:
                 self.log(f"Failed to connect to local client after {max_retries} attempts.")
                 return None
             elif url_type == "custom":
-                response = requests.request(method, f"{endpoint}", headers=self.get_headers(), verify=False)
+                response = self.session.request(method, f"{endpoint}", headers=self.get_headers(), verify=False)
                 self.log(
                     f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
@@ -232,7 +244,7 @@ class Requests:
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                     ('riot:' + self.lockfile['password']).encode()).decode()}
                 try:
-                    response = requests.get(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token",
+                    response = self.session.get(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token",
                                             headers=local_headers, verify=False)
                     self.log(f"https://127.0.0.1:{self.lockfile['port']}/entitlements/v1/token\n{local_headers}")
                 except ConnectionError:

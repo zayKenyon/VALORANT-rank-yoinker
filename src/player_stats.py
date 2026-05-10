@@ -15,6 +15,9 @@ class PlayerStats:
             "hs": "N/A",
             "RankedRatingEarned": "N/A",
             "AFKPenalty": "N/A",
+            "win_rate_last_20": "N/A",
+            "avg_rr_gain": "N/A",
+            "streak": "N/A",
         }
 
     def _get_match_details_cached(self, match_id):
@@ -49,7 +52,7 @@ class PlayerStats:
         try:
             response = self.Requests.fetch(
                 "pd",
-                f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=1&queue=competitive",
+                f"/mmr/v1/players/{puuid}/competitiveupdates?startIndex=0&endIndex=20&queue=competitive",
                 "get",
             )
             matches = response.json().get("Matches", [])
@@ -59,6 +62,29 @@ class PlayerStats:
             self.log(f"Error fetching competitive updates: {e}")
             return self._default_stats()
 
+        wins = 0
+        total_games = 0
+        total_rr_gain = 0
+        streak = 0
+        streak_type = None
+
+        for i, match in enumerate(matches):
+            rr_earned = match.get("RankedRatingEarned", 0)
+            if rr_earned > 0:
+                wins += 1
+                total_rr_gain += rr_earned
+                if streak_type is None or streak_type == "win":
+                    streak_type = "win"
+                    if i == streak: streak += 1
+            elif rr_earned < 0:
+                if streak_type is None or streak_type == "loss":
+                    streak_type = "loss"
+                    if i == streak: streak += 1
+            total_games += 1
+
+        avg_rr_gain = round(total_rr_gain / wins, 1) if wins > 0 else 0
+        win_rate_last_20 = round((wins / total_games) * 100) if total_games > 0 else 0
+        
         match_summary = matches[0]
         match_id = match_summary.get("MatchID")
         if not match_id:
@@ -72,9 +98,9 @@ class PlayerStats:
             self.log(f"Error fetching match details: {e}")
             return self._default_stats()
 
-        return self._process_match_data(puuid, match_data, match_summary)
+        return self._process_match_data(puuid, match_data, match_summary, win_rate_last_20, avg_rr_gain, streak, streak_type)
 
-    def _process_match_data(self, puuid, match_data, match_summary):
+    def _process_match_data(self, puuid, match_data, match_summary, win_rate_last_20, avg_rr_gain, streak, streak_type):
         total_hits, total_headshots, kills, deaths = 0, 0, 0, 0
 
         # Extract round stats
@@ -109,6 +135,9 @@ class PlayerStats:
             "hs": round((total_headshots / total_hits) * 100) if total_hits else "N/A",
             "RankedRatingEarned": ranked_rating_earned,
             "AFKPenalty": afk_penalty,
+            "win_rate_last_20": win_rate_last_20,
+            "avg_rr_gain": avg_rr_gain,
+            "streak": streak if streak_type == "win" else -streak if streak_type == "loss" else 0,
         }
         return final_stats
 
