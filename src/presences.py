@@ -47,11 +47,10 @@ class Presences:
         return None
 
     def decode_presence(self, private):
-        # try:
         if "{" not in str(private) and private is not None and str(private) != "":
-            dict = json.loads(base64.b64decode(str(private)).decode("utf-8"))
-            if dict.get("isValid"):
-                return dict
+            decoded_party_presence = json.loads(base64.b64decode(str(private)).decode("utf-8"))
+            if isinstance(decoded_party_presence, dict) and decoded_party_presence.get('isValid'):
+                return decoded_party_presence
         return {
             "isValid": False,
             "partyId": 0,

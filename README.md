@@ -6,8 +6,14 @@
 
 [![Discord][discord-shield]][discord-url]
 [![Downloads][downloads-shield]][downloads-url]
-    
- 
+
+> [!CAUTION]
+> vRY has published its final release, no changes will be made to the code.
+> 
+> [Community forks](COMMUNITY.md) may be maintained.
+
+---
+
   <ol>
     <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#usage">Usage</a></li>
@@ -17,19 +23,19 @@
     <li><a href="#disclaimer">Disclaimer</a></li>
   </ol>
 
-    
+
 ## About The Project
 
- ![Screenshot](assets/Example.png)
- ![Skin Showcase Image](assets/SkinShowcase.png)
+![Screenshot](assets/Example.png)
+![Skin Showcase Image](assets/SkinShowcase.png)
 
 |Current Skin|Current Rank|Rank Rating|Peak Rank|Account Level|
 |:---:|:---:|:---:|:---:|:---:|
 |![Skin](assets/Skin.png)|![Rank](assets/Rank.png)|![Rating](assets/Rating.png)|![Peak](assets/PeakRank.png)|![Level](assets/Level.png)|
-    
+
 
 ## Usage
- **VALORANT must be open**.
+**VALORANT must be open**.
 
 ### Bundled Release:
 
@@ -57,10 +63,10 @@
 
 ### Letting Github Build It:
 
-The latest commits to the `main` branch will be built by a [Github Actions](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions) workflow 
+The latest commits to the `main` branch will be built by a [Github Actions](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions) workflow
 and a successful build should result in a compiled artifact that you can download and try out.
-See the [Actions tab](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions), click on the `Build` workflow, 
-select a particular workflow run, and it should have an artifact available for download. 
+See the [Actions tab](https://github.com/isaacKenyon/VALORANT-rank-yoinker/actions), click on the `Build` workflow,
+select a particular workflow run, and it should have an artifact available for download.
 
 If you want to make a small change to the application, you can:
 1) [Fork](https://github.com/isaacKenyon/VALORANT-rank-yoinker/fork) this project.
@@ -71,30 +77,30 @@ If you want to make a small change to the application, you can:
 
 ## What about that Tweet?
 
- The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies, outlines how
- applications are not allowed to expose data hidden by the game client. As of Version 1.262, vRY respects streamer mode.
+The [Tweet](https://twitter.com/PlayVALORANT/status/1539728676815642624), which details Riot's API policies, outlines how
+applications are not allowed to expose data hidden by the game client. As of Version 1.262, vRY respects streamer mode.
 
 ## Contributing
 
- Any contributions you make are **greatly appreciated**.
- 
-## Contact 
+Any contributions you make are **greatly appreciated**.
 
- Join the community discord:         
- 
+## Contact
+
+Join the community discord:
+
 [![Discord Banner 2][discord-banner]][discord-url]
 
 ## Acknowledgements
 
- - [Valorant-API.com](https://valorant-api.com/)
- - [Hamper](https://hamper.dev/)
- - [D3CRYPT](https://d3crypt360.pages.dev/)
- 
+- [Valorant-API.com](https://valorant-api.com/)
+- [Hamper](https://hamper.dev/)
+- [D3CRYPT](https://d3crypt360.pages.dev/)
+
 ## Disclaimer
 
- THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
-    
- Whilst effort has been made to abide by Riot's API rules; you acknowledge that use of this software is done so at your own risk.
+THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+
+Whilst effort has been made to abide by Riot's API rules; you acknowledge that use of this software is done so at your own risk.
 
 
 [discord-shield]: https://img.shields.io/discord/872101595037446144?color=7289da&label=Support&logo=discord&logoColor=7289da&style=for-the-badge
