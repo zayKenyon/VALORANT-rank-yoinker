@@ -1,6 +1,28 @@
 import json
 import logging
-from websocket_server import WebsocketServer
+from websocket_server import WebsocketServer, WebSocketHandler
+
+def safe_read_http_headers(self):
+    headers = {"upgrade": "invalid"}
+    try:
+        http_get = self.rfile.readline().decode().strip()
+        if not http_get.upper().startswith('GET'):
+            return headers
+    except Exception:
+        return headers
+        
+    while True:
+        try:
+            header = self.rfile.readline().decode().strip()
+            if not header:
+                break
+            head, value = header.split(':', 1)
+            headers[head.lower().strip()] = value.strip()
+        except Exception:
+            break
+    return headers
+
+WebSocketHandler.read_http_headers = safe_read_http_headers
 
 from src.constants import version
 
