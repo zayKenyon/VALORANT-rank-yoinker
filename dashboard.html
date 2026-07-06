@@ -763,9 +763,23 @@
                     }
                 }
 
+                let avatarSrc = player.agentImgLink;
+                if (!avatarSrc || avatarSrc === "assets/Logo.png") {
+                    if (player.agent && player.agent !== "Unknown" && player.agent !== "") {
+                        // Check if it's already a full URL or a UUID
+                        if (player.agent.startsWith("http")) {
+                            avatarSrc = player.agent;
+                        } else {
+                            avatarSrc = `https://media.valorant-api.com/agents/${player.agent}/displayicon.png`;
+                        }
+                    } else {
+                        avatarSrc = "assets/Logo.png";
+                    }
+                }
+
                 card.innerHTML = `
                     <div class="agent-avatar">
-                        <img src="${player.agentImgLink || `https://media.valorant-api.com/agents/${player.agent}/displayicon.png`}" alt="${player.agent}">
+                        <img src="${avatarSrc}" alt="${player.agent || 'Agent'}">
                     </div>
                     <div class="player-info">
                         <div class="player-name-row">

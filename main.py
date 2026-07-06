@@ -1254,6 +1254,9 @@ try:
                                 "kd": ppstats["kd"],
                                 "headshotPercentage": ppstats["hs"],
                                 "winPercentage": f"{playerRank['wr']} ({playerRank['numberofgames']})",
+                                "playerCard": f"https://media.valorant-api.com/playercards/{player['PlayerIdentity']['PlayerCardID']}/wideart.png" if player["PlayerIdentity"].get("PlayerCardID") else None,
+                                "agent": "Unknown",
+                                "agentImgLink": "assets/Logo.png"
                             }
 
                             # bar()
