@@ -605,13 +605,14 @@
         let ws;
         let reconnectTimeout;
         let ranksMap = {};
+        let mapsMap = {};
 
-        // Fetch Valorant Rank icons once
-        async function loadRankIcons() {
+        // Fetch Valorant Rank icons and Maps once
+        async function loadValorantAssets() {
             try {
+                // Load Ranks
                 const response = await fetch("https://valorant-api.com/v1/competitivetiers");
                 const resJson = await response.json();
-                // Map the latest competitive tier list
                 const latestTiers = resJson.data[resJson.data.length - 1].tiers;
                 latestTiers.forEach(tier => {
                     ranksMap[tier.tier] = {
@@ -622,6 +623,20 @@
                 console.log("Ranks loaded successfully from Valorant API.");
             } catch (err) {
                 console.error("Error fetching rank icons: ", err);
+            }
+
+            try {
+                // Load Maps
+                const response = await fetch("https://valorant-api.com/v1/maps");
+                const resJson = await response.json();
+                resJson.data.forEach(map => {
+                    if (map.displayName && map.splash) {
+                        mapsMap[map.displayName.toLowerCase()] = map.splash;
+                    }
+                });
+                console.log("Maps loaded successfully from Valorant API.");
+            } catch (err) {
+                console.error("Error fetching maps: ", err);
             }
         }
 
@@ -690,8 +705,13 @@
             if (data.map && data.map[0]) {
                 mapBanner.style.display = "flex";
                 mapName.innerText = data.map[0];
-                // Background splash can be fetched or left fallback
-                mapBanner.style.backgroundImage = `linear-gradient(rgba(11, 12, 16, 0.4), rgba(11, 12, 16, 0.4)), url('https://media.valorant-api.com/maps/displayname/${data.map[0]}/splash.png')`;
+                const mapKey = data.map[0].toLowerCase();
+                const mapSplash = mapsMap[mapKey] || "";
+                if (mapSplash) {
+                    mapBanner.style.backgroundImage = `linear-gradient(rgba(11, 12, 16, 0.4), rgba(11, 12, 16, 0.4)), url('${mapSplash}')`;
+                } else {
+                    mapBanner.style.backgroundImage = "none";
+                }
             } else {
                 mapBanner.style.display = "none";
             }
@@ -748,15 +768,23 @@
                 if (player.weapons) {
                     // Try to find the most expensive or favorite weapon (ex: Vandal)
                     const weaponList = Object.values(player.weapons);
-                    const favWeaponObj = weaponList.find(w => w.displayName.toLowerCase().includes("vandal") || w.displayName.toLowerCase().includes("phantom") || w.displayName.toLowerCase().includes("operator"));
+                    const favWeaponObj = weaponList.find(w => 
+                        w && w.displayName && typeof w.displayName === 'string' && (
+                            w.displayName.toLowerCase().includes("vandal") || 
+                            w.displayName.toLowerCase().includes("phantom") || 
+                            w.displayName.toLowerCase().includes("operator")
+                        )
+                    );
                     const activeWeapon = favWeaponObj || weaponList[0];
-                    if (activeWeapon) {
+                    if (activeWeapon && activeWeapon.displayIcon) {
+                        const dispName = activeWeapon.displayName || "Arme";
+                        const skinName = activeWeapon.skinName || dispName;
                         weaponHtml = `
                             <div class="weapon-inventory">
-                                <img src="${activeWeapon.displayIcon}" class="weapon-icon" alt="${activeWeapon.displayName}">
+                                <img src="${activeWeapon.displayIcon}" class="weapon-icon" alt="${dispName}">
                                 <div class="weapon-details">
-                                    <div class="weapon-skin-name">${activeWeapon.skinName || activeWeapon.displayName}</div>
-                                    <div class="weapon-name-type">${activeWeapon.displayName}</div>
+                                    <div class="weapon-skin-name">${skinName}</div>
+                                    <div class="weapon-name-type">${dispName}</div>
                                 </div>
                             </div>
                         `;
@@ -838,7 +866,7 @@
         }
 
         // Init
-        loadRankIcons().then(() => {
+        loadValorantAssets().then(() => {
             connectWebSocket();
         });
     </script>
