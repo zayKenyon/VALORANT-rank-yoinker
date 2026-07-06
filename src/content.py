@@ -1,5 +1,19 @@
 import requests
 
+def hex_to_rgb(hex_str):
+    if not hex_str:
+        return None
+    hex_str = hex_str.lstrip('#')
+    if len(hex_str) >= 6:
+        try:
+            r = int(hex_str[0:2], 16)
+            g = int(hex_str[2:4], 16)
+            b = int(hex_str[4:6], 16)
+            return (r, g, b)
+        except ValueError:
+            return None
+    return None
+
 class Content():
     def __init__(self, Requests, log):
         self.Requests = Requests
@@ -29,14 +43,28 @@ class Content():
         return None
 
     def get_all_agents(self):
-        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
-        agent_dict = {}
-        agent_dict.update({None: None})
-        agent_dict.update({"": ""})
-        for agent in rAgents["data"]:
-            agent_dict.update({agent['uuid'].lower(): agent['displayName']})
-        self.log(f"retrieved agent dict: {agent_dict}")
-        return agent_dict
+        try:
+            rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
+            agent_dict = {}
+            agent_dict.update({None: None})
+            agent_dict.update({"": ""})
+            dynamic_agent_colors = {}
+            for agent in rAgents.get("data", []):
+                uuid = agent['uuid'].lower()
+                name = agent['displayName']
+                agent_dict[uuid] = name
+                
+                # Fetch background gradient colors if available
+                colors_list = agent.get("backgroundGradientColors")
+                if colors_list and len(colors_list) > 0:
+                    rgb = hex_to_rgb(colors_list[0])
+                    if rgb:
+                        dynamic_agent_colors[name.lower()] = rgb
+            self.log(f"retrieved agent dict: {agent_dict}")
+            return agent_dict, dynamic_agent_colors
+        except Exception as e:
+            self.log(f"Error fetching dynamic agents: {e}")
+            return {None: None, "": ""}, {}
 
     def get_all_maps(self):
         """

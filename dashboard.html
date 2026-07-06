@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vRY Live Match Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(20, 24, 33, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --ally-glow: rgba(0, 168, 255, 0.4);
+            --enemy-glow: rgba(255, 77, 77, 0.4);
+            --text-color: #f5f6fa;
+            --text-muted: #8b949e;
+            --gold-color: #eed641;
+            --cyan-color: #00f5ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 168, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 77, 77, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Top Header Area */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(11, 12, 16, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #00f5ff, #ff4d4d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4d4d; /* default disconnected */
+            box-shadow: 0 0 10px #ff4d4d;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.connected {
+            background: #00ff7f;
+            box-shadow: 0 0 10px #00ff7f;
+        }
+
+        .match-info-center {
+            text-align: center;
+        }
+
+        .match-mode {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyan-color);
+        }
+
+        .match-details {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .settings-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-area input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 80px;
+            text-align: center;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .settings-area input:focus {
+            border-color: var(--cyan-color);
+        }
+
+        .settings-area button {
+            background: linear-gradient(135deg, #00f5ff, #00a8ff);
+            color: #0b0c10;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .settings-area button:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        /* Main Workspace */
+        main {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Map Splash banner */
+        .map-banner {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+        }
+
+        .map-banner-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 12, 16, 0.5);
+            backdrop-filter: blur(1px);
+        }
+
+        .map-banner-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .map-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--text-color);
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* Teams Layout Grid */
+        .teams-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .teams-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .team-section {
+            border-radius: 12px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .team-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .team-ally .team-title {
+            color: #00a8ff;
+            border-bottom: 2px solid rgba(0, 168, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .team-enemy .team-title {
+            color: #ff4d4d;
+            border-bottom: 2px solid rgba(255, 77, 77, 0.2);
+            padding-bottom: 10px;
+        }
+
+        /* Player Card Row Styling */
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-size: cover;
+            background-position: center 25%;
+        }
+
+        /* Card Background Overlay */
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(11, 12, 16, 0.95) 30%, rgba(11, 12, 16, 0.6) 80%);
+            z-index: 1;
+        }
+
+        .team-ally .player-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .team-ally .player-card:hover {
+            border-color: #00a8ff;
+            box-shadow: 0 0 15px var(--ally-glow);
+            transform: translateX(5px);
+        }
+
+        .team-enemy .player-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .team-enemy .player-card:hover {
+            border-color: #ff4d4d;
+            box-shadow: 0 0 15px var(--enemy-glow);
+            transform: translateX(-5px);
+        }
+
+        .player-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Agent Avatar */
+        .agent-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin-right: 15px;
+            flex-shrink: 0;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        .agent-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Player Primary Info */
+        .player-info {
+            flex-grow: 1;
+        }
+
+        .player-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .player-tag {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .party-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .player-rank-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .rank-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #d1d4dc;
+        }
+
+        .level-badge {
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        /* Stats Grid inside Card */
+        .player-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 70px);
+            text-align: center;
+            gap: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Weapon Skins area */
+        .weapon-inventory {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-left: auto;
+            max-width: 220px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .weapon-inventory:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .weapon-icon {
+            width: 32px;
+            height: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .weapon-details {
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .weapon-skin-name {
+            font-weight: 600;
+            color: #d1d4dc;
+        }
+
+        .weapon-name-type {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        /* Alerts Column */
+        .alert-area {
+            width: 100px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .alert-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .alert-smurf {
+            background: rgba(255, 77, 77, 0.15);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            box-shadow: 0 0 10px rgba(255, 77, 77, 0.2);
+        }
+
+        .alert-suspect {
+            background: rgba(255, 165, 0, 0.15);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+
+        .alert-boosted {
+            background: rgba(128, 128, 128, 0.15);
+            border: 1px solid #a0a0a0;
+            color: #a0a0a0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        /* Notification overlay */
+        .conn-error {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff4d4d;
+            color: #0b0c10;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Utility classes */
+        .no-lobby {
+            grid-column: span 2;
+            text-align: center;
+            padding: 100px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>vRY DASHBOARD</h1>
+            <div class="status-badge">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Déconnecté</span>
+            </div>
+        </div>
+
+        <div class="match-info-center">
+            <div class="match-mode" id="match-mode">En attente de Valorant...</div>
+            <div class="match-details" id="match-details">Lancez vRY.exe et ouvrez le jeu</div>
+        </div>
+
+        <div class="settings-area">
+            <label for="host-input">IP:</label>
+            <input type="text" id="host-input" value="127.0.0.1" style="width: 110px;">
+            <label for="port-input">Port:</label>
+            <input type="number" id="port-input" value="1100" style="width: 70px;">
+            <button onclick="connectWebSocket()">Se connecter</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Map Splash -->
+        <div class="map-banner" id="map-banner" style="background-image: url('assets/Example.png'); display: none;">
+            <div class="map-banner-blur"></div>
+            <div class="map-banner-content">
+                <div class="map-name" id="map-name">Ascent</div>
+            </div>
+        </div>
+
+        <!-- Teams Column Grid -->
+        <div class="teams-container" id="teams-container">
+            <div class="no-lobby" id="no-lobby-message">
+                <h2>Aucune partie active détectée</h2>
+                <p style="margin-top: 10px;">Lancez une partie ou entrez dans la sélection des agents pour voir les données.</p>
+            </div>
+
+            <!-- Ally Team -->
+            <div class="team-section team-ally" id="ally-section" style="display: none;">
+                <div class="team-title">
+                    <span>Équipe Alliée</span>
+                    <span id="ally-count">0</span>
+                </div>
+                <div class="player-list" id="ally-player-list">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- Enemy Team -->
+            <div class="team-section team-enemy" id="enemy-section" style="display: none;">
+                <div class="team-title">
+                    <span>Équipe Ennemie</span>
+                    <span id="enemy-count">0</span>
+                </div>
+                <div class="player-list" id="enemy-player-list">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        vRY Dashboard // Créé pour VALORANT rank yoinker
+    </footer>
+
+    <div class="conn-error" id="conn-error">
+        Erreur de connexion au WebSocket. Tentative de reconnexion...
+    </div>
+
+    <script>
+        let ws;
+        let reconnectTimeout;
+        let ranksMap = {};
+
+        // Fetch Valorant Rank icons once
+        async function loadRankIcons() {
+            try {
+                const response = await fetch("https://valorant-api.com/v1/competitivetiers");
+                const resJson = await response.json();
+                // Map the latest competitive tier list
+                const latestTiers = resJson.data[resJson.data.length - 1].tiers;
+                latestTiers.forEach(tier => {
+                    ranksMap[tier.tier] = {
+                        name: tier.tierName,
+                        icon: tier.smallIcon
+                    };
+                });
+                console.log("Ranks loaded successfully from Valorant API.");
+            } catch (err) {
+                console.error("Error fetching rank icons: ", err);
+            }
+        }
+
+        function connectWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+
+            const host = document.getElementById("host-input").value || "127.0.0.1";
+            const port = document.getElementById("port-input").value || "1100";
+            const statusDot = document.getElementById("status-dot");
+            const statusText = document.getElementById("status-text");
+            const connError = document.getElementById("conn-error");
+
+            ws = new WebSocket(`ws://${host}:${port}`);
+
+            ws.onopen = () => {
+                console.log("Connected to vRY WebSocket Server.");
+                statusDot.className = "status-dot connected";
+                statusText.innerText = "Connecté";
+                connError.style.display = "none";
+                clearTimeout(reconnectTimeout);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log("Received payload: ", data);
+                if (data.type === "heartbeat") {
+                    renderDashboard(data);
+                }
+            };
+
+            ws.onerror = (err) => {
+                console.error("WebSocket connection error:", err);
+                statusDot.className = "status-dot";
+                statusText.innerText = "Erreur";
+                connError.style.display = "block";
+            };
+
+            ws.onclose = () => {
+                console.log("WebSocket connection closed. Retrying in 5 seconds...");
+                statusDot.className = "status-dot";
+                statusText.innerText = "Déconnecté";
+                reconnectTimeout = setTimeout(connectWebSocket, 5000);
+            };
+        }
+
+        // Render functions
+        function renderDashboard(data) {
+            const noLobby = document.getElementById("no-lobby-message");
+            const allySection = document.getElementById("ally-section");
+            const enemySection = document.getElementById("enemy-section");
+            const allyList = document.getElementById("ally-player-list");
+            const enemyList = document.getElementById("enemy-player-list");
+            const allyCount = document.getElementById("ally-count");
+            const enemyCount = document.getElementById("enemy-count");
+            const matchMode = document.getElementById("match-mode");
+            const matchDetails = document.getElementById("match-details");
+            const mapBanner = document.getElementById("map-banner");
+            const mapName = document.getElementById("map-name");
+
+            // Set state/gamemode details
+            matchMode.innerText = `${data.state} // ${data.mode || 'Inconnu'}`;
+            
+            // Map details
+            if (data.map && data.map[0]) {
+                mapBanner.style.display = "flex";
+                mapName.innerText = data.map[0];
+                // Background splash can be fetched or left fallback
+                mapBanner.style.backgroundImage = `linear-gradient(rgba(11, 12, 16, 0.4), rgba(11, 12, 16, 0.4)), url('https://media.valorant-api.com/maps/displayname/${data.map[0]}/splash.png')`;
+            } else {
+                mapBanner.style.display = "none";
+            }
+
+            const players = Object.values(data.players || {});
+            
+            if (players.length === 0) {
+                noLobby.style.display = "block";
+                allySection.style.display = "none";
+                enemySection.style.display = "none";
+                matchDetails.innerText = "Aucun joueur dans la session";
+                return;
+            }
+
+            noLobby.style.display = "none";
+            allySection.style.display = "block";
+            
+            // Reset lists
+            allyList.innerHTML = "";
+            enemyList.innerHTML = "";
+
+            let allies = 0;
+            let enemies = 0;
+            let scores = null;
+
+            players.forEach(player => {
+                const isAlly = player.team === "Blue" || !player.team; // Fallback if team undefined (e.g. menus)
+                
+                // Build Player Card HTML
+                const card = document.createElement("div");
+                card.className = "player-card";
+                
+                // Set Player Card background image
+                if (player.playerCard) {
+                    card.style.backgroundImage = `url('${player.playerCard}')`;
+                }
+
+                // Rank info mapping
+                const rankData = ranksMap[player.rank] || { name: `Tier ${player.rank}`, icon: "" };
+                const peakRankData = ranksMap[player.peakRank] || { name: `Tier ${player.peakRank}`, icon: "" };
+
+                // Determine alerts (smurf / suspect / boosted)
+                let alertHtml = "";
+                // vRY sends the final_notes which might contain the Smurf labels
+                if (player.winPercentage && player.winPercentage.includes("🔥 SMURF 🔥")) {
+                    alertHtml = `<span class="alert-badge alert-smurf">🔥 SMURF 🔥</span>`;
+                } else if (player.winPercentage && player.winPercentage.includes("⚠ SUSPECT")) {
+                    alertHtml = `<span class="alert-badge alert-suspect">⚠ SUSPECT</span>`;
+                }
+
+                // Parse Favorite Weapon info
+                let weaponHtml = "";
+                // If weapons list is provided by vRY loadout
+                if (player.weapons) {
+                    // Try to find the most expensive or favorite weapon (ex: Vandal)
+                    const weaponList = Object.values(player.weapons);
+                    const favWeaponObj = weaponList.find(w => w.displayName.toLowerCase().includes("vandal") || w.displayName.toLowerCase().includes("phantom") || w.displayName.toLowerCase().includes("operator"));
+                    const activeWeapon = favWeaponObj || weaponList[0];
+                    if (activeWeapon) {
+                        weaponHtml = `
+                            <div class="weapon-inventory">
+                                <img src="${activeWeapon.displayIcon}" class="weapon-icon" alt="${activeWeapon.displayName}">
+                                <div class="weapon-details">
+                                    <div class="weapon-skin-name">${activeWeapon.skinName || activeWeapon.displayName}</div>
+                                    <div class="weapon-name-type">${activeWeapon.displayName}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="agent-avatar">
+                        <img src="${player.agentImgLink || `https://media.valorant-api.com/agents/${player.agent}/displayicon.png`}" alt="${player.agent}">
+                    </div>
+                    <div class="player-info">
+                        <div class="player-name-row">
+                            <span class="player-name">${player.name.split('#')[0]}</span>
+                            <span class="player-tag">#${player.name.split('#')[1] || ''}</span>
+                            <span class="level-badge">Niv. ${player.level || 'N/A'}</span>
+                        </div>
+                        <div class="player-rank-area">
+                            <img src="${rankData.icon}" class="rank-badge" alt="${rankData.name}">
+                            <span class="rank-text">${rankData.name} ${player.rr ? `(${player.rr} RR)` : ''}</span>
+                            <span style="font-size: 11px; color: var(--text-muted)">• Peak: ${peakRankData.name}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="player-stats">
+                        <div class="stat-box">
+                            <span class="stat-value">${player.kd || 'N/A'}</span>
+                            <span class="stat-label">K/D</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${player.headshotPercentage || 'N/A'}%</span>
+                            <span class="stat-label">HS%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${player.winPercentage ? player.winPercentage.split(' ')[0] : 'N/A'}</span>
+                            <span class="stat-label">Win%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${player.partyNumber ? `P#${player.partyNumber}` : '-'}</span>
+                            <span class="stat-label">Groupe</span>
+                        </div>
+                    </div>
+
+                    ${weaponHtml}
+
+                    <div class="alert-area">
+                        ${alertHtml}
+                    </div>
+                `;
+
+                if (isAlly) {
+                    allyList.appendChild(card);
+                    allies++;
+                } else {
+                    enemySection.style.display = "block";
+                    enemyList.appendChild(card);
+                    enemies++;
+                }
+            });
+
+            allyCount.innerText = allies;
+            enemyCount.innerText = enemies;
+            
+            // Adjust details subheader
+            matchDetails.innerText = `Alliés: ${allies} | Ennemis: ${enemies}`;
+        }
+
+        // Init
+        loadRankIcons().then(() => {
+            connectWebSocket();
+        });
+    </script>
+</body>
+</html>

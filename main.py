@@ -22,7 +22,7 @@ from src.errors import Error
 from src.Loadouts import Loadouts
 from src.logs import Logging
 from src.names import Names
-from src.player_stats import PlayerStats
+from src.player_stats import PlayerStats, get_estimated_remaining_time
 from src.presences import Presences
 from src.rank import Rank
 from src.requestsV import Requests
@@ -64,6 +64,7 @@ def get_ip():
     finally:
         s.close()
     return IP
+
 
 
 try:
@@ -118,7 +119,10 @@ try:
     Server = Server(log, ErrorSRC)
     Server.start_server()
 
-    agent_dict = content.get_all_agents()
+    agent_dict, dynamic_agent_colors = content.get_all_agents()
+    for name_lower, rgb in dynamic_agent_colors.items():
+        if name_lower not in AGENTCOLORLIST:
+            AGENTCOLORLIST[name_lower] = rgb
 
     map_info = content.get_all_maps()
     map_urls = content.get_map_urls(map_info)
@@ -225,6 +229,7 @@ try:
         table.clear()
         table.set_default_field_names()
         table.reset_runtime_col_flags()
+        lobby_ranks = []
 
         # check if short ranks should be used
         if cfg.get_feature_flag("short_ranks"):
@@ -454,6 +459,8 @@ try:
                                 if curr_player_stat["match_id"] != coregame.match_id:
                                     # checking for party memebers and self players
                                     times = 0
+                                    times_with = 0
+                                    times_against = 0
                                     m_set = ()
                                     for m in stats_data[player["Subject"]]:
                                         if (
@@ -462,10 +469,22 @@ try:
                                         ):
                                             times += 1
                                             m_set += (m["match_id"],)
+                                            role = m.get("team", "Ally")
+                                            if role == "Ally":
+                                                times_with += 1
+                                            else:
+                                                times_against += 1
+                                    
+                                    last_encountered_team = curr_player_stat.get("team", "Ally")
+                                    last_encountered_team_str = "your" if last_encountered_team == "Ally" else "enemy"
+
                                     if player["PlayerIdentity"]["Incognito"] == False:
                                         already_played_with.append(
                                             {
                                                 "times": times,
+                                                "with": times_with,
+                                                "against": times_against,
+                                                "last_team": last_encountered_team_str,
                                                 "name": curr_player_stat["name"],
                                                 "agent": curr_player_stat["agent"],
                                                 "time_diff": time.time()
@@ -480,6 +499,9 @@ try:
                                         already_played_with.append(
                                             {
                                                 "times": times,
+                                                "with": times_with,
+                                                "against": times_against,
+                                                "last_team": last_encountered_team_str,
                                                 "name": agent_dict.get(
                                                     player["CharacterID"].lower(), "Unknown"
                                                 )
@@ -510,6 +532,8 @@ try:
                         playerRank, previousPlayerRank, ppstats = get_or_fetch_rank_and_stats(
                             player["Subject"], coregame_match_id
                         )
+                        if playerRank["rank"] > 2:
+                            lobby_ranks.append(playerRank["rank"])
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
@@ -677,18 +701,36 @@ try:
                                 elif raw_kd > 1.3: smurf_prob += 10
                                 elif raw_kd < 0.7: smurf_prob -= 20
                             except ValueError: pass
+
+                        # Check for headshot percentage in smurf probability
+                        hs_raw = ppstats.get("hs", "N/A")
+                        if hs_raw != "N/A":
+                            try:
+                                raw_hs = float(hs_raw)
+                                if raw_hs >= 40: smurf_prob += 20
+                                elif raw_hs >= 35: smurf_prob += 10
+                            except ValueError: pass
                             
                         smurf_prob = max(0, min(100, smurf_prob))
                         
                         if smurf_prob >= 75:
-                            warning = colr("Smurf?", fore=(255, 60, 60))
+                            warning = colr("🔥 SMURF 🔥", fore=(255, 50, 50))
                         elif smurf_prob >= 50:
-                            warning = colr("Sus", fore=(255, 165, 0))
+                            warning = colr("⚠ SUSPECT", fore=(255, 165, 0))
                         elif smurf_prob <= 10 and kd != "N/A":
                             try:
                                 if float(kd) < 0.7:
                                     warning = colr("Boosted?", fore=(128, 128, 128))
                             except ValueError: pass
+
+                        fav_weapon = ppstats.get("fav_weapon", "N/A")
+                        fav_weapon_kills = ppstats.get("fav_weapon_kills", 0)
+                        notes_parts = []
+                        if warning:
+                            notes_parts.append(warning)
+                        if fav_weapon != "N/A" and fav_weapon_kills > 0:
+                            notes_parts.append(f"Fav: {fav_weapon} ({fav_weapon_kills}k)")
+                        final_notes = " | ".join(notes_parts)
 
                         table.add_row_table(
                             [
@@ -707,7 +749,7 @@ try:
                                 kd,
                                 level,
                                 ranked_rating_earned,
-                                warning,
+                                final_notes,
                             ]
                         )
 
@@ -754,6 +796,7 @@ try:
                                     "rr": rr,
                                     "match_id": coregame.match_id,
                                     "epoch": time.time(),
+                                    "team": "Ally" if player["TeamID"] == allyTeam else "Enemy",
                                 }
                             }
                         )
@@ -820,6 +863,8 @@ try:
                         playerRank, previousPlayerRank, ppstats = get_or_fetch_rank_and_stats(
                             player["Subject"], pregame_match_id
                         )
+                        if playerRank["rank"] > 2:
+                            lobby_ranks.append(playerRank["rank"])
 
                         if player["Subject"] == Requests.puuid:
                             if cfg.get_feature_flag("discord_rpc"):
@@ -994,18 +1039,36 @@ try:
                                 elif raw_kd > 1.3: smurf_prob += 10
                                 elif raw_kd < 0.7: smurf_prob -= 20
                             except ValueError: pass
+
+                        # Check for headshot percentage in smurf probability
+                        hs_raw = ppstats.get("hs", "N/A")
+                        if hs_raw != "N/A":
+                            try:
+                                raw_hs = float(hs_raw)
+                                if raw_hs >= 40: smurf_prob += 20
+                                elif raw_hs >= 35: smurf_prob += 10
+                            except ValueError: pass
                             
                         smurf_prob = max(0, min(100, smurf_prob))
                         
                         if smurf_prob >= 75:
-                            warning = colr("Smurf?", fore=(255, 60, 60))
+                            warning = colr("🔥 SMURF 🔥", fore=(255, 50, 50))
                         elif smurf_prob >= 50:
-                            warning = colr("Sus", fore=(255, 165, 0))
+                            warning = colr("⚠ SUSPECT", fore=(255, 165, 0))
                         elif smurf_prob <= 10 and kd != "N/A":
                             try:
                                 if float(kd) < 0.7:
                                     warning = colr("Boosted?", fore=(128, 128, 128))
                             except ValueError: pass
+
+                        fav_weapon = ppstats.get("fav_weapon", "N/A")
+                        fav_weapon_kills = ppstats.get("fav_weapon_kills", 0)
+                        notes_parts = []
+                        if warning:
+                            notes_parts.append(warning)
+                        if fav_weapon != "N/A" and fav_weapon_kills > 0:
+                            notes_parts.append(f"Fav: {fav_weapon} ({fav_weapon_kills}k)")
+                        final_notes = " | ".join(notes_parts)
 
                         table.add_row_table(
                             [
@@ -1024,7 +1087,7 @@ try:
                                 kd,
                                 level,
                                 ranked_rating_earned,
-                                warning,
+                                final_notes,
                             ]
                         )
 
@@ -1239,13 +1302,52 @@ try:
                 table.display()
                 firstPrint = False
 
-                # print(f"VALORANT rank yoinker v{version}")
+                # Print lobby rank details and estimated remaining time
+                if game_state in ("INGAME", "PREGAME") and len(lobby_ranks) > 0:
+                    avg_rank_val = round(sum(lobby_ranks) / len(lobby_ranks))
+                    avg_rank_val = max(0, min(len(Ranks) - 1, avg_rank_val))
+                    avg_rank_name = Ranks[avg_rank_val]
+                    
+                    min_rank_val = min(lobby_ranks)
+                    max_rank_val = max(lobby_ranks)
+                    min_rank_val = max(0, min(len(Ranks) - 1, min_rank_val))
+                    max_rank_val = max(0, min(len(Ranks) - 1, max_rank_val))
+                    
+                    extra_info = [f"Lobby Avg Rank: {avg_rank_name} (Spread: {Ranks[min_rank_val]} - {Ranks[max_rank_val]})"]
+                    
+                    if game_state == "INGAME":
+                        presence = presences.get_presence()
+                        priv_presence = presences.get_private_presence(presence) or {}
+                        
+                        ally_score = priv_presence.get("partyOwnerMatchScoreAllyTeam")
+                        enemy_score = priv_presence.get("partyOwnerMatchScoreEnemyTeam")
+                        if ally_score is None and "partyPresenceData" in priv_presence:
+                            party_data = priv_presence.get("partyPresenceData", {}) or {}
+                            ally_score = party_data.get("partyOwnerMatchScoreAllyTeam")
+                            enemy_score = party_data.get("partyOwnerMatchScoreEnemyTeam")
+                            
+                        queue_id = priv_presence.get("queueId")
+                        if queue_id is None and "partyPresenceData" in priv_presence:
+                            party_data = priv_presence.get("partyPresenceData", {}) or {}
+                            queue_id = party_data.get("queueId")
+                            
+                        if ally_score is not None and enemy_score is not None:
+                            est_time = get_estimated_remaining_time(queue_id, ally_score, enemy_score)
+                            if est_time:
+                                score_str = colr(f"{ally_score} - {enemy_score}", fore=(255, 255, 100))
+                                est_time_str = colr(est_time, fore=(0, 255, 255))
+                                extra_info.append(f"Score: {score_str} (Est. Time Left: {est_time_str})")
+                                
+                    print("\n" + " | ".join(extra_info))
+
                 if cfg.get_feature_flag("last_played"):
                     if len(already_played_with) > 0:
-                        print("\n")
+                        print("\n--- Confrontation History ---")
                         for played in already_played_with:
                             print(
-                                f"Already played with {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. (Total played {played['times']} times)"
+                                f"• {played['name']} (last {played['agent']}) {stats.convert_time(played['time_diff'])} ago. "
+                                f"(Played WITH you: {played.get('with', 0)}x, AGAINST you: {played.get('against', 0)}x. "
+                                f"Last match they were on {played.get('last_team', 'your')} team)"
                             )
                 already_played_with = []
         if cfg.cooldown == 0:

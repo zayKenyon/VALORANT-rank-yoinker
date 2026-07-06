@@ -83,20 +83,38 @@ class Ws:
                     return None
                 
                 try:
-                    private_data = json.loads(base64.b64decode(presence['private']))
+                    private_b64 = presence.get('private', '')
+                    if not private_b64:
+                        return None
                     
-                    # Temp fix: Riot is swapping between nested and flat API structures.
-                    state = None
-                    if "matchPresenceData" in private_data: # Check for nested structure
-                        state = private_data.get("matchPresenceData", {}).get("sessionLoopState")
-                    elif "sessionLoopState" in private_data: # Check for flattened structure
-                        state = private_data.get("sessionLoopState")
+                    if isinstance(private_b64, dict):
+                        private_data = private_b64
                     else:
-                        # No known structure found, log and fail
-                        self.log(f"ERROR: Unknown presence API structure in 'websocket.handle': {private_data}")
-                        state = private_data["matchPresenceData"]["sessionLoopState"]
+                        decoded_bytes = base64.b64decode(private_b64)
+                        decoded_str = decoded_bytes.decode("utf-8", errors="ignore")
+                        private_data = json.loads(decoded_str)
+                        if isinstance(private_data, str):
+                            private_data = json.loads(private_data)
+                    
+                    state = None
+                    if isinstance(private_data, dict):
+                        # Temp fix: Riot is swapping between nested and flat API structures.
+                        if "matchPresenceData" in private_data: # Check for nested structure
+                            match_data = private_data.get("matchPresenceData")
+                            if isinstance(match_data, dict):
+                                state = match_data.get("sessionLoopState")
+                        elif "sessionLoopState" in private_data: # Check for flattened structure
+                            state = private_data.get("sessionLoopState")
+                        else:
+                            # No known structure found, log and fail
+                            self.log(f"ERROR: Unknown presence API structure in 'websocket.handle': {private_data}")
+                            match_data = private_data.get("matchPresenceData")
+                            if isinstance(match_data, dict):
+                                state = match_data.get("sessionLoopState")
+                    else:
+                        self.log(f"Decoded presence data is not a dictionary: {private_data}")
 
-                except (json.JSONDecodeError, KeyError, TypeError) as e:
+                except Exception as e:
                     self.log(f"Failed to decode private presence data: {e}")
                     state = None
 

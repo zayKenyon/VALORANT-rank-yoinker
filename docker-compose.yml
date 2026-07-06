@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    container_name: valo-rank-dashboard
+    ports:
+      - "8080:80"
+    restart: unless-stopped

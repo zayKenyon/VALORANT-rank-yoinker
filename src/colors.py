@@ -63,11 +63,15 @@ class Colors:
     def get_agent_from_uuid(self, agentUUID):
         agent = self.agent_dict.get(agentUUID, "Unknown")
         
+        from src.constants import AGENT_META
+        meta = AGENT_META.get(agent.lower(), "")
+        display_str = f"{agent} [{meta}]" if meta else agent
+        
         agent_color = self.AGENTCOLORLIST.get(agent.lower())
         if agent_color is not None:
-            return color(agent, fore=agent_color)
+            return color(display_str, fore=agent_color)
         else:
-            return agent
+            return display_str
 
     def get_hs_gradient(self, number):
         try:
